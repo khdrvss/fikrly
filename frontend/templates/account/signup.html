@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ro'yxatdan o'tish | Fikrly</title>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load socialaccount %}
+</head>
+<body class="bg-background">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-6">
+                <a href="/" class="inline-flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
+                    <span class="text-2xl font-bold text-primary">Fikrly</span>
+                </a>
+                <h1 class="mt-4 text-2xl font-bold text-primary">Ro'yxatdan o'tish</h1>
+                <p class="text-text-secondary">Hisob yarating yoki ijtimoiy tarmoq orqali davom eting</p>
+            </div>
+
+            <div class="card">
+                <form method="post" action="{% url 'account_signup' %}" class="space-y-4">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">Email</label>
+                        <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="input-field" placeholder="your@gmail.com" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">Username</label>
+                        <input type="text" name="username" value="{{ form.username.value|default:'' }}" class="input-field" placeholder="username" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">Parol</label>
+                        <input type="password" name="password1" class="input-field" placeholder="••••••••" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">Parol (tasdiq)</label>
+                        <input type="password" name="password2" class="input-field" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Ro'yxatdan o'tish</button>
+                </form>
+
+                <div class="mt-6">
+                    {% if 'google' in socialaccount.providers %}
+                        <a href="{% provider_login_url 'google' %}" class="w-full btn-outline flex items-center justify-center">
+                            <span>Google bilan davom etish</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-text-secondary mt-4">
+                Hisobingiz bormi?
+                <a class="text-primary font-semibold" href="{% url 'account_login' %}">Kirish</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

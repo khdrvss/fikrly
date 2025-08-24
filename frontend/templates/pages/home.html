@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fikrly - Haqiqiy fikrlar, ishonchli tanlov</title>
-    <link rel="stylesheet" href="static/main.css" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
@@ -16,7 +17,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="homepage.html" class="flex items-center space-x-2">
+                    <a href="{% url 'index' %}" class="flex items-center space-x-2">
                         <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor">
                             <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
                         </svg>
@@ -26,10 +27,10 @@
 
                 <!-- Navigation Links -->
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="homepage.html" class="text-primary font-semibold">Bosh sahifa</a>
-                    <a href="category_browse.html" class="text-text-secondary hover:text-primary transition-smooth">Kategoriyalar</a>
-                    <a href="business_profile.html" class="text-text-secondary hover:text-primary transition-smooth">Bizneslar</a>
-                    <a href="review_submission.html" class="text-text-secondary hover:text-primary transition-smooth">Sharh yozish</a>
+                    <a href="{% url 'index' %}" class="text-primary font-semibold">Bosh sahifa</a>
+                    <a href="{% url 'category_browse' %}" class="text-text-secondary hover:text-primary transition-smooth">Kategoriyalar</a>
+                    <a href="{% url 'business_profile' %}" class="text-text-secondary hover:text-primary transition-smooth">Bizneslar</a>
+                    <a href="{% url 'review_submission' %}" class="text-text-secondary hover:text-primary transition-smooth">Sharh yozish</a>
                 </nav>
 
                 <!-- User Actions -->
@@ -39,8 +40,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </button>
-                    <a href="user_profile.html" class="btn-outline text-sm px-4 py-2">Kirish</a>
-                    <a href="business_dashboard.html" class="btn-primary text-sm px-4 py-2">Biznes uchun</a>
+                    <a href="{% url 'account_login' %}" class="btn-outline text-sm px-4 py-2">Kirish</a>
+                    <a href="{% url 'account_login' %}" class="btn-primary text-sm px-4 py-2">Biznes uchun</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -102,7 +103,7 @@
             <h2 class="text-3xl font-bold text-center text-primary mb-12">Mashhur kategoriyalar</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                 <!-- Restaurant Category -->
-                <a href="category_browse.html" class="card card-hover text-center group">
+                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
                     <div class="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-smooth">
                         <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
@@ -113,7 +114,7 @@
                 </a>
 
                 <!-- Services Category -->
-                <a href="category_browse.html" class="card card-hover text-center group">
+                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
                     <div class="w-16 h-16 mx-auto mb-4 bg-secondary-100 rounded-full flex items-center justify-center group-hover:bg-secondary-200 transition-smooth">
                         <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -124,7 +125,7 @@
                 </a>
 
                 <!-- Retail Category -->
-                <a href="category_browse.html" class="card card-hover text-center group">
+                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
                     <div class="w-16 h-16 mx-auto mb-4 bg-accent-100 rounded-full flex items-center justify-center group-hover:bg-accent-200 transition-smooth">
                         <svg class="w-8 h-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 15a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v12z"/>
@@ -135,7 +136,7 @@
                 </a>
 
                 <!-- Healthcare Category -->
-                <a href="category_browse.html" class="card card-hover text-center group">
+                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
                     <div class="w-16 h-16 mx-auto mb-4 bg-success-100 rounded-full flex items-center justify-center group-hover:bg-success-200 transition-smooth">
                         <svg class="w-8 h-8 text-success" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -146,7 +147,7 @@
                 </a>
 
                 <!-- Education Category -->
-                <a href="category_browse.html" class="card card-hover text-center group">
+                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
                     <div class="w-16 h-16 mx-auto mb-4 bg-warning-100 rounded-full flex items-center justify-center group-hover:bg-warning-200 transition-smooth">
                         <svg class="w-8 h-8 text-warning" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
@@ -157,7 +158,7 @@
                 </a>
 
                 <!-- Tourism Category -->
-                <a href="category_browse.html" class="card card-hover text-center group">
+                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
                     <div class="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-smooth">
                         <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M14 6V4h-4v2h4zM4 8v11h16V8H4zm16-2c1.11 0 2 .89 2 2v11c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2l.01-11c0-1.11.88-2 1.99-2h4V4c0-1.11.89-2 2-2h4c1.11 0 2 .89 2 2v2h4z"/>
@@ -175,77 +176,34 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-12">
                 <h2 class="text-3xl font-bold text-primary">Mashhur bizneslar</h2>
-                <a href="category_browse.html" class="text-primary hover:text-primary-700 font-semibold">
+                <a href="{% url 'category_browse' %}" class="text-primary hover:text-primary-700 font-semibold">
                     Barchasini ko'rish →
                 </a>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Business Card 1 -->
+                {% for company in trending_companies %}
                 <div class="card card-hover">
                     <div class="relative mb-4">
-                        <img src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Oqtepa Lavash" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
+                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop" alt="{{ company.name }}" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        {% if company.is_verified %}
+                        <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">Tasdiqlangan</div>
+                        {% endif %}
                     </div>
                     <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xl font-semibold text-primary">Oqtepa Lavash</h3>
+                        <h3 class="text-xl font-semibold text-primary">{{ company.name }}</h3>
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="font-semibold text-primary">4.8</span>
+                            <svg class="w-5 h-5 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span class="font-semibold text-primary">{{ company.rating }}</span>
                         </div>
                     </div>
-                    <p class="text-text-secondary mb-3">Fast food • Toshkent</p>
-                    <p class="text-sm text-text-secondary mb-4">2,847 sharh • Javob berish tezligi: 2 soat</p>
-                    <a href="business_profile.html" class="btn-outline w-full text-center">Batafsil ko'rish</a>
+                    <p class="text-text-secondary mb-3">{{ company.category }} • {{ company.city }}</p>
+                    <p class="text-sm text-text-secondary mb-4">{{ company.review_count }} sharh</p>
+                    <a href="{% url 'business_profile' %}" class="btn-outline w-full text-center">Batafsil ko'rish</a>
                 </div>
-
-                <!-- Business Card 2 -->
-                <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Bellissimo Pizza" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xl font-semibold text-primary">Bellissimo Pizza</h3>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="font-semibold text-primary">4.6</span>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-3">Pizza • Toshkent</p>
-                    <p class="text-sm text-text-secondary mb-4">1,923 sharh • Javob berish tezligi: 1 soat</p>
-                    <a href="business_profile.html" class="btn-outline w-full text-center">Batafsil ko'rish</a>
-                </div>
-
-                <!-- Business Card 3 -->
-                <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Caravan Bozor" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xl font-semibold text-primary">Caravan Bozor</h3>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="font-semibold text-primary">4.9</span>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-3">Savdo markazi • Toshkent</p>
-                    <p class="text-sm text-text-secondary mb-4">3,456 sharh • Javob berish tezligi: 30 daqiqa</p>
-                    <a href="business_profile.html" class="btn-outline w-full text-center">Batafsil ko'rish</a>
-                </div>
+                {% empty %}
+                <div class="text-text-secondary">Hozircha ma'lumot yo'q.</div>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -255,131 +213,42 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-12">
                 <h2 class="text-3xl font-bold text-primary">So'nggi sharhlar</h2>
-                <a href="review_submission.html" class="text-primary hover:text-primary-700 font-semibold">
+                <a href="{% url 'review_submission' %}" class="text-primary hover:text-primary-700 font-semibold">
                     Sharh yozish →
                 </a>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Review Card 1 -->
+                {% for review in latest_reviews %}
                 <div class="card">
                     <div class="flex items-center mb-4">
-                        <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150" alt="Aziza Karimova" class="w-12 h-12 rounded-full object-cover mr-4" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
+                        <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center mr-4">
+                            <span class="text-primary font-semibold">{{ review.user_name|first|default:"U" }}</span>
+                        </div>
                         <div>
-                            <h4 class="font-semibold text-primary">Aziza Karimova</h4>
+                            <h4 class="font-semibold text-primary">{{ review.user_name }}</h4>
                             <div class="flex items-center">
                                 <div class="flex text-secondary mr-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    <span class="text-sm ml-1 text-text-secondary">{{ review.rating }}/5</span>
                                 </div>
-                                <span class="text-xs text-text-secondary">2 kun oldin</span>
                             </div>
                         </div>
                     </div>
-                    <p class="text-text-secondary mb-3">"Ajoyib xizmat va mazali taomlar. Oila bilan kelishga juda mos joy. Xodimlar juda mehribon va tez xizmat ko'rsatishadi."</p>
+                    <p class="text-text-secondary mb-3">"{{ review.text }}"</p>
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-semibold text-primary">Oqtepa Lavash</span>
+                        <span class="text-sm font-semibold text-primary">{{ review.company.name }}</span>
+                        {% if review.verified_purchase %}
                         <div class="flex items-center text-success text-xs">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             Tasdiqlangan xarid
                         </div>
+                        {% endif %}
                     </div>
                 </div>
-
-                <!-- Review Card 2 -->
-                <div class="card">
-                    <div class="flex items-center mb-4">
-                        <img src="https://images.pixabay.com/photos/2016/11/21/12/42/beard-1845166_960_720.jpg" alt="Bobur Rahimov" class="w-12 h-12 rounded-full object-cover mr-4" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div>
-                            <h4 class="font-semibold text-primary">Bobur Rahimov</h4>
-                            <div class="flex items-center">
-                                <div class="flex text-secondary mr-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                </div>
-                                <span class="text-xs text-text-secondary">1 hafta oldin</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-3">"Caravan bozorida har doim kerakli narsalarni topaman. Narxlar ham mos, sifat ham yaxshi. Faqat ba'zan juda gavjum bo'ladi."</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-semibold text-primary">Caravan Bozor</span>
-                        <div class="flex items-center text-success text-xs">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Tasdiqlangan xarid
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Review Card 3 -->
-                <div class="card">
-                    <div class="flex items-center mb-4">
-                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Malika Tosheva" class="w-12 h-12 rounded-full object-cover mr-4" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div>
-                            <h4 class="font-semibold text-primary">Malika Tosheva</h4>
-                            <div class="flex items-center">
-                                <div class="flex text-secondary mr-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                </div>
-                                <span class="text-xs text-text-secondary">3 kun oldin</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-3">"Bellissimo pizzasi haqiqatan ham mazali! Yetkazib berish ham tez. Do'stlarim bilan buyurtma berishni davom ettiramiz."</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-semibold text-primary">Bellissimo Pizza</span>
-                        <div class="flex items-center text-success text-xs">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Tasdiqlangan xarid
-                        </div>
-                    </div>
-                </div>
+                {% empty %}
+                <div class="text-text-secondary">Hozircha sharhlar yo'q.</div>
+                {% endfor %}
             </div>
         </div>
     </section>
@@ -481,10 +350,10 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Tezkor havolalar</h3>
                     <ul class="space-y-2">
-                        <li><a href="homepage.html" class="text-primary-200 hover:text-white transition-smooth">Bosh sahifa</a></li>
-                        <li><a href="category_browse.html" class="text-primary-200 hover:text-white transition-smooth">Kategoriyalar</a></li>
-                        <li><a href="business_profile.html" class="text-primary-200 hover:text-white transition-smooth">Bizneslar</a></li>
-                        <li><a href="review_submission.html" class="text-primary-200 hover:text-white transition-smooth">Sharh yozish</a></li>
+                        <li><a href="{% url 'index' %}" class="text-primary-200 hover:text-white transition-smooth">Bosh sahifa</a></li>
+                        <li><a href="{% url 'category_browse' %}" class="text-primary-200 hover:text-white transition-smooth">Kategoriyalar</a></li>
+                        <li><a href="{% url 'business_profile' %}" class="text-primary-200 hover:text-white transition-smooth">Bizneslar</a></li>
+                        <li><a href="{% url 'review_submission' %}" class="text-primary-200 hover:text-white transition-smooth">Sharh yozish</a></li>
                     </ul>
                 </div>
 
@@ -492,7 +361,7 @@
                 <div>
                     <h3 class="text-lg font-semibold mb-4">Biznes uchun</h3>
                     <ul class="space-y-2">
-                        <li><a href="business_dashboard.html" class="text-primary-200 hover:text-white transition-smooth">Biznes paneli</a></li>
+                        <li><a href="{% url 'business_dashboard' %}" class="text-primary-200 hover:text-white transition-smooth">Biznes paneli</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Biznesni ro'yxatga olish</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Reklama berish</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Analitika</a></li>
@@ -516,5 +385,7 @@
             </div>
         </div>
     </footer>
+{% load static %}
+<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
 </body>
 </html>

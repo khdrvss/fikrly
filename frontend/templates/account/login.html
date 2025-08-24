@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tizimga kirish | Fikrly</title>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load socialaccount %}
+</head>
+<body class="bg-background">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-6">
+                <a href="/" class="inline-flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
+                    <span class="text-2xl font-bold text-primary">Fikrly</span>
+                </a>
+                <h1 class="mt-4 text-2xl font-bold text-primary">Tizimga kirish</h1>
+                <p class="text-text-secondary">Hisobingizga kiring yoki ijtimoiy tarmoq orqali davom eting</p>
+            </div>
+
+            <div class="card">
+                <form method="post" action="{% url 'account_login' %}" class="space-y-4">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">Email yoki username</label>
+                        <input type="text" name="login" value="{{ form.login.value|default:'' }}" class="input-field" placeholder="email yoki username" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-primary mb-2">Parol</label>
+                        <input type="password" name="password" class="input-field" placeholder="••••••••" required />
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center text-sm text-text-secondary">
+                            <input type="checkbox" name="remember" class="mr-2" />
+                            <span class="ml-2">Eslab qolish</span>
+                        </label>
+                        <a href="{% url 'account_reset_password' %}" class="text-primary text-sm">Parolni unutdingizmi?</a>
+                    </div>
+                    <button type="submit" class="btn-primary w-full">Kirish</button>
+                </form>
+
+                <div class="mt-6">
+                    {% if 'google' in socialaccount.providers %}
+                        <a href="{% provider_login_url 'google' %}" class="w-full btn-outline flex items-center justify-center">
+                            <span>Google bilan kirish</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-text-secondary mt-4">
+                Hisobingiz yo'qmi?
+                <a class="text-primary font-semibold" href="{% url 'account_signup' %}">Ro'yxatdan o'tish</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

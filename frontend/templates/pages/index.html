@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fikrly Reviews Platform</title>
-    <link rel="stylesheet" href="static/main.css" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main.css' %}">
     <style>
         body {
             margin: 0;
@@ -73,17 +74,19 @@
     <script>
         // Redirect to homepage after a short delay
         setTimeout(function() {
-            window.location.href = 'pages/homepage.html';
+            window.location.href = '/';
         }, 2000);
         
         // Fallback redirect in case of any issues
         window.addEventListener('load', function() {
             setTimeout(function() {
                 if (window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/')) {
-                    window.location.replace('pages/homepage.html');
+                    window.location.replace('/');
                 }
             }, 2500);
         });
     </script>
+{% load static %}
+<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
 </body>
 </html>
