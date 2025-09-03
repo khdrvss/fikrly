@@ -155,17 +155,17 @@
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Kompaniya</label>
-                        {{ form.company|as_widget:"class=input-field" }}
+                        {{ form.company }}
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Baho (1-5)</label>
-                        {{ form.rating|as_widget:"class=input-field" }}
+                        {{ form.rating }}
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Ismingiz</label>
-                        {{ form.user_name|as_widget:"class=input-field" }}
+                        {{ form.user_name }}
                     </div>
                 </div>
 
@@ -268,7 +268,7 @@
                 <!-- Review Text -->
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-primary mb-2">Batafsil sharh</label>
-                    {{ form.text|as_widget:"class=input-field h-32 resize-none" }}
+                    {{ form.text }}
                     <div class="flex justify-between items-center mt-2">
                         <p class="text-xs text-text-secondary">
                             Maslahat: Aniq va halol fikrlaringiz boshqa mijozlarga yordam beradi

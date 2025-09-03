@@ -84,15 +84,18 @@
 
             <!-- Search Bar -->
             <div class="max-w-2xl mx-auto">
-                <div class="relative">
-                    <input type="text" placeholder="Biznes nomi, kategoriya yoki joylashuvni qidiring..." class="input-field pl-12 pr-32 py-4 text-lg" />
+                <form method="get" action="{% url 'search_businesses' %}" class="relative" id="searchForm">
+                    <input type="text" name="q" id="searchInput" placeholder="Biznes nomi, kategoriya yoki joylashuvni qidiring..." class="input-field pl-12 pr-32 py-4 text-lg" />
                     <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary px-6 py-2">
-                        Qidirish
+                    <button type="submit" id="searchBtn" class="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary px-6 py-2 hover:bg-primary-700 transition-colors">
+                        <span id="searchBtnText">Qidirish</span>
+                        <svg id="searchBtnSpinner" class="hidden w-4 h-4 animate-spin ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
                     </button>
-                </div>
+                </form>
             </div>
         </div>
     </section>
@@ -184,8 +187,10 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for company in trending_companies %}
                 <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop" alt="{{ company.name }}" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                    <div class="relative mb-4 overflow-hidden">
+                        <div class="w-full h-48 bg-gray-100">
+                            <img src="{{ company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-full object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        </div>
                         {% if company.is_verified %}
                         <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">Tasdiqlangan</div>
                         {% endif %}
@@ -385,7 +390,41 @@
             </div>
         </div>
     </footer>
-{% load static %}
-<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    {% load static %}
+    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    
+    <script>
+        // Enhanced search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+            
+            // Focus on search input when page loads
+            searchInput.focus();
+            
+            // Handle Enter key press
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (searchInput.value.trim()) {
+                        searchForm.submit();
+                    }
+                }
+            });
+            
+            // Add loading state to search button
+            searchForm.addEventListener('submit', function() {
+                const searchBtnText = document.getElementById('searchBtnText');
+                const searchBtnSpinner = document.getElementById('searchBtnSpinner');
+                const searchBtn = document.getElementById('searchBtn');
+                
+                if (searchBtnText && searchBtnSpinner && searchBtn) {
+                    searchBtnText.textContent = 'Qidirilmoqda...';
+                    searchBtnSpinner.classList.remove('hidden');
+                    searchBtn.disabled = true;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

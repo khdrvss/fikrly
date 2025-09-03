@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ company.name }} - Biznes profili | Fikrly</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body class="bg-background">
+    <header class="bg-surface shadow-subtle sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="{% url 'index' %}" class="text-2xl font-bold text-primary">Fikrly</a>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'index' %}" class="text-text-secondary hover:text-primary transition-smooth">Bosh sahifa</a>
+                    <a href="{% url 'business_profile' %}" class="text-primary font-semibold">Bizneslar</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="min-h-screen py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div class="relative overflow-hidden rounded-lg bg-gray-100">
+                        <img src="{{ company.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-80 object-cover object-center" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
+                    </div>
+                    <div class="mt-6 flex items-start justify-between">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-3">
+                                <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear" alt="{{ company.name }} logo" class="w-8 h-8 rounded-md object-cover flex-shrink-0">
+                                <h1 class="text-3xl font-bold text-primary truncate">{{ company.name }}</h1>
+                            </div>
+                            <div class="text-text-secondary mt-1">{{ company.category }} • {{ company.city }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xl font-semibold">⭐ {{ company.rating }}</div>
+                            <div class="text-sm text-text-secondary">{{ company.review_count }} sharh</div>
+                        </div>
+                    </div>
+                    {% if company.description %}
+                    <p class="text-text-secondary mt-4">{{ company.description }}</p>
+                    {% endif %}
+
+                    <h2 class="text-xl font-semibold text-primary mt-8 mb-4">Sharhlar</h2>
+                    <div class="space-y-5">
+                        {% for r in reviews %}
+                        <div class="card">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="font-semibold text-primary">{{ r.user_name }}</div>
+                                <div class="text-sm text-text-secondary">⭐ {{ r.rating }}</div>
+                            </div>
+                            <p class="text-text-secondary">{{ r.text }}</p>
+                        </div>
+                        {% empty %}
+                        <div class="text-text-secondary">Hozircha sharhlar yo'q.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <aside>
+                    {% if company.is_verified %}
+                    <div class="card mb-6">
+                        <div class="text-success font-semibold">Tasdiqlangan biznes</div>
+                        <div class="text-sm text-text-secondary">Profil ma'lumotlari tekshirildi.</div>
+                    </div>
+                    {% endif %}
+                    <a href="{% url 'review_submission' %}" class="btn-primary w-full block text-center">Sharh yozish</a>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    {% load static %}
+    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+</body>
+</html>
+
+

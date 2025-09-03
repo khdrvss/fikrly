@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bizneslar - Fikrly</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body class="bg-background">
+    <header class="bg-surface shadow-subtle sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'index' %}" class="flex items-center space-x-2">
+                        <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor">
+                            <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
+                        </svg>
+                        <span class="text-2xl font-bold text-primary">Fikrly</span>
+                    </a>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'index' %}" class="text-text-secondary hover:text-primary transition-smooth">Bosh sahifa</a>
+                    <a href="{% url 'category_browse' %}" class="text-text-secondary hover:text-primary transition-smooth">Kategoriyalar</a>
+                    <a href="{% url 'business_profile' %}" class="text-primary font-semibold">Bizneslar</a>
+                    <a href="{% url 'review_submission' %}" class="text-text-secondary hover:text-primary transition-smooth">Sharh yozish</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'account_login' %}" class="btn-outline text-sm px-4 py-2">Kirish</a>
+                    <a href="{% url 'account_login' %}" class="btn-primary text-sm px-4 py-2">Biznes uchun</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="min-h-screen py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-primary">
+                        {% if search_query %}
+                            {% if category_filter %}
+                                {{ category_filter }} kategoriyasidagi bizneslar
+                            {% else %}
+                                "{{ search_query }}" uchun qidiruv natijalari
+                            {% endif %}
+                        {% else %}
+                            Bizneslar
+                        {% endif %}
+                    </h1>
+                    {% if search_query %}
+                        <p class="text-text-secondary mt-2">{{ search_results_count }} ta natija topildi</p>
+                    {% endif %}
+                </div>
+                <form method="get" class="flex items-center gap-3">
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Qidirish..." class="input-field w-64">
+                    <button class="btn-outline">Qidirish</button>
+                    {% if search_query %}
+                        {% if category_filter %}
+                            <a href="{% url 'category_browse' %}" class="btn-outline text-sm">Kategoriyalarga qaytish</a>
+                        {% else %}
+                            <a href="{% url 'business_list' %}" class="btn-outline text-sm">Qidiruvni tozalash</a>
+                        {% endif %}
+                    {% endif %}
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for c in companies %}
+                <a href="{% url 'company_detail' c.pk %}" class="block group card hover:shadow-lg transition-smooth">
+                    <div class="relative overflow-hidden">
+                        <div class="w-full h-48 bg-gray-100">
+                            <img src="{{ c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ c.name }}" class="w-full h-full object-cover object-center rounded-t-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
+                        </div>
+                        {% if c.is_verified %}
+                        <span class="absolute top-3 left-3 bg-success text-white px-2 py-0.5 rounded text-xs font-medium">Tasdiqlangan</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear" alt="{{ c.name }} logo" class="w-6 h-6 rounded-md object-cover flex-shrink-0">
+                                <h3 class="text-lg font-semibold text-primary group-hover:text-secondary truncate">{{ c.name }}</h3>
+                            </div>
+                            <div class="ml-2 text-sm text-text-secondary flex-shrink-0">⭐ {{ c.rating }} ({{ c.review_count }})</div>
+                        </div>
+                        <div class="text-sm text-text-secondary mt-1">{{ c.category }} • {{ c.city }}</div>
+                        {% if c.description %}
+                        <p class="text-sm text-text-secondary mt-2 line-clamp-2">{{ c.description }}</p>
+                        {% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="col-span-full text-center py-12">
+                    {% if search_query %}
+                        <div class="text-text-secondary mb-4">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <h3 class="text-xl font-semibold text-primary mb-2">"{{ search_query }}" uchun natija topilmadi</h3>
+                            <p class="text-text-secondary mb-6">Boshqa kalit so'zlar bilan qayta urinib ko'ring yoki barcha bizneslarni ko'ring.</p>
+                            
+                            {% if search_suggestions %}
+                                <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                                    <h4 class="font-semibold text-primary mb-4">Qidiruv takliflari:</h4>
+                                    <div class="grid md:grid-cols-2 gap-4">
+                                        {% if search_suggestions.categories %}
+                                        <div>
+                                            <h5 class="font-medium text-text-secondary mb-2">Mashhur kategoriyalar:</h5>
+                                            <div class="flex flex-wrap gap-2">
+                                                {% for category in search_suggestions.categories %}
+                                                <a href="{% url 'category_browse' %}?category={{ category }}" class="px-3 py-1 bg-primary-100 text-primary rounded-full text-sm hover:bg-primary-200 transition-colors">{{ category }}</a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        {% if search_suggestions.cities %}
+                                        <div>
+                                            <h5 class="font-medium text-text-secondary mb-2">Mashhur shaharlar:</h5>
+                                            <div class="flex flex-wrap gap-2">
+                                                {% for city in search_suggestions.cities %}
+                                                <a href="{% url 'category_browse' %}?city={{ city }}" class="px-3 py-1 bg-secondary-100 text-secondary rounded-full text-sm hover:bg-secondary-200 transition-colors">{{ city }}</a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <a href="{% url 'business_list' %}" class="btn-primary">Barcha bizneslarni ko'rish</a>
+                        </div>
+                    {% else %}
+                        <div class="text-text-secondary">Hozircha bizneslar topilmadi.</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-primary text-white py-12 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">© 2025 Fikrly</div>
+        </div>
+    </footer>
+
+    {% load static %}
+    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+</body>
+</html>
+
+

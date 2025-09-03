@@ -5,6 +5,7 @@ class Company(models.Model):
     category = models.CharField(max_length=100)
     city = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
+    image_url = models.URLField(blank=True)
     is_verified = models.BooleanField(default=False)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     review_count = models.PositiveIntegerField(default=0)
