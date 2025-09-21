@@ -63,8 +63,6 @@
                     O'zbekistondagi eng yaxshi bizneslarni kategoriyalar bo'yicha kashf eting va tanlang
                 </p>
             </div>
-
-
         </div>
     </section>
 
@@ -77,11 +75,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for cat in category_cards %}
-                <div class="card card-hover">
-                    <div class="relative mb-6 overflow-hidden">
-                        <div class="w-full h-48 bg-gray-100">
-                            <img src="{{ cat.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ cat.label }}" class="w-full h-full object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
-                        </div>
+                <div class="card card-hover flex flex-col h-96">
+                    <div class="relative mb-6">
+                        <img src="{{ cat.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ cat.label }}" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
                         {% if cat.badge_text %}
                         <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">{{ cat.badge_text }}</div>
                         {% endif %}
@@ -97,7 +93,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
+                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">{{ cat.assessment.score }} · {{ cat.assessment.label }}</span>
@@ -107,16 +103,16 @@
                             <span class="font-semibold text-success">{{ cat.badge_text }}</span>
                         </div>
                     </div>
-                    <a href="{% url 'business_list' %}?category={{ cat.category }}" class="btn-outline w-full">{{ cat.label }} ga o'tish</a>
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <a href="{% url 'business_list' %}?category={{ cat.category }}" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
+                    </div>
                 </div>
                 {% endfor %}
 
                 <!-- Services Category -->
-                <div class="card card-hover">
-                    <div class="relative mb-6 overflow-hidden">
-                        <div class="w-full h-48 bg-gray-100">
-                            <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Xizmatlar kategoriyasi" class="w-full h-full object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        </div>
+                <div class="card card-hover flex flex-col h-96">
+                    <div class="relative mb-6">
+                        <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Xizmatlar kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-secondary text-white px-3 py-1 rounded-full text-sm font-semibold">
                             8,320 biznes
                         </div>
@@ -132,25 +128,23 @@
                             <p class="text-text-secondary">Ta'mirlash, tozalash, transport</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
+                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Eng mashhur:</span>
-                            <span class="font-semibold text-primary">UzAuto Motors (4.7★)</span>
+                            <span class="text-text-secondary">Baholash</span>
+                            <span class="font-semibold text-primary">85.2 · Yuqori</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">O'rtacha narx:</span>
-                            <span class="font-semibold text-success">100,000 - 500,000 so'm</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Tez javob:</span>
-                            <span class="font-semibold text-success">85% bizneslar</span>
+                            <span class="text-text-secondary">Sharhlar</span>
+                            <span class="font-semibold text-success">8,320 sharh</span>
                         </div>
                     </div>
-                    <button class="btn-outline w-full">Xizmatlarga o'tish</button>
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <a href="{% url 'business_list' %}?category=services" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
+                    </div>
                 </div>
 
                 <!-- Retail Category -->
-                <div class="card card-hover">
+                <div class="card card-hover flex flex-col h-96">
                     <div class="relative mb-6">
                         <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Savdo kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -168,25 +162,23 @@
                             <p class="text-text-secondary">Bozor, do'kon, supermarket</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
+                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Eng mashhur:</span>
-                            <span class="font-semibold text-primary">Caravan Bozor (4.9★)</span>
+                            <span class="text-text-secondary">Baholash</span>
+                            <span class="font-semibold text-primary">92.1 · Yuqori</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Ish vaqti:</span>
-                            <span class="font-semibold text-success">24/7 - 65% bizneslar</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Oila uchun:</span>
-                            <span class="font-semibold text-success">90% bizneslar</span>
+                            <span class="text-text-secondary">Sharhlar</span>
+                            <span class="font-semibold text-success">15,680 sharh</span>
                         </div>
                     </div>
-                    <button class="btn-outline w-full">Savdo markazlariga o'tish</button>
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <a href="{% url 'business_list' %}?category=retail" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
+                    </div>
                 </div>
 
                 <!-- Healthcare Category -->
-                <div class="card card-hover">
+                <div class="card card-hover flex flex-col h-96">
                     <div class="relative mb-6">
                         <img src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sog'liqni saqlash kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-success text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -204,25 +196,23 @@
                             <p class="text-text-secondary">Klinika, dorixona, stomatologiya</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
+                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Eng mashhur:</span>
-                            <span class="font-semibold text-primary">Tashkent Medical (4.8★)</span>
+                            <span class="text-text-secondary">Baholash</span>
+                            <span class="font-semibold text-primary">78.5 · O'rtacha</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">O'rtacha narx:</span>
-                            <span class="font-semibold text-success">200,000 - 800,000 so'm</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sertifikat:</span>
-                            <span class="font-semibold text-success">100% litsenziyali</span>
+                            <span class="text-text-secondary">Sharhlar</span>
+                            <span class="font-semibold text-success">3,240 sharh</span>
                         </div>
                     </div>
-                    <button class="btn-outline w-full">Tibbiyotga o'tish</button>
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <a href="{% url 'business_list' %}?category=healthcare" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
+                    </div>
                 </div>
 
                 <!-- Education Category -->
-                <div class="card card-hover">
+                <div class="card card-hover flex flex-col h-96">
                     <div class="relative mb-6">
                         <img src="https://images.pixabay.com/photos/2015/07/17/22/43/student-849825_960_720.jpg" alt="Ta'lim kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-warning text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -240,25 +230,23 @@
                             <p class="text-text-secondary">Maktab, universitet, kurslar</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
+                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Eng mashhur:</span>
-                            <span class="font-semibold text-primary">TATU (4.6★)</span>
+                            <span class="text-text-secondary">Baholash</span>
+                            <span class="font-semibold text-primary">82.3 · O'rtacha</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">O'rtacha narx:</span>
-                            <span class="font-semibold text-success">500,000 - 2,000,000 so'm</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Akkreditatsiya:</span>
-                            <span class="font-semibold text-success">85% muassasalar</span>
+                            <span class="text-text-secondary">Sharhlar</span>
+                            <span class="font-semibold text-success">2,890 sharh</span>
                         </div>
                     </div>
-                    <button class="btn-outline w-full">Ta'limga o'tish</button>
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <a href="{% url 'business_list' %}?category=education" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
+                    </div>
                 </div>
 
                 <!-- Tourism Category -->
-                <div class="card card-hover">
+                <div class="card card-hover flex flex-col h-96">
                     <div class="relative mb-6">
                         <img src="https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Turizm kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -276,21 +264,19 @@
                             <p class="text-text-secondary">Mehmonxona, sayohat, ko'ngilochar</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6">
+                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Eng mashhur:</span>
-                            <span class="font-semibold text-primary">Registan Plaza (4.7★)</span>
+                            <span class="text-text-secondary">Baholash</span>
+                            <span class="font-semibold text-primary">76.8 · O'rtacha</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">O'rtacha narx:</span>
-                            <span class="font-semibold text-success">300,000 - 1,500,000 so'm</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Til xizmati:</span>
-                            <span class="font-semibold text-success">70% ko'p tilli</span>
+                            <span class="text-text-secondary">Sharhlar</span>
+                            <span class="font-semibold text-success">1,560 sharh</span>
                         </div>
                     </div>
-                    <button class="btn-outline w-full">Turizmga o'tish</button>
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <a href="{% url 'business_list' %}?category=tourism" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
+                    </div>
                 </div>
             </div>
         </div>
