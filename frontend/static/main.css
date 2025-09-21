@@ -964,6 +964,125 @@ h1, h2, h3, h4, h5, h6 {
   height: 24rem;
 }
 
+/* Utility: min-h-96 (24rem) to mirror Tailwind's min-height scale */
+.min-h-96{
+  min-height: 24rem;
+}
+
+/* Local scroll container for business picker */
+/* Business feed container - like Instagram feed */
+.business-feed-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.business-feed-header {
+  flex-shrink: 0;
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.business-feed-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* (Reverted) use a simple vertical stack inside the scroll container */
+
+/* Polished card styling for business rows */
+.biz-card{
+  background-color: #fff;
+  padding: 12px;           
+  border-radius: 4px;     /* rectangular corners */
+  border: 1px solid #e5e7eb;  
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: box-shadow .2s ease, transform .05s ease, background-color .2s ease, border-color .2s ease;
+}
+.biz-card:hover{
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background-color: #fafafa;
+  transform: translateY(-1px);
+  border-color: var(--color-primary-200);
+}
+.biz-card:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.25); /* soft primary ring */
+}
+
+.biz-card:active{
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* Grid tile variant for business cards */
+.biz-card-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  height: 100%;
+}
+
+.biz-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* square thumbnails for consistent size */
+  height: auto;
+  border-radius: 8px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.biz-title {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.biz-meta {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--color-text-secondary);
+}
+
+.biz-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto; /* push rating to bottom for even tiles */
+}
+
+/* clamp up to 2 lines of text */
+.clamp-2 {
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* clamp a single line of text */
+.clamp-1 {
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .min-h-screen{
   min-height: 100vh;
 }

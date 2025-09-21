@@ -54,112 +54,59 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="min-h-screen py-8">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Page Header -->
-            <div class="text-center mb-8">
-                <h1 class="text-3xl md:text-4xl font-bold text-primary mb-4">Sharh yozish</h1>
-                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
-                    Tajribangizni boshqalar bilan bo'lishing va bizneslarni yaxshilashga yordam bering
-                </p>
-            </div>
-
-            <!-- Progress Indicator -->
-            <div class="mb-8">
-                <div class="flex items-center justify-center space-x-4">
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-semibold">1</div>
-                        <span class="ml-2 text-primary font-semibold">Biznes tanlash</span>
-                    </div>
-                    <div class="w-8 h-0.5 bg-gray-300"></div>
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-semibold">2</div>
-                        <span class="ml-2 text-gray-500">Baholash</span>
-                    </div>
-                    <div class="w-8 h-0.5 bg-gray-300"></div>
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center text-sm font-semibold">3</div>
-                        <span class="ml-2 text-gray-500">Tasdiqlash</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Business Search Section -->
-            <div class="card mb-8">
-                <h2 class="text-xl font-semibold text-primary mb-4">Biznesni toping</h2>
-                <div class="relative mb-4">
-                    <input type="text" placeholder="Biznes nomi yoki manzilini kiriting..." class="input-field pl-12 pr-4 py-3" />
-                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
-
-                <!-- Business Suggestions -->
-                <div class="space-y-3">
-                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-smooth">
-                        <img src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=100" alt="Oqtepa Lavash" class="w-12 h-12 rounded-lg object-cover mr-4" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-primary">Oqtepa Lavash</h3>
-                            <p class="text-sm text-text-secondary">Fast food • Chilonzor tumani, Toshkent</p>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">4.8</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-smooth">
-                        <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Bellissimo Pizza" class="w-12 h-12 rounded-lg object-cover mr-4" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-primary">Bellissimo Pizza</h3>
-                            <p class="text-sm text-text-secondary">Pizza • Yunusobod tumani, Toshkent</p>
-                        </div>
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">4.6</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Location Verification -->
-                <div class="mt-6 p-4 bg-primary-50 rounded-lg">
-                    <div class="flex items-center mb-2">
-                        <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </svg>
-                        <h3 class="font-semibold text-primary">Joylashuvni tasdiqlash</h3>
-                    </div>
-                    <p class="text-sm text-text-secondary mb-3">
-                        Haqiqiy sharh yozish uchun biznesga tashrif buyurganingizni tasdiqlang
-                    </p>
-                    <button class="btn-outline text-sm px-4 py-2">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                        </svg>
-                        Joylashuvni ulashish
-                    </button>
-                </div>
-            </div>
-
-            <!-- Review Form Section -->
-            <form method="post" class="card mb-8">
+    <main class="min-h-screen py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-xl font-semibold text-primary mb-4">Tajribangizni baholang</h1>
+            <form id="reviewForm" method="post" action="">
                 {% csrf_token %}
-                <h2 class="text-xl font-semibold text-primary mb-6">Tajribangizni baholang</h2>
-                
-                <!-- Company and rating fields -->
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Kompaniya</label>
-                        {{ form.company }}
+                        <label class="block text-sm font-semibold text-primary mb-2">Biznesni toping</label>
+                        <div class="business-feed-container">
+                            <div class="business-feed-header">
+                                <div class="relative">
+                                    <input id="companySearchInput" type="text" placeholder="Biznes nomi yoki manzilini kiriting..." class="input-field pl-12 pr-4 py-3" />
+                                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="business-feed-scroll" id="companySuggestionsInline">
+                                <div class="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                                    {% for c in suggested_companies %}
+                                    <button type="button" role="button" tabindex="0" class="biz-card biz-card-grid company-suggest cursor-pointer"
+                                        data-company-id="{{ c.pk }}" data-company-name="{{ c.name }}">
+                                        <img src="{{ c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop' }}" alt="{{ c.name }}" class="biz-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop'; this.onerror=null;" />
+                                        <h3 class="biz-title clamp-1">{{ c.name }}</h3>
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hidden">{{ form.company }}</div>
+                        <p class="text-xs text-text-secondary mt-1">Yuqoridan kompaniyani tanlang.</p>
+                        <p id="selectedCompanyLabel" class="text-xs text-success mt-1 hidden">Tanlangan: <span></span></p>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Baho (1-5)</label>
-                        {{ form.rating }}
+                        <label class="block text-sm font-semibold text-primary mb-2">Baho</label>
+                        <div id="starRating" class="flex items-center space-x-2" role="radiogroup" aria-label="Baho">
+                            <button type="button" class="star" data-value="1" aria-label="1 yulduz" aria-checked="false">
+                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </button>
+                            <button type="button" class="star" data-value="2" aria-label="2 yulduz" aria-checked="false">
+                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </button>
+                            <button type="button" class="star" data-value="3" aria-label="3 yulduz" aria-checked="false">
+                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </button>
+                            <button type="button" class="star" data-value="4" aria-label="4 yulduz" aria-checked="false">
+                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </button>
+                            <button type="button" class="star" data-value="5" aria-label="5 yulduz" aria-checked="false">
+                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </button>
+                        </div>
+                        <div class="hidden">{{ form.rating }}</div>
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
@@ -169,101 +116,7 @@
                     </div>
                 </div>
 
-                <!-- Category-specific Ratings -->
-                <div class="grid md:grid-cols-3 gap-6 mb-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Taom sifati</label>
-                        <div class="flex space-x-1">
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Xizmat</label>
-                        <div class="flex space-x-1">
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Muhit</label>
-                        <div class="flex space-x-1">
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                            <button class="w-6 h-6 text-gray-300 hover:text-secondary transition-smooth">
-                                <svg fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Removed 'Xizmat' category-specific ratings -->
 
                 <!-- Review Text -->
                 <div class="mb-6">
@@ -402,8 +255,8 @@
                         </p>
                     </div>
                     <div class="flex space-x-3">
-                        <button class="btn-outline px-6 py-3">Saqlash</button>
-                        <button class="btn-primary px-6 py-3">Yuborish</button>
+                        <button class="btn-outline px-6 py-3" type="button">Saqlash</button>
+                        <button class="btn-primary px-6 py-3" type="submit" form="reviewForm">Yuborish</button>
                     </div>
                 </div>
 
@@ -507,7 +360,105 @@
             </div>
         </div>
     </footer>
-{% load static %}
-<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    {% load static %}
+    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    <script>
+    (function() {
+        const searchInput = document.getElementById('companySearchInput');
+        const list = document.getElementById('companySuggestionsInline');
+        const select = document.querySelector('#reviewForm select[name="company"]');
+        const selectedLabel = document.getElementById('selectedCompanyLabel');
+        const starContainer = document.getElementById('starRating');
+        const ratingInput = document.querySelector('#reviewForm input[name="rating"], #reviewForm select[name="rating"], #reviewForm [name="rating"]');
+
+        function applyFilter(term) {
+            const q = (term || '').trim().toLowerCase();
+            list && list.querySelectorAll('.company-suggest').forEach(btn => {
+                const text = btn.innerText.toLowerCase();
+                btn.style.display = text.includes(q) ? '' : 'none';
+            });
+        }
+
+        function choose(btn) {
+            const id = btn.getAttribute('data-company-id');
+            const name = btn.getAttribute('data-company-name') || btn.innerText.trim();
+            if (select) {
+                select.value = id;
+            }
+            list && list.querySelectorAll('.company-suggest').forEach(el => el.classList.remove('ring-2','ring-secondary','bg-gray-50'));
+            btn.classList.add('ring-2','ring-secondary','bg-gray-50');
+            if (selectedLabel) {
+                selectedLabel.querySelector('span').textContent = name;
+                selectedLabel.classList.remove('hidden');
+            }
+        }
+
+        // Star rating helpers
+        function paintStars(value) {
+            if (!starContainer) return;
+            const stars = starContainer.querySelectorAll('.star svg');
+            stars.forEach((svg, idx) => {
+                const on = idx < value;
+                svg.classList.toggle('text-secondary', on);
+                svg.classList.toggle('text-gray-300', !on);
+            });
+        }
+
+        function setRating(val) {
+            const v = Math.max(1, Math.min(5, Number(val) || 0));
+            if (ratingInput) ratingInput.value = v;
+            paintStars(v);
+            if (starContainer) {
+                starContainer.querySelectorAll('.star').forEach((btn, idx) => btn.setAttribute('aria-checked', String(idx+1 === v)));
+            }
+        }
+
+        if (list) {
+            list.addEventListener('click', (e) => {
+                const btn = e.target.closest('.company-suggest');
+                if (!btn) return;
+                choose(btn);
+            });
+            list.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const btn = e.target.closest('.company-suggest');
+                    if (btn) { e.preventDefault(); choose(btn); }
+                }
+            });
+        }
+
+        searchInput && searchInput.addEventListener('input', () => applyFilter(searchInput.value));
+
+        // Preselect highlight
+        if (select && select.value && list) {
+            const pre = list.querySelector(`.company-suggest[data-company-id="${CSS.escape(select.value)}"]`);
+            if (pre) choose(pre);
+        }
+
+        // Wire up stars
+        if (starContainer) {
+            starContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.star');
+                if (!btn) return;
+                const val = Number(btn.getAttribute('data-value')) || 0;
+                setRating(val);
+            });
+            starContainer.addEventListener('mousemove', (e) => {
+                const btn = e.target.closest('.star');
+                if (!btn) return;
+                const val = Number(btn.getAttribute('data-value')) || 0;
+                paintStars(val);
+            });
+            starContainer.addEventListener('mouseleave', () => {
+                const current = Number(ratingInput && ratingInput.value) || 0;
+                paintStars(current);
+            });
+
+            // Initialize from existing rating value
+            const startVal = Number(ratingInput && ratingInput.value) || 0;
+            if (startVal) paintStars(startVal);
+        }
+    })();
+    </script>
 </body>
 </html>

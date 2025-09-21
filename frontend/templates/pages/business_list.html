@@ -69,29 +69,34 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for c in companies %}
-                <a href="{% url 'company_detail' c.pk %}" class="block group card hover:shadow-lg transition-smooth">
-                    <div class="relative overflow-hidden">
-                        <div class="w-full h-48 bg-gray-100">
-                            <img src="{{ c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ c.name }}" class="w-full h-full object-cover object-center rounded-t-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
-                        </div>
-                        {% if c.is_verified %}
-                        <span class="absolute top-3 left-3 bg-success text-white px-2 py-0.5 rounded text-xs font-medium">Tasdiqlangan</span>
-                        {% endif %}
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-2 min-w-0">
-                                <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear" alt="{{ c.name }} logo" class="w-6 h-6 rounded-md object-cover flex-shrink-0">
-                                <h3 class="text-lg font-semibold text-primary group-hover:text-secondary truncate">{{ c.name }}</h3>
+                <div class="card hover:shadow-lg transition-smooth">
+                    <a href="{% url 'company_detail' c.pk %}" class="block group">
+                        <div class="relative overflow-hidden">
+                            <div class="w-full h-48 bg-gray-100">
+                                <img src="{{ c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ c.name }}" class="w-full h-full object-cover object-center rounded-t-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
                             </div>
-                            <div class="ml-2 text-sm text-text-secondary flex-shrink-0">⭐ {{ c.rating }} ({{ c.review_count }})</div>
+                            {% if c.is_verified %}
+                            <span class="absolute top-3 left-3 bg-success text-white px-2 py-0.5 rounded text-xs font-medium">Tasdiqlangan</span>
+                            {% endif %}
                         </div>
-                        <div class="text-sm text-text-secondary mt-1">{{ c.category }} • {{ c.city }}</div>
-                        {% if c.description %}
-                        <p class="text-sm text-text-secondary mt-2 line-clamp-2">{{ c.description }}</p>
-                        {% endif %}
+                        <div class="mt-4">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear" alt="{{ c.name }} logo" class="w-6 h-6 rounded-md object-cover flex-shrink-0">
+                                    <h3 class="text-lg font-semibold text-primary group-hover:text-secondary truncate">{{ c.name }}</h3>
+                                </div>
+                                <div class="ml-2 text-sm text-text-secondary flex-shrink-0">⭐ {{ c.rating }} ({{ c.review_count }})</div>
+                            </div>
+                            <div class="text-sm text-text-secondary mt-1">{{ c.category }} • {{ c.city }}</div>
+                            {% if c.description %}
+                            <p class="text-sm text-text-secondary mt-2 line-clamp-2">{{ c.description }}</p>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="mt-3">
+                        <a href="{% url 'review_submission' %}?company={{ c.pk }}" class="btn-outline w-full block text-center">Sharh yozish</a>
                     </div>
-                </a>
+                </div>
                 {% empty %}
                 <div class="col-span-full text-center py-12">
                     {% if search_query %}

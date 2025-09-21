@@ -177,21 +177,55 @@ def homepage(request):
 
 
 def review_submission(request):
+	"""
+	Create a new review.
+	- Supports optional ?company=<id> to preselect a company.
+	- Validates rating in [1,5].
+	- Recalculates company rating and review_count using DB aggregates for accuracy.
+	- On success, redirects to the company detail page; otherwise re-renders with errors.
+	"""
+	preselected_company_id = request.GET.get('company')
+	initial = {}
+	if preselected_company_id and preselected_company_id.isdigit():
+		try:
+			initial['company'] = Company.objects.get(pk=int(preselected_company_id))
+		except Company.DoesNotExist:
+			pass
+
 	if request.method == 'POST':
 		form = ReviewForm(request.POST)
+		# Extra server-side validation for rating bounds
+		try:
+			rating_val = int(request.POST.get('rating', 0))
+			if not 1 <= rating_val <= 5:
+				form.add_error('rating', 'Baho 1 dan 5 gacha bo\'lishi kerak.')
+		except (TypeError, ValueError):
+			form.add_error('rating', 'To\'g\'ri baho kiriting (1-5).')
+
 		if form.is_valid():
 			review: Review = form.save(commit=False)
 			review.verified_purchase = True
 			review.save()
-			# Update company counters
+
+			# Update company stats using DB-level aggregation to avoid race conditions
 			company = review.company
-			company.review_count = company.reviews.count()
-			company.rating = round(sum(r.rating for r in company.reviews.all()) / company.review_count, 2)
-			company.save()
-			return redirect('index')
+			agg = company.reviews.aggregate(avg=Avg('rating'), cnt=Count('id'))
+			company.review_count = int(agg.get('cnt') or 0)
+			company.rating = round(float(agg.get('avg') or 0.0), 2) if company.review_count else 0
+			company.save(update_fields=['review_count', 'rating'])
+
+			return redirect('company_detail', pk=company.pk)
 	else:
-		form = ReviewForm()
-	return render(request, 'pages/review_submission.html', {'form': form})
+		form = ReviewForm(initial=initial)
+
+	# Provide all companies for the inline picker (scrollable + client-side filter)
+	# Ordered by popularity first for convenience
+	suggested_companies = Company.objects.order_by('-review_count', '-rating', 'name')
+
+	return render(request, 'pages/review_submission.html', {
+		'form': form,
+		'suggested_companies': suggested_companies,
+	})
 
 
 def company_detail(request, pk: int):

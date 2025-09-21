@@ -75,7 +75,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for cat in category_cards %}
-                <div class="card card-hover flex flex-col h-96">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
                     <div class="relative mb-6">
                         <img src="{{ cat.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ cat.label }}" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
                         {% if cat.badge_text %}
@@ -86,14 +86,14 @@
                         <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
                             <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>
                         </div>
-                        <div>
+                        <div class="flex flex-col gap-1">
                             <h3 class="text-xl font-semibold text-primary">{{ cat.label }}</h3>
                             {% if cat.popular_company %}
                             <p class="text-text-secondary">Eng mashhur: {{ cat.popular_company }} ({{ cat.popular_rating }}★)</p>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
+                    <div class="space-y-3 mb-4 flex-grow">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">{{ cat.assessment.score }} · {{ cat.assessment.label }}</span>
@@ -110,7 +110,7 @@
                 {% endfor %}
 
                 <!-- Services Category -->
-                <div class="card card-hover flex flex-col h-96">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
                     <div class="relative mb-6">
                         <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Xizmatlar kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-secondary text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -128,7 +128,7 @@
                             <p class="text-text-secondary">Ta'mirlash, tozalash, transport</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
+                    <div class="space-y-3 mb-4 flex-grow">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">85.2 · Yuqori</span>
@@ -144,7 +144,7 @@
                 </div>
 
                 <!-- Retail Category -->
-                <div class="card card-hover flex flex-col h-96">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
                     <div class="relative mb-6">
                         <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Savdo kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -162,7 +162,7 @@
                             <p class="text-text-secondary">Bozor, do'kon, supermarket</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
+                    <div class="space-y-3 mb-4 flex-grow">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">92.1 · Yuqori</span>
@@ -178,7 +178,7 @@
                 </div>
 
                 <!-- Healthcare Category -->
-                <div class="card card-hover flex flex-col h-96">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
                     <div class="relative mb-6">
                         <img src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sog'liqni saqlash kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-success text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -196,7 +196,7 @@
                             <p class="text-text-secondary">Klinika, dorixona, stomatologiya</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
+                    <div class="space-y-3 mb-4 flex-grow">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">78.5 · O'rtacha</span>
@@ -212,7 +212,7 @@
                 </div>
 
                 <!-- Education Category -->
-                <div class="card card-hover flex flex-col h-96">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
                     <div class="relative mb-6">
                         <img src="https://images.pixabay.com/photos/2015/07/17/22/43/student-849825_960_720.jpg" alt="Ta'lim kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-warning text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -230,7 +230,7 @@
                             <p class="text-text-secondary">Maktab, universitet, kurslar</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
+                    <div class="space-y-3 mb-4 flex-grow">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">82.3 · O'rtacha</span>
@@ -246,7 +246,7 @@
                 </div>
 
                 <!-- Tourism Category -->
-                <div class="card card-hover flex flex-col h-96">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col h-96">
                     <div class="relative mb-6">
                         <img src="https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Turizm kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
                         <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -264,7 +264,7 @@
                             <p class="text-text-secondary">Mehmonxona, sayohat, ko'ngilochar</p>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-6 flex-grow min-h-[80px]">
+                    <div class="space-y-3 mb-4 flex-grow">
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-text-secondary">Baholash</span>
                             <span class="font-semibold text-primary">76.8 · O'rtacha</span>

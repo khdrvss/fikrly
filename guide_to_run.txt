@@ -1,0 +1,118 @@
+Fikrly — How to Run Locally (Windows PowerShell)
+=================================================
+
+Project root: C:\Users\USER\Desktop\fikrly_reviews_platform
+Shell: Windows PowerShell
+
+PREREQUISITES
+- Python 3.x installed (the Windows launcher `py` is recommended)
+- Internet access the first time to install dependencies
+
+ONE-TIME SETUP (first run only)
+1) Open PowerShell and go to the project folder
+   cd C:\Users\USER\Desktop\fikrly_reviews_platform
+
+2) Create a virtual environment (choose one)
+   # Preferred (Windows Python launcher)
+   py -3 -m venv .venv
+   # OR (if `py` isn’t available)
+   python -m venv .venv
+
+3) Allow script execution for this session and activate the venv
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+   . .\.venv\Scripts\Activate.ps1
+
+4) Install dependencies
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+   
+   # Ensure `requests` is present (needed by django-allauth Google provider)
+   pip install requests
+
+5) Setup the database
+   python manage.py migrate
+   
+   # Optional: load seed data
+   python manage.py seed_uzbek_data
+
+6) Run the development server
+   python manage.py runserver
+   
+   # If port 8000 is busy
+   python manage.py runserver 8001
+
+
+EVERYDAY WORKFLOW (each time you open your PC)
+1) Open PowerShell and go to the project folder
+   cd C:\Users\USER\Desktop\fikrly_reviews_platform
+
+2) Activate the virtual environment (and allow scripts for this session)
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+   . .\.venv\Scripts\Activate.ps1
+
+3) Apply any pending migrations (safe to run every time)
+   python manage.py migrate
+
+4) Start the dev server
+   python manage.py runserver
+
+5) Open in your browser
+   http://127.0.0.1:8000/
+
+To stop the server: press Ctrl + C in the terminal.
+
+
+QUICK START (one-liner)
+# Run this in a new PowerShell window
+cd C:\Users\USER\Desktop\fikrly_reviews_platform; Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; . .\.venv\Scripts\Activate.ps1; python manage.py runserver
+
+
+HEALTH CHECKS / TROUBLESHOOTING
+- Verify you’re in the right folder (should see manage.py)
+  Get-ChildItem manage.py
+
+- Verify you’re using the venv’s Python
+  python -c "import sys; print(sys.executable)"
+
+- Verify Django is installed in this venv
+  python -c "import django; print(django.get_version())"
+
+- If activation still fails due to policy:
+  - Start PowerShell as Administrator and try again, or
+  - Use: & .\.venv\Scripts\Activate.ps1 (note: without dot-sourcing, it may not affect the current session)
+
+- If you see "ModuleNotFoundError: No module named 'django'":
+  . .\.venv\Scripts\Activate.ps1
+  pip install -r requirements.txt
+
+- If you see "No module named 'requests'":
+  pip install requests
+
+- If the port is already in use:
+  python manage.py runserver 8001
+
+- To deactivate the virtual environment when done:
+  deactivate
+
+
+NOTES
+- This project uses SQLite by default (no extra DB setup needed for development).
+- Keep the terminal window open while the server is running.
+- Don’t use the dev server in production; use a proper WSGI/ASGI server instead.
+
+
+CLOUDFLARE QUICK TUNNEL (share your local dev)
+---------------------------------------------
+Prereq: Install cloudflared once
+- winget install Cloudflare.CloudflareTunnel -y
+
+1) In one PowerShell window, start the dev server:
+   PowerShell> .\scripts\start-dev.ps1 -Port 8000
+
+2) In a second PowerShell window, open a public tunnel:
+   PowerShell> .\scripts\tunnel.ps1 -Port 8000
+
+You’ll get a URL like: https://<random>.trycloudflare.com
+Open it on your phone or share it. When you stop cloudflared, the URL goes offline.
+
+Django is configured to allow .trycloudflare.com in DEBUG mode.

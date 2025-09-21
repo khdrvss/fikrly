@@ -27,6 +27,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-u^i4qrjlyd&+zgx%c%=a)
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+if DEBUG:
+    # Allow Cloudflare Quick Tunnel random subdomains and local binds during development
+    ALLOWED_HOSTS = list({*ALLOWED_HOSTS, '.trycloudflare.com', '0.0.0.0'})
 
 
 # Application definition
@@ -82,12 +85,8 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'fikrly'),
-        'USER': os.environ.get('POSTGRES_USER', 'fikrly'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
-        'HOST': os.environ.get('POSTGRES_HOST', '127.0.0.1'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

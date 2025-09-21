@@ -1,0 +1,4 @@
+Django==5.2.4
+django-allauth==65.11.2
+PyJWT==2.10.1
+cryptography==46.0.1
