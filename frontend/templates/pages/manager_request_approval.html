@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tasdiqlashni so'rash - Fikrly</title>
+  <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body class="bg-background">
+  <main class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-xl font-semibold text-primary mb-4">Tasdiqlashni so'rash</h1>
+
+    <div class="card p-6 mb-4">
+      <p class="mb-2"><strong>Kompaniya:</strong> {{ review.company.name }}</p>
+      <p class="mb-2"><strong>Sharh:</strong> {{ review.text }}</p>
+      <p class="text-sm text-text-secondary">Bahosi: {{ review.rating }}⭐ • Muallif: {{ review.user_name }}</p>
+    </div>
+
+    <form method="post" class="card p-6">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <label class="flex items-center gap-2 mb-4">
+        {{ form.confirm }}
+        <span>Ushbu sharh uchun admin tasdiqlashini so'rash</span>
+      </label>
+      <div class="flex justify-end gap-2">
+        <a class="btn-outline" href="{% url 'business_dashboard' %}">Bekor qilish</a>
+        <button class="btn-primary" type="submit">Yuborish</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

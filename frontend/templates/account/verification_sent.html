@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email tasdiqlash yuborildi</title>
+  <script>
+    // Mark that we just sent a verification email
+    try { sessionStorage.setItem('email_verification_sent', '1'); } catch (e) {}
+    // Redirect user to login -> profile (works whether logged in or not)
+    (function(){
+      var target = '/accounts/login/?next=/profile/';
+      window.location.replace(target);
+    })();
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=/accounts/login/?next=/profile/" />
+  </noscript>
+</head>
+<body>
+  <p>Email tasdiqlash yuborildi. Iltimos, pochtangizni tekshiring...</p>
+</body>
+</html>

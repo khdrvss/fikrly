@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from a .env file at project root (if present)
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -46,16 +50,18 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'frontend',
+    'frontend.apps.FrontendConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'frontend.middleware.NoCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'frontend.middleware.PostLoginRedirectMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -72,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # allauth context processors removed in recent versions; not required
             ],
         },
     },
@@ -131,6 +138,10 @@ STATICFILES_DIRS = [
     BASE_DIR / "public",
 ]
 
+# Media (user uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -161,10 +172,42 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Email login configuration (email verification still disabled)
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-# Updated django-allauth settings (new format)
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+ACCOUNT_UNIQUE_EMAIL = True  # required when using email as a login method
+# Prefer new-format settings; classic ones removed to avoid deprecation
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
-# Restrict signup to Gmail only
-ACCOUNT_EMAIL_DOMAIN_WHITELIST = ['gmail.com']
 ACCOUNT_SIGNUP_REDIRECT_URL = '/'
+ACCOUNT_ADAPTER = 'frontend.adapters.AccountAdapter'
+
+# Email backend & defaults
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@fikrly.uz')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', DEFAULT_FROM_EMAIL)
+EMAIL_SUBJECT_PREFIX = os.environ.get('EMAIL_SUBJECT_PREFIX', '[Fikrly] ')
+
+# Allow override in DEBUG via env
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+if not EMAIL_BACKEND:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'
+
+# If SMTP backend, read SMTP settings from env
+if EMAIL_BACKEND.endswith('smtp.EmailBackend'):
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+    EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'true').lower() in ('1','true','yes')
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+
+# Telegram notifications (optional)
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+# Comma-separated chat IDs (can be user IDs or group IDs)
+TELEGRAM_ADMIN_CHAT_IDS = [cid.strip() for cid in os.environ.get('TELEGRAM_ADMIN_CHAT_IDS', '').split(',') if cid.strip()]
+TELEGRAM_REVIEWS_CHAT_IDS = [cid.strip() for cid in os.environ.get('TELEGRAM_REVIEWS_CHAT_IDS', '').split(',') if cid.strip()]
+
+# Eskiz SMS (phone OTP)
+ESKIZ_BASE = os.environ.get('ESKIZ_BASE', 'https://notify.eskiz.uz')
+ESKIZ_EMAIL = os.environ.get('ESKIZ_EMAIL', '')
+ESKIZ_PASSWORD = os.environ.get('ESKIZ_PASSWORD', '')
+ESKIZ_FROM = os.environ.get('ESKIZ_FROM', '4546')

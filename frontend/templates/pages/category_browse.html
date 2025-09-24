@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kategoriyalar - Fikrly</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
@@ -77,7 +78,7 @@
                 {% for cat in category_cards %}
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
                     <div class="relative mb-6">
-                        <img src="{{ cat.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ cat.label }}" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        <img src="{{ cat.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ cat.label }}" class="w-full h-24 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
                         {% if cat.badge_text %}
                         <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">{{ cat.badge_text }}</div>
                         {% endif %}
@@ -107,339 +108,13 @@
                         <a href="{% url 'business_list' %}?category={{ cat.category }}" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
                     </div>
                 </div>
+                {% empty %}
+                <div class="col-span-full text-center text-text-secondary py-12">Hozircha kategoriyalar bo'yicha ma'lumot yo'q.</div>
                 {% endfor %}
-
-                <!-- Services Category -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
-                    <div class="relative mb-6">
-                        <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Xizmatlar kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-secondary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            8,320 biznes
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-secondary" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-primary">Xizmatlar</h3>
-                            <p class="text-text-secondary">Ta'mirlash, tozalash, transport</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3 mb-4 flex-grow">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Baholash</span>
-                            <span class="font-semibold text-primary">85.2 · Yuqori</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sharhlar</span>
-                            <span class="font-semibold text-success">8,320 sharh</span>
-                        </div>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100">
-                        <a href="{% url 'business_list' %}?category=services" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
-                    </div>
-                </div>
-
-                <!-- Retail Category -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
-                    <div class="relative mb-6">
-                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Savdo kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            15,680 biznes
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 15a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v12z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-primary">Savdo markazlari</h3>
-                            <p class="text-text-secondary">Bozor, do'kon, supermarket</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3 mb-4 flex-grow">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Baholash</span>
-                            <span class="font-semibold text-primary">92.1 · Yuqori</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sharhlar</span>
-                            <span class="font-semibold text-success">15,680 sharh</span>
-                        </div>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100">
-                        <a href="{% url 'business_list' %}?category=retail" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
-                    </div>
-                </div>
-
-                <!-- Healthcare Category -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
-                    <div class="relative mb-6">
-                        <img src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Sog'liqni saqlash kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-success text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            3,240 biznes
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-success" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-primary">Sog'liqni saqlash</h3>
-                            <p class="text-text-secondary">Klinika, dorixona, stomatologiya</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3 mb-4 flex-grow">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Baholash</span>
-                            <span class="font-semibold text-primary">78.5 · O'rtacha</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sharhlar</span>
-                            <span class="font-semibold text-success">3,240 sharh</span>
-                        </div>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100">
-                        <a href="{% url 'business_list' %}?category=healthcare" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
-                    </div>
-                </div>
-
-                <!-- Education Category -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
-                    <div class="relative mb-6">
-                        <img src="https://images.pixabay.com/photos/2015/07/17/22/43/student-849825_960_720.jpg" alt="Ta'lim kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-warning text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            2,890 biznes
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-warning" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-primary">Ta'lim muassasalari</h3>
-                            <p class="text-text-secondary">Maktab, universitet, kurslar</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3 mb-4 flex-grow">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Baholash</span>
-                            <span class="font-semibold text-primary">82.3 · O'rtacha</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sharhlar</span>
-                            <span class="font-semibold text-success">2,890 sharh</span>
-                        </div>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100">
-                        <a href="{% url 'business_list' %}?category=education" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
-                    </div>
-                </div>
-
-                <!-- Tourism Category -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col h-96">
-                    <div class="relative mb-6">
-                        <img src="https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Turizm kategoriyasi" class="w-full h-48 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                            1,560 biznes
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 6V4h-4v2h4zM4 8v11h16V8H4zm16-2c1.11 0 2 .89 2 2v11c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2l.01-11c0-1.11.88-2 1.99-2h4V4c0-1.11.89-2 2-2h4c1.11 0 2 .89 2 2v2h4z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold text-primary">Turizm va dam olish</h3>
-                            <p class="text-text-secondary">Mehmonxona, sayohat, ko'ngilochar</p>
-                        </div>
-                    </div>
-                    <div class="space-y-3 mb-4 flex-grow">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Baholash</span>
-                            <span class="font-semibold text-primary">76.8 · O'rtacha</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sharhlar</span>
-                            <span class="font-semibold text-success">1,560 sharh</span>
-                        </div>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100">
-                        <a href="{% url 'business_list' %}?category=tourism" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
-
-    <!-- Trending Businesses -->
-    <section class="py-16 bg-surface">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-12">
-                <h2 class="text-3xl font-bold text-primary">Mashhur bizneslar</h2>
-                <div class="flex space-x-4">
-                    <button class="text-primary hover:text-primary-700 font-semibold">Toshkent</button>
-                    <button class="text-text-secondary hover:text-primary font-semibold">Samarqand</button>
-                    <button class="text-text-secondary hover:text-primary font-semibold">Buxoro</button>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Business Card 1 -->
-                <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Oqtepa Lavash" class="w-full h-32 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-2 right-2 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-1">Oqtepa Lavash</h3>
-                    <p class="text-sm text-text-secondary mb-2">Fast food • Yunusobod</p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">4.8</span>
-                        </div>
-                        <span class="text-xs text-text-secondary">2,847 sharh</span>
-                    </div>
-                </div>
-
-                <!-- Business Card 2 -->
-                <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Bellissimo Pizza" class="w-full h-32 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-2 right-2 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-1">Bellissimo Pizza</h3>
-                    <p class="text-sm text-text-secondary mb-2">Pizza • Mirzo Ulug'bek</p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">4.6</span>
-                        </div>
-                        <span class="text-xs text-text-secondary">1,923 sharh</span>
-                    </div>
-                </div>
-
-                <!-- Business Card 3 -->
-                <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Caravan Bozor" class="w-full h-32 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-2 right-2 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-1">Caravan Bozor</h3>
-                    <p class="text-sm text-text-secondary mb-2">Savdo markazi • Sergeli</p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">4.9</span>
-                        </div>
-                        <span class="text-xs text-text-secondary">3,456 sharh</span>
-                    </div>
-                </div>
-
-                <!-- Business Card 4 -->
-                <div class="card card-hover">
-                    <div class="relative mb-4">
-                        <img src="https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Tashkent Medical" class="w-full h-32 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                        <div class="absolute top-2 right-2 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            Tasdiqlangan
-                        </div>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-1">Tashkent Medical</h3>
-                    <p class="text-sm text-text-secondary mb-2">Klinika • Shayxontohur</p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="w-4 h-4 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm font-semibold">4.8</span>
-                        </div>
-                        <span class="text-xs text-text-secondary">892 sharh</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Local Favorites -->
-    <section class="py-16 bg-gradient-to-br from-primary-50 to-secondary-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-primary mb-4">Mahalliy sevimlilar</h2>
-                <p class="text-text-secondary max-w-2xl mx-auto">
-                    Toshkent aholisi tomonidan eng ko'p tavsiya qilingan bizneslar
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Local Favorite 1 -->
-                <div class="card text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-primary mb-2">Eng sevimli restoran</h3>
-                    <p class="text-3xl font-bold text-primary mb-2">Osh Markazi</p>
-                    <p class="text-text-secondary mb-4">Chorsu bozorida joylashgan an'anaviy o'zbek oshxonasi</p>
-                    <div class="bg-primary-50 p-3 rounded-lg">
-                        <p class="text-sm text-primary font-semibold">4.9★ • 5,234 sharh</p>
-                    </div>
-                </div>
-
-                <!-- Local Favorite 2 -->
-                <div class="card text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-secondary-100 rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 15a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v12z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-primary mb-2">Eng yaxshi xizmat</h3>
-                    <p class="text-3xl font-bold text-secondary mb-2">Avtoulov Service</p>
-                    <p class="text-text-secondary mb-4">Avtomobil ta'mirlash va texnik xizmat ko'rsatish</p>
-                    <div class="bg-secondary-50 p-3 rounded-lg">
-                        <p class="text-sm text-secondary font-semibold">4.8★ • 2,156 sharh</p>
-                    </div>
-                </div>
-
-                <!-- Local Favorite 3 -->
-                <div class="card text-center">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-success-100 rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-success" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-primary mb-2">Eng ishonchli dorixona</h3>
-                    <p class="text-3xl font-bold text-success mb-2">Farmatsiya Plus</p>
-                    <p class="text-text-secondary mb-4">24/7 ishlaydi, malakali farmatsevtlar</p>
-                    <div class="bg-success-50 p-3 rounded-lg">
-                        <p class="text-sm text-success font-semibold">4.9★ • 3,789 sharh</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- Map Integration Placeholder -->
     <section class="py-16 bg-background">
@@ -554,7 +229,7 @@
                     <ul class="space-y-2">
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
                     </ul>
                 </div>
@@ -566,6 +241,6 @@
         </div>
     </footer>
 {% load static %}
-<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+<script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
 </html>

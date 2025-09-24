@@ -5,9 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sharh yozish - Fikrly</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <style>
+            /* Green highlight for chosen company */
+            .biz-card.is-selected {
+                background: #ecfdf5; /* green-50 */
+                border: 2px solid #22c55e; /* green-500 */
+                box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+            }
+            .biz-card.is-selected .biz-title { color: #166534; font-weight: 600; }
+        </style>
 <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
 </head>
 <body class="bg-background">
@@ -62,8 +72,8 @@
                 <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Biznesni toping</label>
-                        <div class="business-feed-container">
-                            <div class="business-feed-header">
+                        <div class="business-feed-container" id="businessFinder">
+                            <div class="business-feed-header" id="companySearchHeader">
                                 <div class="relative">
                                     <input id="companySearchInput" type="text" placeholder="Biznes nomi yoki manzilini kiriting..." class="input-field pl-12 pr-4 py-3" />
                                     <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,16 +86,32 @@
                                     {% for c in suggested_companies %}
                                     <button type="button" role="button" tabindex="0" class="biz-card biz-card-grid company-suggest cursor-pointer"
                                         data-company-id="{{ c.pk }}" data-company-name="{{ c.name }}">
-                                        <img src="{{ c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop' }}" alt="{{ c.name }}" class="biz-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop'; this.onerror=null;" />
+                                        <img src="{{ c.display_image_url|default:c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop' }}" alt="{{ c.name }}" class="biz-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop'; this.onerror=null;" />
                                         <h3 class="biz-title clamp-1">{{ c.name }}</h3>
                                     </button>
                                     {% endfor %}
                                 </div>
                             </div>
                         </div>
+                        <!-- Selected company summary (visible after choosing) -->
+                        <div id="selectedCompanySummary" class="hidden mt-3 p-4 rounded-lg border-2 border-green-500 bg-green-50 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img id="selectedCompanyImage" src="" alt="" class="w-14 h-14 rounded object-cover mr-3"/>
+                                <div>
+                                    <p class="text-xs text-green-700">Tanlangan kompaniya</p>
+                                    <h3 id="selectedCompanyName" class="text-base font-semibold text-green-800"></h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button id="changeCompanyAction" type="button" class="btn-outline text-sm px-3 py-2">O'zgartirish</button>
+                                <button id="unchooseCompanyAction" type="button" class="btn-secondary text-sm px-3 py-2">Bekor qilish</button>
+                            </div>
+                        </div>
                         <div class="hidden">{{ form.company }}</div>
                         <p class="text-xs text-text-secondary mt-1">Yuqoridan kompaniyani tanlang.</p>
-                        <p id="selectedCompanyLabel" class="text-xs text-success mt-1 hidden">Tanlangan: <span></span></p>
+                        <p id="selectedCompanyLabel" class="text-xs text-success mt-1 hidden">Tanlangan: <span></span>
+                            <button id="changeCompanyBtn" type="button" class="ml-2 text-primary underline hover:no-underline hidden">O'zgartirish</button>
+                        </p>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Baho</label>
@@ -120,7 +146,9 @@
 
                 <!-- Review Text -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-primary mb-2">Batafsil sharh</label>
+                    <label class="block text-sm font-semibold text-primary mb-2">Batafsil sharh
+                        <a href="{% url 'community_guidelines' %}" class="ml-2 text-xs text-text-secondary underline" title="MVP bosqichida fotosuratlar qabul qilinmaydi. Batafsil: Hamjamiyat qoidalari">Nega fotosuratlar yo‘q?</a>
+                    </label>
                     {{ form.text }}
                     <div class="flex justify-between items-center mt-2">
                         <p class="text-xs text-text-secondary">
@@ -139,34 +167,9 @@
                     </div>
                 </div>
 
-                <!-- Photo Upload -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-primary mb-3">Rasmlar qo'shish</label>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-smooth">
-                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        <p class="text-text-secondary mb-2">Rasmlarni bu yerga tashlang yoki</p>
-                        <button class="btn-outline text-sm px-4 py-2">Fayl tanlash</button>
-                        <p class="text-xs text-text-secondary mt-2">PNG, JPG, JPEG (maksimal 5MB)</p>
-                    </div>
-                </div>
+                <!-- Attachments removed for MVP -->
 
-                <!-- Voice Input -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between p-4 bg-secondary-50 rounded-lg">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 text-secondary mr-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-                            </svg>
-                            <div>
-                                <h3 class="font-semibold text-secondary">Ovozli yozuv</h3>
-                                <p class="text-sm text-text-secondary">Sharhni ovoz orqali yozing</p>
-                            </div>
-                        </div>
-                        <button class="btn-secondary text-sm px-4 py-2">Boshlash</button>
-                    </div>
-                </div>
+                
 
                 <!-- Privacy Options -->
                 <div class="mb-6">
@@ -186,9 +189,18 @@
                         </label>
                     </div>
                 </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="reset" class="btn-outline px-6 py-3">Tozalash</button>
-                    <button type="submit" class="btn-primary px-6 py-3">Yuborish</button>
+                <div class="flex items-center justify-between flex-col md:flex-row gap-3 md:gap-6 mt-4">
+                    <p class="text-xs text-text-secondary md:mr-auto">
+                        Yuborish tugmasini bosish orqali siz
+                        <a href="{% url 'terms_of_service' %}" class="underline text-primary">Foydalanish shartlari</a>
+                        va
+                        <a href="{% url 'community_guidelines' %}" class="underline text-primary">Hamjamiyat qoidalari</a>
+                        bilan tanishganingizni tasdiqlaysiz.
+                    </p>
+                    <div class="flex justify-end space-x-3">
+                        <button type="reset" class="btn-outline px-6 py-3">Tozalash</button>
+                        <button type="submit" class="btn-primary px-6 py-3">Yuborish</button>
+                    </div>
                 </div>
             </form>
 
@@ -208,7 +220,6 @@
                             <li>• Aniq va foydali ma'lumot bering</li>
                             <li>• Hurmatli tilda yozing</li>
                             <li>• Konstruktiv takliflar bering</li>
-                            <li>• O'z rasmlaringizni yuklang</li>
                         </ul>
                     </div>
                     <div>
@@ -294,6 +305,8 @@
                 <!-- Company Info -->
                 <div>
                     <div class="flex items-center space-x-2 mb-4">
+
+            <!-- Attachment preview script removed -->
                         <svg class="w-8 h-8 text-secondary" viewBox="0 0 32 32" fill="currentColor">
                             <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
                         </svg>
@@ -349,7 +362,7 @@
                     <ul class="space-y-2">
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
                     </ul>
                 </div>
@@ -361,14 +374,24 @@
         </div>
     </footer>
     {% load static %}
-    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
     <script>
     (function() {
         const searchInput = document.getElementById('companySearchInput');
         const list = document.getElementById('companySuggestionsInline');
-        const select = document.querySelector('#reviewForm select[name="company"]');
-        const selectedLabel = document.getElementById('selectedCompanyLabel');
-        const starContainer = document.getElementById('starRating');
+    const select = document.querySelector('#reviewForm select[name="company"]');
+    const selectedLabel = document.getElementById('selectedCompanyLabel');
+    const changeCompanyBtn = document.getElementById('changeCompanyBtn');
+    const finder = document.getElementById('businessFinder');
+    const headerEl = document.getElementById('companySearchHeader');
+    const starContainer = document.getElementById('starRating');
+    const gridEl = list && list.querySelector('.grid');
+    // Summary elements
+    const summary = document.getElementById('selectedCompanySummary');
+    const summaryName = document.getElementById('selectedCompanyName');
+    const summaryImage = document.getElementById('selectedCompanyImage');
+    const changeCompanyAction = document.getElementById('changeCompanyAction');
+    const unchooseCompanyAction = document.getElementById('unchooseCompanyAction');
         const ratingInput = document.querySelector('#reviewForm input[name="rating"], #reviewForm select[name="rating"], #reviewForm [name="rating"]');
 
         function applyFilter(term) {
@@ -379,18 +402,64 @@
             });
         }
 
+        function foldFinder(selectedBtn) {
+            if (!list) return;
+            // Show only the selected card, hide others
+            list.querySelectorAll('.company-suggest').forEach(el => {
+                el.style.display = (el === selectedBtn) ? '' : 'none';
+            });
+            // Make grid one column so the card spans full width
+            const grid = gridEl || (list && list.querySelector('.grid'));
+            if (grid) {
+                grid.classList.remove('grid-cols-2','md:grid-cols-3','lg:grid-cols-4');
+                grid.classList.add('grid-cols-1');
+            }
+            // Hide search header and show change button
+            if (headerEl) headerEl.classList.add('hidden');
+            if (changeCompanyBtn) changeCompanyBtn.classList.remove('hidden');
+            // Completely hide the finder to avoid giant image/card area
+            if (finder) finder.classList.add('hidden');
+        }
+
+        function unfoldFinder() {
+            if (!list) return;
+            // Reveal all cards again
+            list.querySelectorAll('.company-suggest').forEach(el => {
+                el.style.display = '';
+            });
+            // Restore multi-column grid
+            const grid = gridEl || (list && list.querySelector('.grid'));
+            if (grid) {
+                grid.classList.remove('grid-cols-1');
+                grid.classList.add('grid-cols-2','md:grid-cols-3','lg:grid-cols-4');
+            }
+            if (headerEl) headerEl.classList.remove('hidden');
+            if (summary) summary.classList.add('hidden');
+            if (changeCompanyBtn) changeCompanyBtn.classList.add('hidden');
+            if (searchInput) setTimeout(() => searchInput.focus(), 0);
+            // Show the finder again
+            if (finder) finder.classList.remove('hidden');
+        }
+
         function choose(btn) {
             const id = btn.getAttribute('data-company-id');
             const name = btn.getAttribute('data-company-name') || btn.innerText.trim();
             if (select) {
                 select.value = id;
             }
-            list && list.querySelectorAll('.company-suggest').forEach(el => el.classList.remove('ring-2','ring-secondary','bg-gray-50'));
-            btn.classList.add('ring-2','ring-secondary','bg-gray-50');
+            list && list.querySelectorAll('.company-suggest').forEach(el => el.classList.remove('is-selected','ring-2','ring-secondary','bg-gray-50'));
+            btn.classList.add('is-selected');
             if (selectedLabel) {
                 selectedLabel.querySelector('span').textContent = name;
                 selectedLabel.classList.remove('hidden');
             }
+            // Fill summary and keep only the chosen company visible
+            const img = btn.querySelector('img');
+            const imgSrc = img ? img.src : '';
+            if (summaryName) summaryName.textContent = name;
+            if (summaryImage && imgSrc) summaryImage.src = imgSrc;
+            if (summary) summary.classList.remove('hidden');
+            foldFinder(btn);
         }
 
         // Star rating helpers
@@ -433,6 +502,24 @@
         if (select && select.value && list) {
             const pre = list.querySelector(`.company-suggest[data-company-id="${CSS.escape(select.value)}"]`);
             if (pre) choose(pre);
+        }
+
+        // Allow user to change company (re-open the finder)
+        if (changeCompanyBtn) {
+            changeCompanyBtn.addEventListener('click', () => unfoldFinder());
+        }
+        if (changeCompanyAction) {
+            changeCompanyAction.addEventListener('click', () => unfoldFinder());
+        }
+        if (unchooseCompanyAction) {
+            unchooseCompanyAction.addEventListener('click', () => {
+                // Clear selection completely
+                if (select) select.value = '';
+                list && list.querySelectorAll('.company-suggest').forEach(el => el.classList.remove('is-selected'));
+                if (selectedLabel) selectedLabel.classList.add('hidden');
+                if (summary) summary.classList.add('hidden');
+                unfoldFinder();
+            });
         }
 
         // Wire up stars

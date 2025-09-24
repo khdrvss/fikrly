@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bizneslar - Fikrly</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 </head>
@@ -72,8 +73,8 @@
                 <div class="card hover:shadow-lg transition-smooth">
                     <a href="{% url 'company_detail' c.pk %}" class="block group">
                         <div class="relative overflow-hidden">
-                            <div class="w-full h-48 bg-gray-100">
-                                <img src="{{ c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ c.name }}" class="w-full h-full object-cover object-center rounded-t-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
+                            <div class="w-full h-20 bg-gray-100">
+                                <img src="{{ c.display_image_url|default:c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ c.name }}" class="w-full h-full object-cover object-center rounded-t-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
                             </div>
                             {% if c.is_verified %}
                             <span class="absolute top-3 left-3 bg-success text-white px-2 py-0.5 rounded text-xs font-medium">Tasdiqlangan</span>
@@ -154,7 +155,7 @@
     </footer>
 
     {% load static %}
-    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
 </html>
 

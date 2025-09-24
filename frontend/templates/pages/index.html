@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fikrly Reviews Platform</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <style>
         body {
             margin: 0;
@@ -87,6 +88,6 @@
         });
     </script>
 {% load static %}
-<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+<script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
 </html>

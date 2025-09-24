@@ -6,5 +6,9 @@ class FrontendConfig(AppConfig):
     name = 'frontend'
 
     def ready(self):
-        # Placeholder for signals if needed later
-        return super().ready()
+        # Wire signals
+        try:
+            from . import signals  # noqa: F401
+        except Exception:
+            # Avoid crashing on import-time issues in checks/migrations
+            pass

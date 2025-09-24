@@ -4,13 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% if request.user.is_authenticated %}{{ request.user.get_full_name|default:request.user.username }}{% else %}Foydalanuvchi{% endif %} - Foydalanuvchi profili | Fikrly</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static %}{% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
 </head>
 <body class="bg-background">
+    <div id="toastEmailSent" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50">
+        <div class="px-4 py-3 rounded shadow-md bg-green-600 text-white text-sm">
+            Email tasdiqlash yuborildi. Pochtangizni tekshiring.
+        </div>
+    </div>
     <!-- Header Navigation -->
     <header class="bg-surface shadow-subtle sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,26 +59,49 @@
         </div>
     </header>
 
+        {% if profile and not profile.is_approved %}
+        <div class="bg-yellow-50 border border-yellow-200 text-yellow-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-start md:items-center gap-3">
+                <svg class="w-5 h-5 mt-1 md:mt-0 text-yellow-600 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L1 21h22L12 2zm0 14a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-1-7h2v6h-2V9z"/>
+                </svg>
+                <div class="text-sm">
+                    <div class="font-semibold">Profilingiz tasdiqlanishi kutilmoqda</div>
+                    <div class="text-yellow-700">Administrator tasdiqlagandan so'ng barcha funksiyalar ochiladi. Bu odatda qisqa vaqt oladi.</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
     <!-- Profile Header Section -->
     <section class="bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
                 <!-- Profile Image -->
-                <div class="relative">
-                    <div class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg bg-primary-100 flex items-center justify-center">
-                        <span class="text-3xl text-primary font-bold">{{ request.user.get_username|first|default:"U" }}</span>
-                    </div>
-                    <div class="absolute -bottom-2 -right-2 bg-success text-white p-2 rounded-full">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
+        <div class="relative w-32 h-32 aspect-square rounded-full overflow-hidden border border-gray-200 shadow-sm bg-white" style="border-radius:9999px">
+                    {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="avatar" class="w-full h-full object-cover" style="border-radius:9999px" />
+                    {% else %}
+            <div class="w-full h-full flex items-center justify-center bg-primary-50" style="border-radius:9999px">
+                            <span class="text-3xl text-primary font-semibold">{{ request.user.get_username|first|default:"U" }}</span>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <!-- Profile Info -->
                 <div class="flex-1 text-center md:text-left">
                     <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-                        <h1 class="text-3xl font-bold text-primary">{{ request.user.get_full_name|default:request.user.username }}</h1>
+                        <h1 class="text-3xl font-bold text-primary flex items-center">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                            {% if profile.is_approved %}
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-semibold">
+                                <svg class="w-4 h-4 mr-1 text-green-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M9 12l2 2 4-4M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                                </svg>
+                                Tasdiqlangan
+                            </span>
+                            {% endif %}
+                        </h1>
                         <div class="flex items-center justify-center md:justify-start gap-2">
                             <span class="bg-success text-white px-3 py-1 rounded-full text-sm font-semibold">Ishonchli sharhchi</span>
                             <span class="bg-secondary text-white px-3 py-1 rounded-full text-sm font-semibold">Mahalliy ekspert</span>
@@ -88,28 +116,38 @@
                     <!-- Stats -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-primary">247</div>
+                            <div class="text-2xl font-bold text-primary">{{ profile_stats.total_reviews }}</div>
                             <div class="text-text-secondary text-sm">Sharhlar</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-secondary">4.9</div>
-                            <div class="text-text-secondary text-sm">Foydalilik reytingi</div>
+                            <div class="text-2xl font-bold text-secondary">{{ profile_stats.avg_rating|floatformat:1 }}</div>
+                            <div class="text-text-secondary text-sm">O'rtacha baho</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-success">156</div>
-                            <div class="text-text-secondary text-sm">Yordamlashgan bizneslar</div>
+                            <div class="text-2xl font-bold text-success">{{ profile_stats.unique_companies }}</div>
+                            <div class="text-text-secondary text-sm">Yordam bergan bizneslar</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-accent">3.2K</div>
+                            <div class="text-2xl font-bold text-accent">{{ profile_stats.helpful_votes }}</div>
                             <div class="text-text-secondary text-sm">Foydali ovozlar</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-col gap-3">
-                    <button class="btn-primary px-6 py-2 text-sm">Profilni tahrirlash</button>
-                    <button class="btn-outline px-6 py-2 text-sm">Sozlamalar</button>
+                <!-- Profile Edit Form -->
+                <div class="w-full md:max-w-sm">
+                    <form method="post" enctype="multipart/form-data" class="card space-y-3">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-semibold text-primary mb-2">Avatar</label>
+                            <input type="file" name="avatar" accept="image/*" class="input-field" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-primary mb-2">Bio</label>
+                            {{ form.bio }}
+                        </div>
+                        <button class="btn-primary w-full">Saqlash</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -195,13 +233,13 @@
             <div class="border-b border-gray-200 mb-8">
                 <nav class="flex space-x-8">
                     <button class="border-b-2 border-primary text-primary font-semibold py-2 px-1">
-                        Sharhlarim (247)
+                        Sharhlarim ({{ profile_stats.total_reviews }})
                     </button>
                     <button class="border-b-2 border-transparent text-text-secondary hover:text-primary py-2 px-1 transition-smooth">
-                        Saqlangan (12)
+                        Saqlangan (0)
                     </button>
                     <button class="border-b-2 border-transparent text-text-secondary hover:text-primary py-2 px-1 transition-smooth">
-                        Kuzatilayotgan (8)
+                        Kuzatilayotgan (0)
                     </button>
                     <button class="border-b-2 border-transparent text-text-secondary hover:text-primary py-2 px-1 transition-smooth">
                         Statistika
@@ -211,329 +249,43 @@
 
             <!-- Reviews Grid -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Review Card 1 -->
+                {% for r in user_reviews %}
                 <div class="card">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center">
-                            <img src="https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=100" alt="Oqtepa Lavash" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
+                            <img src="{{ r.company.display_image_url|default:r.company.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop' }}" alt="{{ r.company.name }}" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" />
                             <div>
-                                <h3 class="font-semibold text-primary">Oqtepa Lavash</h3>
-                                <p class="text-sm text-text-secondary">2 kun oldin</p>
+                                <h3 class="font-semibold text-primary">{{ r.company.name }}</h3>
+                                <p class="text-sm text-text-secondary">{{ r.created_at|date:"M d, Y" }}</p>
                             </div>
                         </div>
                         <div class="flex text-secondary">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
+                            {% for _ in "12345"|make_list %}
+                                <svg class="w-4 h-4 {% if forloop.counter > r.rating %}text-gray-300{% endif %}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            {% endfor %}
                         </div>
                     </div>
-                    <p class="text-text-secondary mb-4">
-                        "Ajoyib xizmat va mazali taomlar. Oila bilan kelishga juda mos joy. Xodimlar juda mehribon va tez xizmat ko'rsatishadi. Lavash va somsa ayniqsa mazali edi."
-                    </p>
+                    <p class="text-text-secondary mb-4">{{ r.text }}</p>
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center text-success text-sm">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM8 5a1 1 0 0 1 2 0v4H8V5zm2 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
-                            </svg>
-                            47 foydali
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-text-secondary hover:text-primary transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button class="text-text-secondary hover:text-accent transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
+                        <div class="text-sm text-text-secondary">Baho: <span class="font-semibold text-primary">{{ r.rating }}</span>/5</div>
+                        <div class="flex items-center space-x-3 text-sm">
+                            <a href="{% url 'company_detail' r.company.pk %}" class="text-primary">Ko'rish</a>
+                            <a href="{% url 'review_edit' r.pk %}" class="text-text-secondary hover:text-primary">Tahrirlash</a>
+                            <a href="{% url 'review_delete' r.pk %}" class="text-accent hover:opacity-80">O'chirish</a>
                         </div>
                     </div>
                 </div>
-
-                <!-- Review Card 2 -->
-                <div class="card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <img src="https://images.pixabay.com/photos/2017/07/31/11/21/people-2557396_960_720.jpg" alt="Bellissimo Pizza" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                            <div>
-                                <h3 class="font-semibold text-primary">Bellissimo Pizza</h3>
-                                <p class="text-sm text-text-secondary">1 hafta oldin</p>
-                            </div>
-                        </div>
-                        <div class="flex text-secondary">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-4">
-                        "Pizza mazali, lekin yetkazib berish biroz kech bo'ldi. Xizmat yaxshi, lekin vaqtni yaxshilash kerak. Umumiy holda yaxshi tajriba."
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center text-success text-sm">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM8 5a1 1 0 0 1 2 0v4H8V5zm2 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
-                            </svg>
-                            23 foydali
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-text-secondary hover:text-primary transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button class="text-text-secondary hover:text-accent transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Review Card 3 -->
-                <div class="card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?q=80&w=100&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Caravan Bozor" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                            <div>
-                                <h3 class="font-semibold text-primary">Caravan Bozor</h3>
-                                <p class="text-sm text-text-secondary">2 hafta oldin</p>
-                            </div>
-                        </div>
-                        <div class="flex text-secondary">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-4">
-                        "Caravan bozorida har doim kerakli narsalarni topaman. Narxlar ham mos, sifat ham yaxshi. Xaridorlar uchun qulay muhit yaratilgan."
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center text-success text-sm">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM8 5a1 1 0 0 1 2 0v4H8V5zm2 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
-                            </svg>
-                            89 foydali
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-text-secondary hover:text-primary transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button class="text-text-secondary hover:text-accent transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Review Card 4 -->
-                <div class="card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <img src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=100" alt="Tashkent Medical Center" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                            <div>
-                                <h3 class="font-semibold text-primary">Tashkent Medical Center</h3>
-                                <p class="text-sm text-text-secondary">3 hafta oldin</p>
-                            </div>
-                        </div>
-                        <div class="flex text-secondary">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-4">
-                        "Professional xizmat va zamonaviy jihozlar. Shifokorlar juda malakali va sabr-toqatli. Tavsiya qilaman barcha do'stlarimga."
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center text-success text-sm">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM8 5a1 1 0 0 1 2 0v4H8V5zm2 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
-                            </svg>
-                            156 foydali
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-text-secondary hover:text-primary transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button class="text-text-secondary hover:text-accent transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Review Card 5 -->
-                <div class="card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <img src="https://images.pixabay.com/photos/2016/11/18/14/05/brick-1834784_960_720.jpg" alt="Uzbek National Foods" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                            <div>
-                                <h3 class="font-semibold text-primary">Uzbek National Foods</h3>
-                                <p class="text-sm text-text-secondary">1 oy oldin</p>
-                            </div>
-                        </div>
-                        <div class="flex text-secondary">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-4">
-                        "An'anaviy o'zbek taomlari juda mazali. Osh va manti ayniqsa yoqdi. Narxlar ham mos. Faqat xizmat biroz sekin edi."
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center text-success text-sm">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM8 5a1 1 0 0 1 2 0v4H8V5zm2 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
-                            </svg>
-                            34 foydali
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-text-secondary hover:text-primary transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button class="text-text-secondary hover:text-accent transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Review Card 6 -->
-                <div class="card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=100&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Tech Solutions UZ" class="w-12 h-12 rounded-lg object-cover mr-3" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'; this.onerror=null;" />
-                            <div>
-                                <h3 class="font-semibold text-primary">Tech Solutions UZ</h3>
-                                <p class="text-sm text-text-secondary">1 oy oldin</p>
-                            </div>
-                        </div>
-                        <div class="flex text-secondary">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <p class="text-text-secondary mb-4">
-                        "Kompyuter ta'mirlash xizmati juda professional. Muammo tez hal qilindi va narx ham mos edi. Kafolat ham berishdi."
-                    </p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center text-success text-sm">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 9V5a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zM8 5a1 1 0 0 1 2 0v4H8V5zm2 12a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
-                            </svg>
-                            67 foydali
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-text-secondary hover:text-primary transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button class="text-text-secondary hover:text-accent transition-smooth">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                {% empty %}
+                <div class="col-span-full text-center text-text-secondary">Hali sharh yozmagansiz.</div>
+                {% endfor %}
             </div>
 
             <!-- Load More Button -->
+            {% if user_reviews %}
             <div class="text-center mt-12">
                 <button class="btn-outline px-8 py-3">Ko'proq yuklash</button>
             </div>
+            {% endif %}
         </div>
     </section>
 
@@ -641,7 +393,7 @@
                     <ul class="space-y-2">
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
                     </ul>
                 </div>
@@ -653,6 +405,21 @@
         </div>
     </footer>
 {% load static %}
-<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+<script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
+<script>
+    (function(){
+        try {
+            var flag = sessionStorage.getItem('email_verification_sent');
+            if (flag === '1') {
+                var el = document.getElementById('toastEmailSent');
+                if (el) {
+                    el.classList.remove('hidden');
+                    setTimeout(function(){ el.classList.add('hidden'); }, 4000);
+                }
+                sessionStorage.removeItem('email_verification_sent');
+            }
+        } catch (e) {}
+    })();
+</script>
 </body>
 </html>

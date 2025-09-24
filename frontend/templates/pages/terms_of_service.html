@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foydalanish shartlari | Fikrly</title>
+  {% load static %}
+  {% load static_bust %}
+  <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+</head>
+<body class="bg-background">
+  <header class="bg-surface shadow-subtle">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="{% url 'index' %}" class="text-2xl font-bold text-primary">Fikrly</a>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-bold text-primary mb-6">Foydalanish shartlari</h1>
+    <div class="prose max-w-none text-text-secondary">
+      <p>Oxirgi yangilanish: 2025-09-22</p>
+      <p>Ushbu Foydalanish shartlari Fikrly platformasidan foydalanish qoidalarini belgilaydi. Platformadan foydalanish orqali ushbu shartlarga rozilik bildirasiz.</p>
+      <h2 class="text-xl font-semibold text-primary mt-6">1. Hisob qaydnoması</h2>
+      <ul class="list-disc ml-6">
+        <li>Roʻyxatdan oʻtish uchun haqiqiy email talab qilinadi. Email tasdiqlanmaguncha ayrim imkoniyatlar yopiq boʻlishi mumkin.</li>
+        <li>Profil maʼlumotlarini yangilab turing; firibgarlik va soxtalashtirish taqiqlanadi.</li>
+      </ul>
+      <h2 class="text-xl font-semibold text-primary mt-6">2. Kontent va sharhlar</h2>
+      <ul class="list-disc ml-6">
+        <li>Haqorat, nafrat, yolgʻon axborot, spamlarga yoʻl qoʻyilmaydi.</li>
+        <li>Sharhlar real tajribaga asoslanishi va foydali boʻlishi kerak.</li>
+        <li>Qoida buzilishida kontentni oʻchirish yoki cheklash huquqiga egamiz.</li>
+      </ul>
+      <h2 class="text-xl font-semibold text-primary mt-6">3. Biznes egalari</h2>
+      <ul class="list-disc ml-6">
+        <li>Javob yozishda hurmat saqlang; manipulyativ yoki sotib olingan sharhlarga ruxsat berilmaydi.</li>
+      </ul>
+      <h2 class="text-xl font-semibold text-primary mt-6">4. Maʼlumotlar va maxfiylik</h2>
+      <p>Maxfiylik siyosati bilan tanishing: <a class="text-primary underline" href="{% url 'privacy_policy' %}">Maxfiylik siyosati</a>.</p>
+      <h2 class="text-xl font-semibold text-primary mt-6">5. Masʼuliyat cheklovi</h2>
+      <p>Platformadan "boricha" foydalaniladi; uchinchi tomon kontenti uchun javobgar emasmiz.</p>
+      <h2 class="text-xl font-semibold text-primary mt-6">6. Bogʻlanish</h2>
+      <p>Taklif va murojaatlar uchun: <a class="underline" href="mailto:support@fikrly.uz">support@fikrly.uz</a></p>
+    </div>
+  </main>
+
+  <footer class="bg-primary text-white py-8 mt-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <a href="{% url 'index' %}" class="underline">Bosh sahifa</a>
+    </div>
+  </footer>
+  {% load static %}
+  <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
+</body>
+</html>

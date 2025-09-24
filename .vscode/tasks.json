@@ -1,0 +1,106 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "django-check",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"check"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint - stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "makemigrations",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"makemigrations"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "migrate",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"migrate",
+				"--noinput"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "makemigrations",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"makemigrations"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "migrate",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"migrate",
+				"--noinput"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "makemigrations (likes)",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"makemigrations"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "migrate (likes)",
+			"type": "shell",
+			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"args": [
+				"manage.py",
+				"migrate",
+				"--noinput"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		}
+	]
+}

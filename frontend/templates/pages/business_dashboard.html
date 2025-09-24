@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Biznes paneli - Fikrly</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
@@ -469,7 +470,7 @@
                     <ul class="space-y-2">
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
                     </ul>
                 </div>
@@ -481,6 +482,6 @@
         </div>
     </footer>
 {% load static %}
-<script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+<script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
 </html>

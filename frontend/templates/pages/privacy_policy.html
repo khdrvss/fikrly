@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maxfiylik siyosati | Fikrly</title>
+    {% load static %}
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+</head>
+<body class="bg-background">
+    <header class="bg-surface shadow-subtle sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="{% url 'index' %}" class="text-2xl font-bold text-primary">Fikrly</a>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'index' %}" class="text-text-secondary hover:text-primary transition-smooth">Bosh sahifa</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="min-h-screen py-10">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-primary mb-6">Maxfiylik siyosati</h1>
+            <p class="text-text-secondary mb-6">
+                Ushbu Maxfiylik siyosati Fikrly platformasidan foydalanganda siz haqingizdagi ma'lumotlar qanday to'planishi, saqlanishi va ishlatilishini tushuntiradi.
+            </p>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">1. To'planadigan ma'lumotlar</h2>
+                <ul class="list-disc pl-6 text-text-secondary space-y-2">
+                    <li>Hisob qaydnomasini yaratishda kiritilgan ma'lumotlar (ism, email va hokazo)</li>
+                    <li>Platformada yozgan sharhlaringiz, baholaringiz va yuklagan rasm(lar)ingiz</li>
+                    <li>Texnik ma'lumotlar: qurilma turi, brauzer, IP manzil, cookie va sessiya ma'lumotlari</li>
+                </ul>
+            </section>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">2. Ma'lumotlardan foydalanish</h2>
+                <ul class="list-disc pl-6 text-text-secondary space-y-2">
+                    <li>Xizmatlarimizni ko'rsatish va yaxshilash</li>
+                    <li>Foydalanuvchi xavfsizligini ta'minlash va suiiste'mollarning oldini olish</li>
+                    <li>Qonunchilik talablarini bajarish</li>
+                </ul>
+            </section>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">3. Uchinchi tomonlar</h2>
+                <p class="text-text-secondary">
+                    Biz texnik xizmatlar (xosting, tahlil vositalari) uchun uchinchi tomon provayderlardan foydalanishimiz mumkin. Ular bilan ma'lumotlar faqat zarur texnik maqsadlarda ulashiladi va shartnoma asosida himoyalanadi.
+                </p>
+            </section>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">4. Cookie va shaxsiy sozlamalar</h2>
+                <p class="text-text-secondary">
+                    Cookie fayllari sayt funksionalligi va tahlil maqsadida ishlatiladi. Brauzer sozlamalari orqali cookie'larni boshqarishingiz mumkin.
+                </p>
+            </section>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">5. Ma'lumotlarni saqlash muddati</h2>
+                <p class="text-text-secondary">
+                    Ma'lumotlar maqsad amalga oshirilishi uchun zarur bo'lgan muddat davomida yoki qonun talab qilgan muddatda saqlanadi.
+                </p>
+            </section>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">6. Foydalanuvchi huquqlari</h2>
+                <ul class="list-disc pl-6 text-text-secondary space-y-2">
+                    <li>Ma'lumotlarga kirish va ularni yangilash</li>
+                    <li>Ma'lumotlarni o'chirishni so'rash (qonuniy cheklovlar doirasida)</li>
+                    <li>Rozilikni bekor qilish (agar qo'llanilsa)</li>
+                </ul>
+            </section>
+
+            <section class="space-y-4 mb-8">
+                <h2 class="text-xl font-semibold text-primary">7. Bog'lanish</h2>
+                <p class="text-text-secondary">
+                    Savol va murojaatlar uchun: <a href="mailto:support@fikrly.uz" class="text-primary underline">support@fikrly.uz</a>
+                </p>
+            </section>
+
+            <div class="mt-10">
+                <a href="{% url 'index' %}" class="btn-outline">Bosh sahifaga qaytish</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-primary text-white py-12 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">© 2025 Fikrly</div>
+        </div>
+    </footer>
+
+    {% load static %}
+    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
+</body>
+</html>

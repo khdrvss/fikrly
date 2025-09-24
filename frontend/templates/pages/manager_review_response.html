@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biznes javobi - Fikrly</title>
+  <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body class="bg-background">
+  <main class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-xl font-semibold text-primary mb-4">Biznes javobi</h1>
+
+    <div class="card p-6 mb-4">
+      <p class="mb-2"><strong>Kompaniya:</strong> {{ review.company.name }}</p>
+      <p class="mb-2"><strong>Sharh:</strong> {{ review.text }}</p>
+      <p class="text-sm text-text-secondary">Bahosi: {{ review.rating }}⭐ • Muallif: {{ review.user_name }}</p>
+    </div>
+
+    <form method="post" class="card p-6">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-primary mb-2">Biznes javobi</label>
+        {{ form.owner_response_text }}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary">Saqlash</button>
+        <a class="btn-outline" href="{% url 'company_detail' review.company.pk %}">Bekor qilish</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

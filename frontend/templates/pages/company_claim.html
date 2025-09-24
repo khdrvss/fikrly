@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-xl mx-auto py-10">
+  <h1 class="text-2xl font-bold text-primary mb-4">Kompaniyani tasdiqlash</h1>
+  <p class="text-text-secondary mb-4">{{ company.name }} kompaniyasi uchun ishchi emailingizni kiriting. Tasdiqlash havolasi yuboriladi.</p>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block text-sm text-text-secondary mb-1">Email</label>
+      {{ form.email }}
+      {% for e in form.email.errors %}<div class="text-error text-sm">{{ e }}</div>{% endfor %}
+    </div>
+    <button class="btn-primary">Tasdiqlash havolasini yuborish</button>
+  </form>
+</div>
+{% endblock %}

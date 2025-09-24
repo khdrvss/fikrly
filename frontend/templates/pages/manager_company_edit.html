@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kompaniyani tahrirlash - Fikrly</title>
+  <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body class="bg-background">
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-xl font-semibold text-primary mb-6">{{ company.name }} — tahrirlash</h1>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4 card p-6">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-primary mb-1">Nomi</label>
+          {{ form.name }}
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-primary mb-1">Kategoriya</label>
+          {{ form.category }}
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-primary mb-1">Shahar</label>
+          {{ form.city }}
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-primary mb-1">Tavsif</label>
+        {{ form.description }}
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-primary mb-1">Rasm yuklash</label>
+          {{ form.image }}
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-primary mb-1">Kutubxona rasmi</label>
+          {{ form.library_image_path }}
+          <p class="text-xs text-text-secondary mt-1">Fayllar: media/company_library</p>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-primary mb-1">Tashqi rasm URL</label>
+        {{ form.image_url }}
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <a href="{% url 'business_dashboard' %}" class="btn-outline">Bekor qilish</a>
+        <button class="btn-primary" type="submit">Saqlash</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fikrly - Haqiqiy fikrlar, ishonchli tanlov</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
@@ -66,21 +67,8 @@
                 O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy mijozlar fikrlari orqali eng yaxshi bizneslarni toping.
             </p>
 
-            <!-- Trust Metrics -->
-            <div class="flex flex-wrap justify-center gap-8 mb-12">
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-primary">2.4M+</div>
-                    <div class="text-text-secondary">Sharhlar</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-primary">150K+</div>
-                    <div class="text-text-secondary">Tasdiqlangan bizneslar</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-primary">890K+</div>
-                    <div class="text-text-secondary">Faol foydalanuvchilar</div>
-                </div>
-            </div>
+            <!-- Trust Metrics (hidden until real stats wired) -->
+            <div class="hidden"></div>
 
             <!-- Search Bar -->
             <div class="max-w-2xl mx-auto">
@@ -100,76 +88,12 @@
         </div>
     </section>
 
-    <!-- Category Navigation -->
+    <!-- Category Navigation (link only, no fake counts) -->
     <section class="py-16 bg-surface">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center text-primary mb-12">Mashhur kategoriyalar</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                <!-- Restaurant Category -->
-                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-smooth">
-                        <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-2">Restoran</h3>
-                    <p class="text-sm text-text-secondary">12,450 biznes</p>
-                </a>
-
-                <!-- Services Category -->
-                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-secondary-100 rounded-full flex items-center justify-center group-hover:bg-secondary-200 transition-smooth">
-                        <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-2">Xizmatlar</h3>
-                    <p class="text-sm text-text-secondary">8,320 biznes</p>
-                </a>
-
-                <!-- Retail Category -->
-                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-accent-100 rounded-full flex items-center justify-center group-hover:bg-accent-200 transition-smooth">
-                        <svg class="w-8 h-8 text-accent" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 7h-3V6a4 4 0 0 0-8 0v1H5a1 1 0 0 0-1 1v11a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V8a1 1 0 0 0-1-1zM10 6a2 2 0 0 1 4 0v1h-4V6zm8 15a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V9h2v1a1 1 0 0 0 2 0V9h4v1a1 1 0 0 0 2 0V9h2v12z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-2">Savdo</h3>
-                    <p class="text-sm text-text-secondary">15,680 biznes</p>
-                </a>
-
-                <!-- Healthcare Category -->
-                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-success-100 rounded-full flex items-center justify-center group-hover:bg-success-200 transition-smooth">
-                        <svg class="w-8 h-8 text-success" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-2">Sog'liqni saqlash</h3>
-                    <p class="text-sm text-text-secondary">3,240 biznes</p>
-                </a>
-
-                <!-- Education Category -->
-                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-warning-100 rounded-full flex items-center justify-center group-hover:bg-warning-200 transition-smooth">
-                        <svg class="w-8 h-8 text-warning" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-2">Ta'lim</h3>
-                    <p class="text-sm text-text-secondary">2,890 biznes</p>
-                </a>
-
-                <!-- Tourism Category -->
-                <a href="{% url 'category_browse' %}" class="card card-hover text-center group">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center group-hover:bg-primary-200 transition-smooth">
-                        <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14 6V4h-4v2h4zM4 8v11h16V8H4zm16-2c1.11 0 2 .89 2 2v11c0 1.11-.89 2-2 2H4c-1.11 0-2-.89-2-2l.01-11c0-1.11.88-2 1.99-2h4V4c0-1.11.89-2 2-2h4c1.11 0 2 .89 2 2v2h4z"/>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-primary mb-2">Turizm</h3>
-                    <p class="text-sm text-text-secondary">1,560 biznes</p>
-                </a>
+            <h2 class="text-3xl font-bold text-center text-primary mb-12">Kategoriyalarni ko'rish</h2>
+            <div class="text-center">
+                <a href="{% url 'category_browse' %}" class="btn-primary inline-block px-6 py-3">Kategoriyalar sahifasiga o'tish</a>
             </div>
         </div>
     </section>
@@ -188,8 +112,8 @@
                 {% for company in trending_companies %}
                 <div class="card card-hover">
                     <div class="relative mb-4 overflow-hidden">
-                        <div class="w-full h-48 bg-gray-100">
-                            <img src="{{ company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-full object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        <div class="w-full h-20 bg-gray-100">
+                            <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-full object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
                         </div>
                         {% if company.is_verified %}
                         <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">Tasdiqlangan</div>
@@ -258,64 +182,8 @@
         </div>
     </section>
 
-    <!-- Trust Score Highlights -->
-    <section class="py-16 bg-gradient-to-r from-primary-50 to-secondary-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-primary mb-4">Ishonch reytingi yuqori bizneslar</h2>
-                <p class="text-text-secondary max-w-2xl mx-auto">
-                    Mijozlar fikrlari asosida o'z xizmatlarini yaxshilagan va yuqori ishonch darajasiga erishgan bizneslar
-                </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Trust Score Card 1 -->
-                <div class="card text-center">
-                    <div class="w-20 h-20 mx-auto mb-4 bg-success-100 rounded-full flex items-center justify-center">
-                        <svg class="w-10 h-10 text-success" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-primary mb-2">Eng ishonchli biznes</h3>
-                    <p class="text-3xl font-bold text-success mb-2">9.8/10</p>
-                    <p class="text-text-secondary mb-4">Oqtepa Lavash - 6 oy davomida 98% ijobiy sharhlar</p>
-                    <div class="bg-success-50 p-3 rounded-lg">
-                        <p class="text-sm text-success font-semibold">+45% mijozlar soni o'sishi</p>
-                    </div>
-                </div>
-
-                <!-- Trust Score Card 2 -->
-                <div class="card text-center">
-                    <div class="w-20 h-20 mx-auto mb-4 bg-secondary-100 rounded-full flex items-center justify-center">
-                        <svg class="w-10 h-10 text-secondary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-primary mb-2">Eng tez rivojlanayotgan</h3>
-                    <p class="text-3xl font-bold text-secondary mb-2">+67%</p>
-                    <p class="text-text-secondary mb-4">Bellissimo Pizza - oxirgi 3 oyda reytingi o'sishi</p>
-                    <div class="bg-secondary-50 p-3 rounded-lg">
-                        <p class="text-sm text-secondary font-semibold">4.2 dan 4.6 gacha ko'tarildi</p>
-                    </div>
-                </div>
-
-                <!-- Trust Score Card 3 -->
-                <div class="card text-center">
-                    <div class="w-20 h-20 mx-auto mb-4 bg-primary-100 rounded-full flex items-center justify-center">
-                        <svg class="w-10 h-10 text-primary" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-primary mb-2">Eng faol javob beruvchi</h3>
-                    <p class="text-3xl font-bold text-primary mb-2">15 daq</p>
-                    <p class="text-text-secondary mb-4">Caravan Bozor - o'rtacha javob berish vaqti</p>
-                    <div class="bg-primary-50 p-3 rounded-lg">
-                        <p class="text-sm text-primary font-semibold">100% sharhlarga javob beradi</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Trust Score Highlights removed until we have real analytics -->
+    <div class="hidden"></div>
 
     <!-- Footer -->
     <footer class="bg-primary text-white py-12">
@@ -379,8 +247,9 @@
                     <ul class="space-y-2">
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
                         <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
+                        <li><a href="{% url 'terms_of_service' %}" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
+                        <li><a href="{% url 'community_guidelines' %}" class="text-primary-200 hover:text-white transition-smooth">Hamjamiyat qoidalari</a></li>
                     </ul>
                 </div>
             </div>
@@ -391,7 +260,7 @@
         </div>
     </footer>
     {% load static %}
-    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
     
     <script>
         // Enhanced search functionality

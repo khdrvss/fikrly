@@ -5,57 +5,98 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ro'yxatdan o'tish | Fikrly</title>
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
     {% load socialaccount %}
 </head>
 <body class="bg-background">
     <div class="min-h-screen flex items-center justify-center px-4">
-        <div class="w-full max-w-md">
-            <div class="text-center mb-6">
-                <a href="/" class="inline-flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
-                    <span class="text-2xl font-bold text-primary">Fikrly</span>
-                </a>
-                <h1 class="mt-4 text-2xl font-bold text-primary">Ro'yxatdan o'tish</h1>
-                <p class="text-text-secondary">Hisob yarating yoki ijtimoiy tarmoq orqali davom eting</p>
-            </div>
+        <div class="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
+        <!-- Left brand panel for desktop -->
+        <div class="hidden md:flex items-center justify-center p-8">
+            <a href="/" class="inline-flex items-center space-x-3">
+                <svg class="w-12 h-12 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
+                <div>
+                    <div class="text-3xl font-bold text-primary">Fikrly</div>
+                    <p class="text-text-secondary">Ishonchli sharhlar platformasi</p>
+                </div>
+            </a>
+        </div>
 
-            <div class="card">
+        <!-- Right form panel -->
+        <div class="flex items-center justify-center p-0 md:p-4">
+            <div class="w-full max-w-md">
+                <!-- Mobile heading -->
+                <div class="text-center mb-6 md:hidden">
+                    <a href="/" class="inline-flex items-center space-x-2">
+                        <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
+                        <span class="text-2xl font-bold text-primary">Fikrly</span>
+                    </a>
+                    <h1 class="mt-4 text-2xl font-bold text-primary">Ro'yxatdan o'tish</h1>
+                    <p class="text-text-secondary">Hisob yarating yoki ijtimoiy tarmoq orqali davom eting</p>
+                </div>
+
+                <div class="card">
                 <form method="post" action="{% url 'account_signup' %}" class="space-y-4">
                     {% csrf_token %}
-                    {{ form.non_field_errors }}
+                    {% if form.non_field_errors %}
+                        <div class="text-red-600 text-sm">{{ form.non_field_errors }}</div>
+                    {% endif %}
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Email</label>
                         <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="input-field" placeholder="your@gmail.com" required />
+                        <p class="text-xs text-text-secondary mt-1">Faqat Gmail domeniga ruxsat berilgan.</p>
+                        {% if form.email.errors %}
+                            <p class="text-red-600 text-xs mt-1">{{ form.email.errors|join:', ' }}</p>
+                        {% endif %}
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Username</label>
                         <input type="text" name="username" value="{{ form.username.value|default:'' }}" class="input-field" placeholder="username" required />
+                        {% if form.username.errors %}
+                            <p class="text-red-600 text-xs mt-1">{{ form.username.errors|join:', ' }}</p>
+                        {% endif %}
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Parol</label>
                         <input type="password" name="password1" class="input-field" placeholder="••••••••" required />
+                        {% if form.password1.errors %}
+                            <p class="text-red-600 text-xs mt-1">{{ form.password1.errors|join:', ' }}</p>
+                        {% endif %}
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-primary mb-2">Parol (tasdiq)</label>
                         <input type="password" name="password2" class="input-field" placeholder="••••••••" required />
+                        {% if form.password2.errors %}
+                            <p class="text-red-600 text-xs mt-1">{{ form.password2.errors|join:', ' }}</p>
+                        {% endif %}
                     </div>
+                    <p class="text-xs text-text-secondary">Davom etish orqali siz 
+                        <a href="{% url 'terms_of_service' %}" class="underline text-primary">Foydalanish shartlari</a> va
+                        <a href="{% url 'community_guidelines' %}" class="underline text-primary">Hamjamiyat qoidalari</a> bilan tanishganingizni tasdiqlaysiz.
+                    </p>
                     <button type="submit" class="btn-primary w-full">Ro'yxatdan o'tish</button>
                 </form>
 
                 <div class="mt-6">
-                    {% if 'google' in socialaccount.providers %}
-                        <a href="{% provider_login_url 'google' %}" class="w-full btn-outline flex items-center justify-center">
-                            <span>Google bilan davom etish</span>
-                        </a>
-                    {% endif %}
+                    {% get_providers as social_providers %}
+                    {% for provider in social_providers %}
+                        {% if provider.id == 'google' %}
+                            <a href="{% provider_login_url 'google' %}" class="w-full btn-outline flex items-center justify-center">
+                                <span>Google bilan davom etish</span>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-            </div>
+                </div>
 
-            <p class="text-center text-sm text-text-secondary mt-4">
+                <p class="text-center text-sm text-text-secondary mt-4">
                 Hisobingiz bormi?
                 <a class="text-primary font-semibold" href="{% url 'account_login' %}">Kirish</a>
+                <!-- Phone sign-up temporarily hidden -->
             </p>
+            </div>
+        </div>
         </div>
     </div>
 </body>

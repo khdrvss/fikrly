@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shikoyat yuborish - Fikrly</title>
+  <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body class="bg-background">
+  <main class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-xl font-semibold text-primary mb-4">Shikoyat yuborish</h1>
+
+    <div class="card p-6 mb-4">
+      <p class="mb-2"><strong>Kompaniya:</strong> {{ review.company.name }}</p>
+      <p class="text-sm text-text-secondary">Sharh #{{ review.pk }} — {{ review.rating }}⭐</p>
+      <p class="text-text-secondary mt-2">{{ review.text }}</p>
+    </div>
+
+    <form method="post" class="card p-6">
+      {% csrf_token %}
+  <!-- Honeypot field (hidden) -->
+  {{ form.website }}
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-primary mb-2">Sabab</label>
+        {{ form.reason }}
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-semibold text-primary mb-2">Qo‘shimcha maʼlumot (ixtiyoriy)</label>
+        {{ form.details }}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn-primary">Yuborish</button>
+        <a class="btn-outline" href="{% url 'company_detail' review.company.pk %}">Bekor qilish</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>

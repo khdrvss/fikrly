@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hamjamiyat qoidalari | Fikrly</title>
+  {% load static %}
+  {% load static_bust %}
+  <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+</head>
+<body class="bg-background">
+  <header class="bg-surface shadow-subtle">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="{% url 'index' %}" class="text-2xl font-bold text-primary">Fikrly</a>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-bold text-primary mb-6">Hamjamiyat qoidalari</h1>
+    <div class="prose max-w-none text-text-secondary">
+      <p>Oxirgi yangilanish: 2025-09-22</p>
+      <p>Fikrly hamjamiyati – foydali va hurmatli muhit. Quyidagi qoidalarga amal qiling:</p>
+      <ul class="list-disc ml-6">
+        <li>Nafrat, haqorat, kamsitish, shaxsiyatga tegish taqiqlanadi.</li>
+        <li>Yolgʻon, notoʻgʻri yoki manipulyativ kontentga ruxsat berilmaydi.</li>
+        <li>Reklama/spam faqat ruxsat etilgan joylarda.</li>
+        <li>Shaxsiy maʼlumotlarni oshkor qilmang.</li>
+        <li>Muammo ko‘rsangiz, <a class="underline" href="{% url 'report_review' 1 %}" onclick="return false;">Shikoyat</a> funksiyasidan foydalaning.</li>
+      </ul>
+      <p>Qoidalarni buzish uyaltirish, kontentni olib tashlash yoki hisobni cheklashga olib kelishi mumkin.</p>
+    </div>
+  </main>
+
+  <footer class="bg-primary text-white py-8 mt-12">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <a href="{% url 'index' %}" class="underline">Bosh sahifa</a>
+    </div>
+  </footer>
+  {% load static %}
+  <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
+</body>
+</html>

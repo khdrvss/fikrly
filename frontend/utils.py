@@ -32,3 +32,43 @@ def compute_assessment(rating: float, review_count: int) -> Assessment:
         label = "Past"
 
     return Assessment(score=round(score * 100, 1), label=label)
+
+
+# --- Notifications / Utilities ---
+def send_telegram_message(message: str, chat_ids: list[str] | None = None) -> None:
+    """Send a Telegram message to all admin chat IDs if configured.
+    Best-effort: swallow exceptions in dev to avoid breaking flows.
+    """
+    import json
+    import urllib.request
+    import urllib.parse
+    from django.conf import settings
+
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+    chats = chat_ids if chat_ids is not None else getattr(settings, 'TELEGRAM_ADMIN_CHAT_IDS', [])
+    if not token or not chats:
+        return
+
+    base = f"https://api.telegram.org/bot{token}/sendMessage"
+    payload_base = {
+        'text': message,
+        'parse_mode': 'HTML',
+        'disable_web_page_preview': 'true',
+    }
+    for chat_id in chats:
+        try:
+            data = payload_base | {'chat_id': chat_id}
+            req = urllib.request.Request(base, data=urllib.parse.urlencode(data).encode('utf-8'))
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                resp.read()
+        except Exception:
+            # Ignore failures silently in development
+            continue
+
+
+def diff_instance_fields(instance, changed_data: dict) -> str:
+    """Produce a simple details string for changed fields."""
+    parts = []
+    for k, v in changed_data.items():
+        parts.append(f"{k} -> {v}")
+    return "; ".join(parts)

@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menejer paneli - Fikrly</title>
+  <link rel="stylesheet" href="{% static 'main.css' %}">
+</head>
+<body class="bg-background">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-xl font-semibold text-primary">Menejer paneli</h1>
+      <a href="{% url 'business_list' %}" class="btn-outline">Bizneslar</a>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="card">
+        <h2 class="text-lg font-semibold text-primary mb-3">Mening kompaniyalarim</h2>
+        {% if companies %}
+          <ul class="divide-y divide-gray-200">
+            {% for c in companies %}
+              <li class="py-3 flex items-center justify-between">
+                <div>
+                  <p class="font-medium">{{ c.name }}</p>
+                  <p class="text-sm text-text-secondary">{{ c.category }} • {{ c.city }}</p>
+                </div>
+                <a class="btn-primary" href="{% url 'manager_company_edit' c.pk %}">Tahrirlash</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-text-secondary">Sizga biriktirilgan kompaniyalar yo'q.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h2 class="text-lg font-semibold text-primary mb-3">Kutayotgan sharhlar</h2>
+        {% if pending_reviews %}
+          <ul class="space-y-3">
+            {% for r in pending_reviews %}
+              <li class="p-3 border rounded flex items-start justify-between">
+                <div>
+                  <p class="font-medium">{{ r.company.name }} • {{ r.user_name }} — {{ r.rating }}⭐</p>
+                  <p class="text-sm text-text-secondary">{{ r.text|truncatewords:20 }}</p>
+                  {% if r.approval_requested %}
+                    <span class="text-xs text-success">So'rov yuborilgan</span>
+                  {% endif %}
+                </div>
+                <a class="btn-outline" href="{% url 'manager_request_approval' r.pk %}">Tasdiqlashni so'rash</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-text-secondary">Hozircha kutayotgan sharhlar yo'q.</p>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</body>
+</html>

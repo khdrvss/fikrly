@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telefon bilan kirish | Fikrly</title>
+  {% load static_bust %}
+  <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+</head>
+<body class="bg-background">
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md">
+      <div class="card">
+        <h1 class="text-xl font-bold text-primary mb-4">Telefon raqam bilan kirish</h1>
+        <form method="post" class="space-y-3">
+          {% csrf_token %}
+          <div>
+            <label class="block text-sm font-semibold text-primary mb-1">Telefon raqami</label>
+            <input name="phone" value="{{ form.phone.value|default:'' }}" placeholder="9989xxxxxxxx" class="input-field" required />
+            {% if form.phone.errors %}
+              <p class="text-red-600 text-xs mt-1">{{ form.phone.errors.0 }}</p>
+            {% endif %}
+          </div>
+          <button class="btn-primary w-full">Kod yuborish</button>
+        </form>
+        <p class="text-xs text-text-secondary mt-3">Kodni qabul qilishda muammo bo‘lsa, 1 daqiqadan keyin qayta urinib ko‘ring.</p>
+        <p class="text-center text-sm text-text-secondary mt-4">
+          <a class="text-primary underline" href="{% url 'account_login' %}">Parol bilan kirish</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

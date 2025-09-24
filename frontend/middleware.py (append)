@@ -1,0 +1,19 @@
+class PostLoginRedirectMiddleware:
+    """If auth just occurred and a post-login target is stored, redirect once.
+
+    Place after AuthenticationMiddleware.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        try:
+            from django.shortcuts import redirect
+            if request.user.is_authenticated:
+                target = request.session.pop('_next_after_login', None) or request.session.pop('post_login_redirect', None)
+                if target and request.path != target and getattr(response, 'status_code', 200) in (200, 302):
+                    return redirect(target)
+        except Exception:
+            pass
+        return response

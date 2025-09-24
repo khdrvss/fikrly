@@ -3,9 +3,51 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ company.name }} - Biznes profili | Fikrly</title>
+        <title>{{ company.name }} - Fikrly</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    {% load static_bust %}
+    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+        {% with canonical=request.build_absolute_uri %}
+        <link rel="canonical" href="{{ canonical }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="{{ company.name }} - Fikrly" />
+        <meta property="og:description" content="Reyting: {{ company.rating }} ⭐ • {{ company.review_count }} sharh" />
+        <meta property="og:url" content="{{ canonical }}" />
+        <meta property="og:image" content="{{ company.display_image_url|default:company.image_url }}" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="{{ company.name }} - Fikrly" />
+        <meta name="twitter:description" content="Reyting: {{ company.rating }} ⭐ • {{ company.review_count }} sharh" />
+        <meta name="twitter:image" content="{{ company.display_image_url|default:company.image_url }}" />
+        {% endwith %}
+
+        {% comment %} JSON-LD structured data {% endcomment %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "{{ company.name|escapejs }}",
+            "image": "{{ company.display_image_url|default:company.image_url }}",
+            "url": "{{ request.build_absolute_uri }}",
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "{{ company.rating|default:0 }}",
+                "reviewCount": "{{ company.review_count|default:0 }}"
+            }
+            {% if reviews %},
+            "review": [
+                {% for r in reviews|slice:':5' %}
+                {
+                    "@type": "Review",
+                    "author": {"@type": "Person", "name": "{{ r.user_name|escapejs }}"},
+                    "datePublished": "{{ r.created_at|date:'c' }}",
+                    "reviewBody": "{{ r.text|truncatechars:200|escapejs }}",
+                    "reviewRating": {"@type": "Rating", "ratingValue": "{{ r.rating }}", "bestRating": "5", "worstRating": "1"}
+                }{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]
+            {% endif %}
+        }
+        </script>
 </head>
 <body class="bg-background">
     <header class="bg-surface shadow-subtle sticky top-0 z-50">
@@ -25,55 +67,397 @@
             <div class="grid lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2">
                     <div class="relative overflow-hidden rounded-lg bg-gray-100">
-                        <img src="{{ company.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-80 object-cover object-center" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
+                        <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-80 object-cover object-center" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
                     </div>
-                    <div class="mt-6 flex items-start justify-between">
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-3">
-                                <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear" alt="{{ company.name }} logo" class="w-8 h-8 rounded-md object-cover flex-shrink-0">
-                                <h1 class="text-3xl font-bold text-primary truncate">{{ company.name }}</h1>
-                            </div>
-                            <div class="text-text-secondary mt-1">{{ company.category }} • {{ company.city }}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xl font-semibold">⭐ {{ company.rating }}</div>
-                            <div class="text-sm text-text-secondary">{{ company.review_count }} sharh</div>
-                        </div>
-                    </div>
-                    {% if company.description %}
-                    <p class="text-text-secondary mt-4">{{ company.description }}</p>
-                    {% endif %}
+                                        <div class="mt-6 flex items-start justify-between">
+                                                <div class="min-w-0">
+                                                        <div class="flex items-center gap-3">
+                                                                <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear" alt="{{ company.name }} logo" class="w-10 h-10 rounded-md object-cover flex-shrink-0">
+                                                                <div>
+                                                                        <h1 class="text-3xl font-bold text-primary truncate">{{ company.name }}</h1>
+                                                                        <div class="text-text-secondary mt-1 flex items-center gap-2 flex-wrap">
+                                                                                <span>{{ company.category }}</span>
+                                                                                {% if company.city %}<span>• {{ company.city }}</span>{% endif %}
+                                                                                {% if years_on_site %}<span>• {{ years_on_site }} yil saytda</span>{% endif %}
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                                <div class="text-right">
+                                                        <div class="text-xl font-semibold">⭐ {{ company.rating }}</div>
+                                                        <div class="text-sm text-text-secondary">{{ company.review_count }} sharh</div>
+                                                </div>
+                                        </div>
 
-                    <h2 class="text-xl font-semibold text-primary mt-8 mb-4">Sharhlar</h2>
+                                        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                                <div class="md:col-span-2 card p-3">
+                                                        <div class="flex items-center gap-4 flex-wrap">
+                                                                {% if company.tax_id %}
+                                                                    <div class="flex items-center gap-1">
+                                                                        <span class="text-text-secondary">INN:</span>
+                                                                        <span class="font-medium">{{ company.tax_id|slice:":5" }}****</span>
+                                                                    </div>
+                                                                {% endif %}
+                                                                {% if company.address %}
+                                                                    <div class="flex items-center gap-1">
+                                                                        <span class="text-text-secondary">Manzil:</span>
+                                                                        <span class="font-medium">{{ company.address }}</span>
+                                                                    </div>
+                                                                {% endif %}
+                                                                {% if company.landmark %}
+                                                                    <div class="flex items-center gap-1">
+                                                                        <span class="text-text-secondary">Mo'ljal:</span>
+                                                                        <span class="font-medium">{{ company.landmark }}</span>
+                                                                    </div>
+                                                                {% endif %}
+                                                                <div class="ml-auto flex items-center gap-3">
+                                                                    <span class="text-text-secondary">Yangilandi: {{ company.updated_at|date:"d.m.Y" }}</span>
+                                                                                                        <div class="flex items-center gap-1">
+                                                                                                            <button id="likeBtn" class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" data-auth="{% if request.user.is_authenticated %}1{% else %}0{% endif %}" data-liked="{% if liked_state %}1{% else %}0{% endif %}" data-like-url="{% url 'like_company' company.pk %}" {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'"{% endif %}>
+                                                                                                                <span id="likeIcon">❤</span>
+                                                                                                                <span id="likeText">Yoqdi</span>
+                                                                                                            </button>
+                                                                                                            <span id="likeCount" class="tabular-nums ml-1">{{ company.like_count }}</span>
+                                                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                                <div class="card p-3 flex items-center justify-between">
+                                                        {% if map_url %}
+                                                                <div class="text-text-secondary">Xaritada ko‘rish</div>
+                                                                <a href="{{ map_url }}" target="_blank" class="btn-primary px-3 py-1">Ko‘rsatish</a>
+                                                        {% else %}
+                                                                <div class="text-text-secondary">Xarita uchun manzil yo‘q</div>
+                                                        {% endif %}
+                                                </div>
+                                        </div>
+
+                                        <div class="mt-4 card p-4">
+                                                <div class="flex flex-wrap items-center gap-2">
+                                                        {% if company.website %}
+                                                            <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{{ company.website }}" target="_blank" rel="noopener">
+                                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg>
+                                                                <span>Veb‑sayt</span>
+                                                            </a>
+                                                        {% endif %}
+                                                        {% if request.user.is_authenticated %}
+                                                            {% if company.email_public %}
+                                                                <button id="revealEmail" class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" data-url="{% url 'reveal_contact' company.pk 'email' %}">
+                                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+                                                                    <span>E‑mail</span>
+                                                                </button>
+                                                            {% endif %}
+                                                            {% if company.phone_public %}
+                                                                <button id="revealPhone" class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" data-url="{% url 'reveal_contact' company.pk 'phone' %}">
+                                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.79.65 2.64a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.44-1.22a2 2 0 0 1 2.11-.45c.85.31 1.74.53 2.64.65A2 2 0 0 1 22 16.92z"/></svg>
+                                                                    <span>Telefon</span>
+                                                                </button>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {% if company.email_public %}
+                                                                <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{% url 'account_login' %}?next={{ request.path }}">
+                                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+                                                                    <span>E‑mail</span>
+                                                                </a>
+                                                            {% endif %}
+                                                            {% if company.phone_public %}
+                                                                <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{% url 'account_login' %}?next={{ request.path }}">
+                                                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.79.65 2.64a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.44-1.22a2 2 0 0 1 2.11-.45c.85.31 1.74.53 2.64.65A2 2 0 0 1 22 16.92z"/></svg>
+                                                                    <span>Telefon</span>
+                                                                </a>
+                                                            {% endif %}
+                                                        {% endif %}
+
+                                                        
+
+                                                        {% if company.is_verified %}
+                                                            <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{% url 'verification_badge' %}">
+                                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6l-11 11-5-5"/></svg>
+                                                                <span>Tasdiqlangan – bu nima?</span>
+                                                            </a>
+                                                        {% endif %}
+                                                </div>
+                                                {% if company.description %}
+                                                    <p class="text-text-secondary mt-3">{{ company.description }}</p>
+                                                {% endif %}
+                                        </div>
+
+                    <!-- Rating distribution -->
+                    <div class="mt-6">
+                        <h3 class="text-md font-semibold text-primary mb-2">Baholar taqsimoti</h3>
+                        <div class="space-y-2">
+                            {% for row in rating_distribution %}
+                            <a class="flex items-center gap-3 text-sm group" href="?{{ qs_no_stars }}stars={{ row.star }}">
+                                <div class="w-10 tabular-nums group-hover:underline">{{ row.star }}★</div>
+                                <div class="flex-1 h-3 bg-gray-100 rounded overflow-hidden">
+                                    <div class="h-3 bg-secondary rounded" data-percent="{{ row.percent }}"></div>
+                                </div>
+                                <div class="w-10 text-right tabular-nums text-text-secondary">{{ row.count }}</div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mt-8 mb-4 border-b sticky top-16 bg-background z-40">
+                        <nav class="flex gap-6 text-sm">
+                            <a href="#info" class="py-3 border-b-2 border-transparent hover:border-primary">Ma’lumot</a>
+                            <a href="#reviews" class="py-3 border-b-2 border-primary">Sharhlar</a>
+                            {% if company.working_hours %}<a href="#hours" class="py-3 border-b-2 border-transparent hover:border-primary">Ish vaqti</a>{% endif %}
+                        </nav>
+                    </div>
+                    <section id="info" class="mb-6">
+                        <div class="card">
+                            <h2 class="text-lg font-semibold text-primary mb-2">Kompaniya ma’lumotlari</h2>
+                            <div class="flex flex-wrap gap-2">
+                                {% if map_url %}
+                                <a href="{{ map_url }}" target="_blank" class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s-6-4.35-6-10A6 6 0 1 1 18 11c0 5.65-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>
+                                    <span>Xaritada ko‘rish</span>
+                                </a>
+                                {% endif %}
+                                {% if company.address %}
+                                <span class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2 cursor-default select-text">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                                    <span>{{ company.address }}</span>
+                                </span>
+                                {% endif %}
+                                {% if company.official_email_domain %}
+                                <span class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2 cursor-default select-text">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h18v4H3zM3 13h18v8H3z"/></svg>
+                                    <span>{{ company.official_email_domain }}</span>
+                                </span>
+                                {% endif %}
+                                {% if company.facebook_url %}
+                                <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{{ company.facebook_url }}" target="_blank" rel="noopener">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.87v-6.99H7.9V12h2.5V9.79c0-2.46 1.47-3.82 3.72-3.82 1.08 0 2.2.19 2.2.19v2.42h-1.24c-1.22 0-1.6.76-1.6 1.54V12h2.72l-.43 2.88h-2.29v6.99A10 10 0 0 0 22 12Z"/></svg>
+                                    <span>Facebook</span>
+                                </a>
+                                {% endif %}
+                                {% if company.telegram_url %}
+                                <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{{ company.telegram_url }}" target="_blank" rel="noopener">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M9.9 14.2l-.4 5.6c.6 0 .9-.3 1.2-.7l2.9-2.8 6.1 4.5c1.1.6 1.8.3 2.1-1l3.8-17.7c.4-1.7-.6-2.4-1.7-2l-22.4 8.6c-1.5.6-1.5 1.4-.3 1.8l5.7 1.8L19 6.1c.8-.5 1.6-.2 1 0l-10.1 8.1z"/></svg>
+                                    <span>Telegram</span>
+                                </a>
+                                {% endif %}
+                                {% if company.instagram_url %}
+                                <a class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" href="{{ company.instagram_url }}" target="_blank" rel="noopener">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.75a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5z"/></svg>
+                                    <span>Instagram</span>
+                                </a>
+                                {% endif %}
+                                <span class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2 cursor-default">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v8M8 12h8"/></svg>
+                                    <span>Yangilandi: {{ company.updated_at|date:"d.m.Y" }}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+                    <h2 id="reviews" class="text-xl font-semibold text-primary mb-4">Sharhlar</h2>
+                    <form method="get" class="mb-4 flex flex-wrap items-center gap-3">
+                        <label class="text-sm text-text-secondary">Saralash:</label>
+                        <select name="sort" class="input-field" onchange="this.form.submit()">
+                            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Yangi</option>
+                            <option value="highest" {% if current_sort == 'highest' %}selected{% endif %}>Eng yuqori baho</option>
+                            <option value="lowest" {% if current_sort == 'lowest' %}selected{% endif %}>Eng past baho</option>
+                        </select>
+                        <label class="inline-flex items-center text-sm ml-3">
+                            <input type="checkbox" name="with_text" value="1" class="mr-2" {% if with_text %}checked{% endif %} onchange="this.form.submit()" />
+                            Faqat matnli
+                        </label>
+                        <label class="inline-flex items-center text-sm ml-1">
+                            <input type="checkbox" name="with_response" value="1" class="mr-2" {% if with_response %}checked{% endif %} onchange="this.form.submit()" />
+                            Biznes javobi bor
+                        </label>
+                        <div class="flex items-center gap-2 ml-4 text-sm">
+                            <span class="text-text-secondary">Baholar:</span>
+                            {# Use rating_distribution so we can show counts next to each star #}
+                            {% for row in rating_distribution %}
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" name="stars" value="{{ row.star }}" class="mr-1" onchange="this.form.submit()"
+                                        {% if current_stars and row.star in current_stars %}checked{% endif %}
+                                    />
+                                    {{ row.star }}★ ({{ row.count }})
+                                </label>
+                            {% endfor %}
+                        </div>
+                        {# preserve other params except page #}
+                        {% for key, val in request.GET.items %}
+                            {% if key != 'sort' and key != 'with_text' and key != 'with_response' and key != 'page' and key != 'stars' %}
+                                <input type="hidden" name="{{ key }}" value="{{ val }}" />
+                            {% endif %}
+                        {% endfor %}
+                        {% if filters_active %}
+                        <a href="?{{ clear_filters_qs }}" class="ml-auto text-sm text-primary hover:underline">Filtrlarni tozalash</a>
+                        {% endif %}
+                    </form>
                     <div class="space-y-5">
                         {% for r in reviews %}
                         <div class="card">
                             <div class="flex items-center justify-between mb-1">
                                 <div class="font-semibold text-primary">{{ r.user_name }}</div>
-                                <div class="text-sm text-text-secondary">⭐ {{ r.rating }}</div>
+                                <div class="flex items-center gap-3 text-sm text-text-secondary">
+                                    <span>⭐ {{ r.rating }}</span>
+                                    <a href="{% url 'report_review' r.pk %}" class="text-error hover:underline">Shikoyat</a>
+                                </div>
                             </div>
                             <p class="text-text-secondary">{{ r.text }}</p>
+
+                            {% if r.owner_response_text %}
+                            <div class="mt-3 p-3 rounded border border-green-200 bg-green-50">
+                                <div class="text-xs text-success font-semibold mb-1">Biznes javobi</div>
+                                <p class="text-sm text-primary">{{ r.owner_response_text }}</p>
+                                {% if r.owner_response_at %}
+                                <div class="text-xs text-text-secondary mt-1">{{ r.owner_response_at|date:"M d, Y H:i" }}</div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {% if request.user.is_authenticated and company.manager_id == request.user.id %}
+                                <div class="mt-2">
+                                    <a class="text-xs text-primary underline hover:no-underline" href="{% url 'manager_review_response' r.pk %}">
+                                        {% if r.owner_response_text %}Javobni tahrirlash{% else %}Javob yozish{% endif %}
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
                         {% empty %}
                         <div class="text-text-secondary">Hozircha sharhlar yo'q.</div>
                         {% endfor %}
                     </div>
+
+                    {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                    <div class="mt-6 flex items-center justify-between">
+                        <div class="text-sm text-text-secondary">
+                            Sahifa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            {% if page_obj.has_previous %}
+                                <a class="btn-outline px-3 py-1" href="?{{ qs_base }}page={{ page_obj.previous_page_number }}">Oldingi</a>
+                            {% else %}
+                                <span class="btn-outline px-3 py-1 opacity-50 cursor-not-allowed">Oldingi</span>
+                            {% endif %}
+                            {% for p in pages_to_show %}
+                                {% if p == page_obj.number %}
+                                    <span class="px-3 py-1 rounded bg-primary text-white">{{ p }}</span>
+                                {% else %}
+                                    <a class="px-3 py-1 rounded border text-primary hover:bg-primary hover:text-white transition-smooth" href="?{{ qs_base }}page={{ p }}">{{ p }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <a class="btn-primary px-3 py-1" href="?{{ qs_base }}page={{ page_obj.next_page_number }}">Keyingi</a>
+                            {% else %}
+                                <span class="btn-primary px-3 py-1 opacity-50 cursor-not-allowed">Keyingi</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 <aside>
                     {% if company.is_verified %}
                     <div class="card mb-6">
-                        <div class="text-success font-semibold">Tasdiqlangan biznes</div>
+                        <div class="text-success font-semibold flex items-center gap-2">
+                            <span>✔️ Tasdiqlangan biznes</span>
+                            <a href="{% url 'verification_badge' %}" class="text-xs text-primary underline">Bu nima?</a>
+                        </div>
                         <div class="text-sm text-text-secondary">Profil ma'lumotlari tekshirildi.</div>
+                    </div>
+                    {% else %}
+                    <div class="card mb-6">
+                        <div class="text-sm text-text-secondary mb-2">Kompaniya egasi yoki vakilimisiz?</div>
+                        {% if request.user.is_authenticated %}
+                        <a href="{% url 'claim_company' company.pk %}" class="btn-outline w-full text-center">Kompaniyani tasdiqlash</a>
+                        {% else %}
+                        <a href="{% url 'account_login' %}?next={% url 'claim_company' company.pk %}" class="btn-outline w-full text-center">Kompaniyani tasdiqlash</a>
+                        {% endif %}
                     </div>
                     {% endif %}
                     <a href="{% url 'review_submission' %}?company={{ company.pk }}" class="btn-primary w-full block text-center">Sharh yozish</a>
+                                        {% if company.working_hours %}
+                                        <div id="hours" class="card mt-6">
+                                                <div class="font-semibold text-primary mb-2">Ish vaqti</div>
+                                                <div class="text-sm text-text-secondary whitespace-pre-line">{{ company.working_hours|json_script:"wh" }}</div>
+                                                <script>
+                                                    (function(){
+                                                        try{
+                                                            const data = JSON.parse(document.getElementById('wh').textContent);
+                                                            const el = document.currentScript.previousElementSibling;
+                                                            if(Array.isArray(data)){
+                                                                el.textContent = data.join('\n');
+                                                            } else if (data && typeof data === 'object'){
+                                                                el.textContent = Object.entries(data).map(([k,v])=>`${k}: ${v}`).join('\n');
+                                                            }
+                                                        }catch(e){}
+                                                    })();
+                                                </script>
+                                        </div>
+                                        {% endif %}
                 </aside>
             </div>
         </div>
     </main>
 
     {% load static %}
-    <script id="dhws-dataInjector" src="{% static 'dhws-data-injector.js' %}"></script>
+    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
+        <script>
+            (function(){
+                try {
+                    var bars = document.querySelectorAll('[data-percent]');
+                    bars.forEach(function(el){
+                        var p = parseFloat(el.getAttribute('data-percent')) || 0;
+                        if (p < 0) p = 0; if (p > 100) p = 100;
+                        el.style.width = p + '%';
+                    });
+                } catch (e) { /* no-op */ }
+            })();
+            (function(){
+                function getCookie(name){
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                }
+                const likeBtn = document.getElementById('likeBtn');
+                const likeIcon = document.getElementById('likeIcon');
+                const likeText = document.getElementById('likeText');
+                function setLikedUI(isLiked){
+                    if (!likeBtn) return;
+                    if (isLiked){
+                        likeBtn.classList.add('bg-primary','text-white');
+                        likeBtn.classList.remove('btn-outline');
+                        likeIcon.textContent = '❤';
+                        likeText.textContent = 'Yoqqan';
+                    } else {
+                        likeBtn.classList.remove('bg-primary','text-white');
+                        likeBtn.classList.add('btn-outline');
+                        likeIcon.textContent = '❤';
+                        likeText.textContent = 'Yoqdi';
+                    }
+                }
+                setLikedUI(likeBtn && likeBtn.dataset.liked === '1');
+                if (likeBtn && likeBtn.dataset.auth === '1'){
+                    likeBtn.addEventListener('click', function(){
+                        const url = likeBtn.dataset.likeUrl;
+                        fetch(url, {method:'POST', headers:{'X-CSRFToken': getCookie('csrftoken')}})
+                        .then(r=>r.json()).then(d=>{ if(d.ok){ document.getElementById('likeCount').textContent = d.like_count; setLikedUI(!!d.liked); }}).catch(()=>{});
+                    });
+                }
+                const revE = document.getElementById('revealEmail');
+        if (revE){
+                    revE.addEventListener('click', function(){
+            const url = revE.dataset.url;
+            fetch(url, {headers:{'X-CSRFToken': getCookie('csrftoken')}})
+                        .then(r=>r.json()).then(d=>{ if(d.ok){ revE.outerHTML = `<a class="text-primary underline" href="mailto:${d.value}">${d.value}</a>`; }}).catch(()=>{});
+                    });
+                }
+                const revP = document.getElementById('revealPhone');
+                if (revP){
+                    revP.addEventListener('click', function(){
+            const url = revP.dataset.url;
+            fetch(url, {headers:{'X-CSRFToken': getCookie('csrftoken')}})
+                        .then(r=>r.json()).then(d=>{ if(d.ok){ revP.outerHTML = `<a class="text-primary underline" href="tel:${d.value}">${d.value}</a>`; }}).catch(()=>{});
+                    });
+                }
+            })();
+        </script>
 </body>
 </html>
 
