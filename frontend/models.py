@@ -201,3 +201,48 @@ class CompanyClaim(models.Model):
 
     def __str__(self) -> str:
         return f"Claim({self.company.name}) by {self.email} [{self.status}]"
+
+
+class Category(models.Model):
+    COLOR_CHOICES = [
+        ('red', 'Qizil'),
+        ('orange', 'To\'q sariq'),
+        ('yellow', 'Sariq'),
+        ('green', 'Yashil'),
+        ('blue', 'Ko\'k'),
+        ('purple', 'Binafsha'),
+        ('pink', 'Pushti'),
+        ('gray', 'Kulrang'),
+    ]
+    
+    name = models.CharField(max_length=100, unique=True, verbose_name="Kategoriya nomi")
+    slug = models.SlugField(max_length=100, unique=True, verbose_name="URL slug")
+    description = models.TextField(blank=True, verbose_name="Tavsif")
+    icon_svg = models.TextField(blank=True, verbose_name="SVG icon kodi", help_text="SVG path elementi, masalan: <path d='M12 2L2 7L12 12L22 7L12 2Z'/>")
+    color = models.CharField(max_length=20, choices=COLOR_CHOICES, default='gray', verbose_name="Rang")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="Tartib", help_text="Kichik raqam birinchi ko'rsatiladi")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['sort_order', 'name']
+        verbose_name = "Kategoriya"
+        verbose_name_plural = "Kategoriyalar"
+    
+    def __str__(self):
+        return self.name
+    
+    @property
+    def company_count(self):
+        """Return count of companies in this category"""
+        return Company.objects.filter(category=self.name).count()
+    
+    @property
+    def review_count(self):
+        """Return total reviews for companies in this category"""
+        from django.db.models import Sum
+        result = Company.objects.filter(category=self.name).aggregate(
+            total_reviews=Sum('review_count')
+        )
+        return result['total_reviews'] or 0

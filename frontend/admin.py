@@ -268,3 +268,59 @@ class CompanyClaimAdmin(admin.ModelAdmin):
     list_filter = ("status", "created_at")
     search_fields = ("company__name", "email", "claimant__username")
     readonly_fields = ("company", "claimant", "email", "token", "status", "created_at", "verified_at", "expires_at", "request_ip", "user_agent")
+
+
+from .models import Category
+
+class CategoryAdminForm(forms.ModelForm):
+    """Custom form for Category admin with better icon field"""
+    icon_svg = forms.CharField(
+        label="SVG Icon",
+        required=False,
+        widget=forms.Textarea(attrs={
+            'rows': 3,
+            'class': 'font-mono',
+            'placeholder': '<path d="M12 2L2 7L12 12L22 7L12 2Z"/>'
+        }),
+        help_text="SVG path elementi. Masalan: &lt;path d='M12 2L2 7L12 12L22 7L12 2Z'/&gt;"
+    )
+    
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    form = CategoryAdminForm
+    list_display = ('name', 'slug', 'color', 'is_active', 'sort_order', 'company_count', 'review_count', 'created_at')
+    list_filter = ('color', 'is_active', 'created_at')
+    search_fields = ('name', 'slug', 'description')
+    prepopulated_fields = {'slug': ('name',)}
+    list_editable = ('is_active', 'sort_order', 'color')
+    ordering = ('sort_order', 'name')
+    
+    fieldsets = (
+        ('Asosiy ma\'lumotlar', {
+            'fields': ('name', 'slug', 'description', 'is_active')
+        }),
+        ('Dizayn', {
+            'fields': ('icon_svg', 'color', 'sort_order'),
+            'description': 'Kategoriya ko\'rinishi uchun sozlamalar'
+        }),
+        ('Statistika', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
+    
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def company_count(self, obj):
+        """Display company count for this category"""
+        return obj.company_count
+    company_count.short_description = 'Kompaniyalar soni'
+    
+    def review_count(self, obj):
+        """Display review count for this category"""
+        return obj.review_count
+    review_count.short_description = 'Sharhlar soni'

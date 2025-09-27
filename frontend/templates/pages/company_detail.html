@@ -67,7 +67,7 @@
             <div class="grid lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2">
                     <div class="relative overflow-hidden rounded-lg bg-gray-100">
-                        <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-80 object-cover object-center" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
+                        <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-48 object-cover object-center" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1600&auto=format&fit=crop'; this.onerror=null;">
                     </div>
                                         <div class="mt-6 flex items-start justify-between">
                                                 <div class="min-w-0">
@@ -111,7 +111,6 @@
                                                                     </div>
                                                                 {% endif %}
                                                                 <div class="ml-auto flex items-center gap-3">
-                                                                    <span class="text-text-secondary">Yangilandi: {{ company.updated_at|date:"d.m.Y" }}</span>
                                                                                                         <div class="flex items-center gap-1">
                                                                                                             <button id="likeBtn" class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2" data-auth="{% if request.user.is_authenticated %}1{% else %}0{% endif %}" data-liked="{% if liked_state %}1{% else %}0{% endif %}" data-like-url="{% url 'like_company' company.pk %}" {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'"{% endif %}>
                                                                                                                 <span id="likeIcon">❤</span>
@@ -179,26 +178,47 @@
                                                 </div>
                                                 {% if company.description %}
                                                     <p class="text-text-secondary mt-3">{{ company.description }}</p>
-                                                {% endif %}
-                                        </div>
-
-                    <!-- Rating distribution -->
-                    <div class="mt-6">
-                        <h3 class="text-md font-semibold text-primary mb-2">Baholar taqsimoti</h3>
-                        <div class="space-y-2">
-                            {% for row in rating_distribution %}
-                            <a class="flex items-center gap-3 text-sm group" href="?{{ qs_no_stars }}stars={{ row.star }}">
-                                <div class="w-10 tabular-nums group-hover:underline">{{ row.star }}★</div>
-                                <div class="flex-1 h-3 bg-gray-100 rounded overflow-hidden">
-                                    <div class="h-3 bg-secondary rounded" data-percent="{{ row.percent }}"></div>
+                                        {% endif %}
                                 </div>
-                                <div class="w-10 text-right tabular-nums text-text-secondary">{{ row.count }}</div>
-                            </a>
-                            {% endfor %}
-                        </div>
-                    </div>
 
-                    <div class="mt-8 mb-4 border-b sticky top-16 bg-background z-40">
+                    <!-- Review Summary - Prominent Section -->
+                    <div class="mt-6 grid md:grid-cols-2 gap-6">
+                        <div class="card p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-l-4 border-primary">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-primary">Mijozlar fikri</h3>
+                                <div class="text-3xl font-bold text-primary">{{ company.rating }}<span class="text-lg text-text-secondary">/5</span></div>
+                            </div>
+                            <div class="text-text-secondary mb-2">{{ company.review_count }} sharh asosida</div>
+                            <div class="flex items-center gap-2 text-sm">
+                                <div class="flex">
+                                    {% for i in "12345" %}
+                                        {% if company.rating >= i|add:0 %}
+                                            <span class="text-yellow-400">★</span>
+                                        {% else %}
+                                            <span class="text-gray-300">★</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="text-text-secondary">Umumiy baho</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Rating distribution - Enhanced -->
+                        <div class="card p-6">
+                            <h3 class="text-lg font-semibold text-primary mb-4">Baholar taqsimoti</h3>
+                            <div class="space-y-3">
+                                {% for row in rating_distribution %}
+                                <a class="flex items-center gap-3 text-sm group hover:bg-gray-50 p-2 rounded-lg transition-colors" href="?{{ qs_no_stars }}stars={{ row.star }}">
+                                    <div class="w-12 font-medium group-hover:text-primary">{{ row.star }}★</div>
+                                    <div class="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-4 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-500" style="width: {{ row.percent }}%"></div>
+                                    </div>
+                                    <div class="w-8 text-right tabular-nums text-text-secondary font-medium">{{ row.count }}</div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>                    <div class="mt-8 mb-4 border-b sticky top-16 bg-background z-40">
                         <nav class="flex gap-6 text-sm">
                             <a href="#info" class="py-3 border-b-2 border-transparent hover:border-primary">Ma’lumot</a>
                             <a href="#reviews" class="py-3 border-b-2 border-primary">Sharhlar</a>
@@ -245,14 +265,42 @@
                                     <span>Instagram</span>
                                 </a>
                                 {% endif %}
-                                <span class="btn-outline px-3 py-1 text-sm rounded-full flex items-center gap-2 cursor-default">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v8M8 12h8"/></svg>
-                                    <span>Yangilandi: {{ company.updated_at|date:"d.m.Y" }}</span>
-                                </span>
+
                             </div>
                         </div>
                     </section>
-                    <h2 id="reviews" class="text-xl font-semibold text-primary mb-4">Sharhlar</h2>
+                    
+                    <!-- Review Highlights -->
+                    {% if reviews %}
+                    <div class="mt-8 mb-6">
+                        <h3 class="text-lg font-semibold text-primary mb-4">So'nggi sharhlar</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            {% for r in reviews|slice:":2" %}
+                            <div class="card p-4 border-l-4 border-secondary">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="font-medium text-primary">{{ r.user_name }}</div>
+                                    <div class="flex items-center gap-1">
+                                        {% for i in "12345" %}
+                                            {% if r.rating >= i|add:0 %}
+                                                <span class="text-yellow-400 text-sm">★</span>
+                                            {% else %}
+                                                <span class="text-gray-300 text-sm">★</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p class="text-text-secondary text-sm line-clamp-3">{{ r.text|truncatewords:20 }}</p>
+                                <div class="mt-2 text-xs text-text-secondary">{{ r.created_at|date:"d.m.Y" }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="#reviews" class="btn-outline px-6 py-2">Barcha sharhlarni ko'rish</a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <h2 id="reviews" class="text-xl font-semibold text-primary mb-4">Barcha sharhlar</h2>
                     <form method="get" class="mb-4 flex flex-wrap items-center gap-3">
                         <label class="text-sm text-text-secondary">Saralash:</label>
                         <select name="sort" class="input-field" onchange="this.form.submit()">

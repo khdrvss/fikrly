@@ -56,116 +56,67 @@
     </header>
 
     <!-- Page Header -->
-    <section class="bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-primary mb-4">Biznes kategoriyalari</h1>
-                <p class="text-xl text-text-secondary max-w-3xl mx-auto">
-                    O'zbekistondagi eng yaxshi bizneslarni kategoriyalar bo'yicha kashf eting va tanlang
-                </p>
+    <section class="bg-white py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Kategoriyalar</h1>
+            
+            <!-- Search Bar -->
+            <div class="max-w-md mx-auto">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                        </svg>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="categorySearch" 
+                        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" 
+                        placeholder="Kategoriyalarni qidiring..."
+                        autocomplete="off"
+                    >
+                </div>
+                <!-- Search Results Counter -->
+                <div class="mt-2 text-sm text-gray-500">
+                    <span id="searchResults">{{ categories|length }} ta kategoriya</span>
+                </div>
             </div>
         </div>
     </section>
 
-    
-
-
-
-    <!-- Kategoriyalar (real ma'lumotlar asosida) -->
-    <section class="py-16 bg-background">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {% for cat in category_cards %}
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 p-6 flex flex-col min-h-96">
-                    <div class="relative mb-6">
-                        <img src="{{ cat.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ cat.label }}" class="w-full h-24 object-cover rounded-lg" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
-                        {% if cat.badge_text %}
-                        <div class="absolute top-3 right-3 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">{{ cat.badge_text }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
-                            <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>
+    <!-- Categories List -->
+    <section class="py-6 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for cat in categories %}
+                <a href="{% url 'business_list' %}?category={{ cat.category }}" class="flex items-center justify-between p-4 border border-primary-200 rounded-lg hover:border-primary hover:bg-primary-50 transition-all duration-200 group">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-primary-100 group-hover:bg-primary-200 rounded-lg flex items-center justify-center mr-3 transition-colors">
+                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {{ cat.icon|safe }}
+                            </svg>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <h3 class="text-xl font-semibold text-primary">{{ cat.label }}</h3>
-                            {% if cat.popular_company %}
-                            <p class="text-text-secondary">Eng mashhur: {{ cat.popular_company }} ({{ cat.popular_rating }}★)</p>
-                            {% endif %}
+                        <div>
+                            <h3 class="font-medium text-gray-900 group-hover:text-primary transition-colors">{{ cat.label }}</h3>
                         </div>
                     </div>
-                    <div class="space-y-3 mb-4 flex-grow">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Baholash</span>
-                            <span class="font-semibold text-primary">{{ cat.assessment.score }} · {{ cat.assessment.label }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-text-secondary">Sharhlar</span>
-                            <span class="font-semibold text-success">{{ cat.badge_text }}</span>
-                        </div>
-                    </div>
-                    <div class="mt-auto pt-4 border-t border-gray-100">
-                        <a href="{% url 'business_list' %}?category={{ cat.category }}" class="btn-outline w-full block py-3 text-center hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105">Keyingi</a>
-                    </div>
-                </div>
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
                 {% empty %}
-                <div class="col-span-full text-center text-text-secondary py-12">Hozircha kategoriyalar bo'yicha ma'lumot yo'q.</div>
+                <div class="col-span-full text-center text-gray-500 py-12">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7l2 2m0 0l2 2m-2-2v6m-2-2L5 20"/>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Kategoriyalar topilmadi</h3>
+                    <p class="text-gray-500">Hozircha kategoriyalar bo'yicha ma'lumot yo'q.</p>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </section>
-    
 
-    <!-- Map Integration Placeholder -->
-    <section class="py-16 bg-background">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-primary mb-4">Xarita orqali qidirish</h2>
-                <p class="text-text-secondary max-w-2xl mx-auto">
-                    Toshkent shahrida joylashgan bizneslarni xarita orqali toping
-                </p>
-            </div>
-
-            <div class="bg-surface rounded-lg shadow-subtle overflow-hidden">
-                <div class="h-96 bg-gray-100 flex items-center justify-center relative">
-                    <div class="text-center">
-                        <svg class="w-16 h-16 text-text-secondary mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        <h3 class="text-xl font-semibold text-primary mb-2">Interaktiv xarita</h3>
-                        <p class="text-text-secondary">Bizneslarni joylashuvi bo'yicha ko'ring</p>
-                    </div>
-                    
-                    <!-- Map Controls -->
-                    <div class="absolute top-4 left-4 space-y-2">
-                        <button class="bg-surface shadow-subtle p-2 rounded-lg hover:bg-gray-50 transition-smooth">
-                            <svg class="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                        </button>
-                        <button class="bg-surface shadow-subtle p-2 rounded-lg hover:bg-gray-50 transition-smooth">
-                            <svg class="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Location Filter -->
-                    <div class="absolute top-4 right-4">
-                        <select class="bg-surface shadow-subtle px-4 py-2 rounded-lg border-none focus:ring-2 focus:ring-primary-500">
-                            <option>Barcha tumanlar</option>
-                            <option>Yunusobod</option>
-                            <option>Mirzo Ulug'bek</option>
-                            <option>Shayxontohur</option>
-                            <option>Sergeli</option>
-                            <option>Chilonzor</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer class="bg-primary text-white py-12">
@@ -240,6 +191,129 @@
             </div>
         </div>
     </footer>
+
+    <!-- Category Search Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('categorySearch');
+            const searchResults = document.getElementById('searchResults');
+            const categoryGrid = document.querySelector('.grid');
+            const categoryCards = Array.from(categoryGrid.querySelectorAll('a'));
+            const totalCategories = categoryCards.length;
+
+            // Update results counter
+            function updateResultsCounter(visibleCount) {
+                if (visibleCount === totalCategories) {
+                    searchResults.textContent = `${totalCategories} ta kategoriya`;
+                } else {
+                    searchResults.textContent = `${visibleCount} ta natija topildi`;
+                }
+            }
+
+            // Filter categories based on search input
+            function filterCategories() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                categoryCards.forEach(card => {
+                    const categoryName = card.querySelector('h3').textContent.toLowerCase();
+                    const isVisible = categoryName.includes(searchTerm);
+                    
+                    if (isVisible) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                        
+                        // Add highlight animation for matches
+                        if (searchTerm.length > 0) {
+                            card.classList.add('search-highlight');
+                        } else {
+                            card.classList.remove('search-highlight');
+                        }
+                    } else {
+                        card.style.display = 'none';
+                        card.classList.remove('search-highlight');
+                    }
+                });
+
+                updateResultsCounter(visibleCount);
+
+                // Show/hide empty state
+                showEmptyState(visibleCount === 0 && searchTerm.length > 0);
+            }
+
+            // Show empty state when no results found
+            function showEmptyState(show) {
+                let emptyState = document.getElementById('emptySearchState');
+                
+                if (show && !emptyState) {
+                    emptyState = document.createElement('div');
+                    emptyState.id = 'emptySearchState';
+                    emptyState.className = 'col-span-full text-center py-12';
+                    emptyState.innerHTML = `
+                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">Kategoriya topilmadi</h3>
+                        <p class="text-gray-500">Boshqa so'z yoki iboralar bilan qidirib ko'ring</p>
+                    `;
+                    categoryGrid.appendChild(emptyState);
+                } else if (!show && emptyState) {
+                    emptyState.remove();
+                }
+            }
+
+            // Real-time search with debounce
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(filterCategories, 150);
+            });
+
+            // Clear search on Escape key
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    filterCategories();
+                    searchInput.blur();
+                }
+            });
+
+            // Focus search on Ctrl+F or Cmd+F
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+        });
+    </script>
+
+    <!-- Search Highlight Styles -->
+    <style>
+        .search-highlight {
+            animation: searchPulse 0.3s ease-in-out;
+        }
+        
+        @keyframes searchPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        #categorySearch:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+
 {% load static %}
 <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
