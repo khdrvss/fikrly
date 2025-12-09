@@ -5,10 +5,9 @@ Top-level
 - `frontend/` — Main Django app (models, views, templates, admin, forms)
 - `public/` — Public static assets served as-is (favicon, manifest)
 - `media/` — Uploaded files (avatars, company_library, attachments)
-- `css/` & `frontend/static/` — Tailwind source and built CSS
+- `frontend/static/` — Tailwind source and built CSS
 - `templates/` — (If present) shared templates — primary templates live in `frontend/templates`
 - `scripts/` — helper scripts for development
-- `tools/` — local tools/binaries
 - `requirements.txt` — Python dependencies
 - `package.json` — Frontend dependencies and scripts
 - `manage.py` — Django management entrypoint
@@ -37,7 +36,7 @@ Data & media
 - `public/` — static assets served directly (favicon, manifest, js)
 
 Ops & scripts
-- `scripts/` — Windows/PowerShell helpers for cloudflared, local dev
+- `scripts/` — Windows/PowerShell helpers for local dev
 - `tasks` — VS Code tasks.json configured for Django (makemigrations, migrate, check)
 
 Where to start

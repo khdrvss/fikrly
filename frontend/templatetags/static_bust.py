@@ -9,11 +9,8 @@ register = template.Library()
 def static_bust(path: str) -> str:
     """
     Return static URL with a cache-busting query param based on file mtime.
-    In DEBUG=False, just returns the normal static URL.
     """
     url = static(path)
-    if not getattr(settings, 'DEBUG', True):
-        return url
 
     # Try to resolve absolute path from STATICFILES_DIRS
     mtime = None

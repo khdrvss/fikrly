@@ -72,3 +72,18 @@ def diff_instance_fields(instance, changed_data: dict) -> str:
     for k, v in changed_data.items():
         parts.append(f"{k} -> {v}")
     return "; ".join(parts)
+
+
+def recalculate_company_stats(company_id: int) -> None:
+    """Recalculate rating and review_count for a company based on approved reviews."""
+    from django.db.models import Avg, Count
+    from .models import Company
+
+    try:
+        company = Company.objects.get(pk=company_id)
+        agg = company.reviews.filter(is_approved=True).aggregate(avg=Avg('rating'), cnt=Count('id'))
+        company.review_count = int(agg.get('cnt') or 0)
+        company.rating = round(float(agg.get('avg') or 0.0), 2) if company.review_count else 0
+        company.save(update_fields=['review_count', 'rating'])
+    except Company.DoesNotExist:
+        pass

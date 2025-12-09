@@ -1,5 +1,5 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.contrib.auth import get_user_model
 from allauth.account.signals import user_signed_up
 from django.contrib.auth.signals import user_logged_in
@@ -12,6 +12,8 @@ User = get_user_model()
 
 @receiver(post_save, sender=User)
 def create_profile_on_user_create(sender, instance, created, **kwargs):
+    if kwargs.get('raw', False):
+        return
     if created:
         UserProfile.objects.get_or_create(user=instance)
 
@@ -110,3 +112,14 @@ def log_review_reported(sender, instance, created, **kwargs):
         )
     except Exception:
         pass
+
+
+@receiver([post_save, post_delete], sender=Review)
+def update_company_stats_signal(sender, instance, **kwargs):
+    """
+    Recalculate company stats whenever a review is saved (created/updated) or deleted.
+    This ensures rating and review_count stay in sync.
+    """
+    from .utils import recalculate_company_stats
+    if instance.company_id:
+        recalculate_company_stats(instance.company_id)

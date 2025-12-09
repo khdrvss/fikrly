@@ -1,551 +1,464 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sharh yozish - Fikrly</title>
-    {% load static %}
-    {% load static_bust %}
-    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <style>
-            /* Green highlight for chosen company */
-            .biz-card.is-selected {
-                background: #ecfdf5; /* green-50 */
-                border: 2px solid #22c55e; /* green-500 */
-                box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
-            }
-            .biz-card.is-selected .biz-title { color: #166534; font-weight: 600; }
-        </style>
-<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
-</head>
-<body class="bg-background">
-    <!-- Header Navigation -->
-    <header class="bg-surface shadow-subtle sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="{% url 'index' %}" class="flex items-center space-x-2">
-                        <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor">
-                            <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
-                        </svg>
-                        <span class="text-2xl font-bold text-primary">Fikrly</span>
-                    </a>
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Sharh yozish - Fikrly" %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Custom scrollbar for the company list */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    /* Star rating hover effects */
+    .star-btn:hover svg,
+    .star-btn.is-active svg {
+        color: #fbbf24; /* amber-400 */
+        fill: currentColor;
+    }
+    .star-btn svg {
+        transition: color 0.15s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "Tajribangizni baholang" %}</h1>
+        <p class="text-gray-600">{% trans "Sizning fikringiz bizneslarga o'sishga va boshqalarga to'g'ri tanlov qilishga yordam beradi." %}</p>
+    </div>
+
+    <form id="reviewForm" method="post" action="" class="space-y-6" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Step 1: Select Company -->
+        <div class="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">{% trans "1. Biznesni tanlang" %}</h2>
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700">{% trans "Majburiy" %}</span>
                 </div>
 
-                <!-- Navigation Links -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{% url 'index' %}" class="text-text-secondary hover:text-primary transition-smooth">Bosh sahifa</a>
-                    <a href="{% url 'category_browse' %}" class="text-text-secondary hover:text-primary transition-smooth">Kategoriyalar</a>
-                    <a href="{% url 'business_profile' %}" class="text-text-secondary hover:text-primary transition-smooth">Bizneslar</a>
-                    <a href="{% url 'review_submission' %}" class="text-primary font-semibold">Sharh yozish</a>
-                </nav>
+                <div id="companySelectionArea">
+                    <!-- Search Input -->
+                    <div class="relative mb-4" id="companySearchContainer">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" id="companySearchInput"
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all sm:text-sm"
+                            placeholder="{% trans 'Biznes nomi yoki manzilini qidiring...' %}" autocomplete="off">
+                    </div>
 
-                <!-- User Actions -->
-                <div class="flex items-center space-x-4">
-                    <button class="text-text-secondary hover:text-primary transition-smooth">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    <!-- Company List -->
+                    <div id="companySuggestions" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-80 overflow-y-auto custom-scrollbar p-1">
+                        {% static 'images/placeholder.png' as default_placeholder %}
+                        {% trans "Kategoriya yo'q" as no_category %}
+                        {% for c in suggested_companies %}
+                        <div class="company-card cursor-pointer group relative flex items-center p-3 rounded-xl border border-gray-200 hover:border-primary-400 hover:shadow-md transition-all bg-white"
+                                data-id="{{ c.pk }}"
+                                data-name="{{ c.name }}"
+                                data-image="{{ c.display_logo|default:c.display_image_url|default:default_placeholder }}"
+                                data-scale="{{ c.logo_scale|default:100 }}">
+                            <div class="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-gray-100 mr-3 relative">
+                                <img src="{{ c.display_logo|default:c.display_image_url|default:default_placeholder }}"
+                                        alt="{{ c.name }}"
+                                        class="h-full w-full object-cover absolute inset-0"
+                                        style="transform: scale(calc({{ c.logo_scale|default:100 }} / 100));"
+                                        onerror="this.onerror=null;this.src='{{ default_placeholder }}'">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600 transition-colors">{{ c.name }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ c.category_fk.display_name|default:c.category|default:no_category }}</p>
+                            </div>
+                            <div class="md:hidden ml-2">
+                                <span class="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
+                            </div>
+                            <div class="absolute inset-0 border-2 border-primary-500 rounded-xl opacity-0 scale-95 transition-all pointer-events-none selection-ring"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Hidden Select for Django Form -->
+                    <div class="hidden">
+                        {{ form.company }}
+                    </div>
+                </div>
+
+                <!-- Selected Company View (Hidden by default) -->
+                <div id="selectedCompanyView" class="hidden">
+                    <div class="flex items-center justify-between p-4 bg-primary-50 border border-primary-100 rounded-xl">
+                        <div class="flex items-center">
+                            <div class="h-12 w-12 rounded-lg overflow-hidden bg-white border border-primary-100 mr-3">
+                                <img id="selectedCompanyImg" src="" alt="" class="h-full w-full object-cover">
+                            </div>
+                            <div>
+                                <p class="text-sm text-primary-600 font-medium mb-0.5">{% trans "Tanlangan biznes" %}</p>
+                                <h3 id="selectedCompanyName" class="text-base font-bold text-gray-900"></h3>
+                            </div>
+                        </div>
+                        <button type="button" id="changeCompanyBtn" class="text-sm text-gray-500 hover:text-primary-600 font-medium underline decoration-dotted underline-offset-2">
+                            {% trans "O'zgartirish" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Rating -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">{% trans "2. Baholang" %}</h2>
+                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700">{% trans "Majburiy" %}</span>
+            </div>
+
+            <div class="flex flex-col items-center justify-center py-4">
+                <div class="flex items-center space-x-2" id="starRatingWidget">
+                    {% for i in "12345" %}
+                    <button type="button" class="star-btn p-1 focus:outline-none transform hover:scale-110 transition-transform" data-value="{{ forloop.counter }}">
+                        <svg class="w-10 h-10 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                         </svg>
                     </button>
-                    <a href="{% url 'account_login' %}" class="btn-outline text-sm px-4 py-2">Kirish</a>
-                    <a href="{% url 'account_login' %}" class="btn-primary text-sm px-4 py-2">Biznes uchun</a>
+                    {% endfor %}
+                </div>
+                <p id="ratingLabel" class="mt-3 text-sm font-medium text-gray-500 h-5">{% trans "Baho tanlang" %}</p>
+                <div class="hidden">
+                    {{ form.rating }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Review Details -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">{% trans "3. Batafsil fikringiz" %}</h2>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Name Field -->
+                <div>
+                    <label for="{{ form.user_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Ismingiz" %}</label>
+                    <input type="text" name="{{ form.user_name.name }}" id="{{ form.user_name.id_for_label }}"
+                            class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm"
+                            placeholder="{% trans 'Ismingizni kiriting' %}"
+                            value="{{ form.user_name.value|default:'' }}">
+                    {% if form.user_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.user_name.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden text-text-secondary">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
+                <!-- Review Text -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-gray-700">{% trans "Sharh matni" %}</label>
+                        <span class="text-xs text-gray-400" id="charCount">0/500</span>
+                    </div>
+                    <textarea name="{{ form.text.name }}" id="{{ form.text.id_for_label }}" rows="5"
+                                class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm resize-y"
+                                placeholder="{% trans "Nima sizga yoqdi yoki yoqmadi? Boshqalarga foydali bo'ladigan tafsilotlarni yozing..." %}">{{ form.text.value|default:'' }}</textarea>
+                    {% if form.text.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.text.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {% trans "Haqoratli so'zlar va shaxsiy ma'lumotlardan saqlaning." %}
+                    </p>
+                </div>
+
+                <!-- Receipt Upload -->
+                <div>
+                    <label for="{{ form.receipt.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Xarid cheki (ixtiyoriy)" %}</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-primary-400 transition-colors bg-gray-50 hover:bg-white">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600 justify-center">
+                                <label for="{{ form.receipt.id_for_label }}" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                                    <span>{% trans "Fayl yuklash" %}</span>
+                                    <input id="{{ form.receipt.id_for_label }}" name="{{ form.receipt.name }}" type="file" class="sr-only" accept="image/*">
+                                </label>
+                                <p class="pl-1">{% trans "yoki bu yerga tashlang" %}</p>
+                            </div>
+                            <p class="text-xs text-gray-500">
+                                PNG, JPG, GIF ({% trans "maks." %} 5MB)
+                            </p>
+                        </div>
+                    </div>
+                    {% if form.receipt.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.receipt.errors.0 }}</p>
+                    {% endif %}
+                    <p class="mt-2 text-xs text-gray-500">
+                        {% trans "Chek yuklash orqali siz 'Tasdiqlangan xarid' belgisini olishingiz mumkin." %}
+                    </p>
+                </div>
+
+                <!-- Privacy Toggles -->
+                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+                    <h3 class="text-sm font-semibold text-gray-900">{% trans "Maxfiylik sozlamalari" %}</h3>
+
+                    <label class="flex items-center cursor-pointer group">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" class="peer h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 transition-all cursor-pointer" checked>
+                        </div>
+                        <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">{% trans "Ismimni ko'rsatish" %}</span>
+                    </label>
+
+                    <label class="flex items-center cursor-pointer group">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" class="peer h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 transition-all cursor-pointer" checked>
+                        </div>
+                        <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">{% trans "Biznesga javob berish imkoniyatini berish" %}</span>
+                    </label>
+                </div>
+
+
+            </div>
+        </div>
+
+        <!-- Submit Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+            <p class="text-xs text-gray-500 text-center sm:text-left max-w-md">
+                {% trans "Yuborish tugmasini bosish orqali siz" %} <a href="{% url 'terms_of_service' %}" class="text-primary-600 hover:underline">{% trans "Foydalanish shartlari" %}</a> {% trans "va" %} <a href="{% url 'community_guidelines' %}" class="text-primary-600 hover:underline">{% trans "Hamjamiyat qoidalari" %}</a>{% trans "ga rozilik bildirasiz." %}
+            </p>
+            <div class="flex gap-3 w-full sm:w-auto">
+                <button type="reset" class="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                    {% trans "Tozalash" %}
+                </button>
+                <button type="submit" class="flex-1 sm:flex-none px-8 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-200 transition-all transform hover:-translate-y-0.5">
+                    {% trans "Yuborish" %}
                 </button>
             </div>
         </div>
-    </header>
+    </form>
+</main>
+{% endblock %}
 
-    <main class="min-h-screen py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-xl font-semibold text-primary mb-4">Tajribangizni baholang</h1>
-            <form id="reviewForm" method="post" action="">
-                {% csrf_token %}
-                <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Biznesni toping</label>
-                        <div class="business-feed-container" id="businessFinder">
-                            <div class="business-feed-header" id="companySearchHeader">
-                                <div class="relative">
-                                    <input id="companySearchInput" type="text" placeholder="Biznes nomi yoki manzilini kiriting..." class="input-field pl-12 pr-4 py-3" />
-                                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="business-feed-scroll" id="companySuggestionsInline">
-                                <div class="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                    {% for c in suggested_companies %}
-                                    <button type="button" role="button" tabindex="0" class="biz-card biz-card-grid company-suggest cursor-pointer"
-                                        data-company-id="{{ c.pk }}" data-company-name="{{ c.name }}">
-                                        <img src="{{ c.display_image_url|default:c.image_url|default:'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop' }}" alt="{{ c.name }}" class="biz-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=400&auto=format&fit=crop'; this.onerror=null;" />
-                                        <h3 class="biz-title clamp-1">{{ c.name }}</h3>
-                                    </button>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Selected company summary (visible after choosing) -->
-                        <div id="selectedCompanySummary" class="hidden mt-3 p-4 rounded-lg border-2 border-green-500 bg-green-50 flex items-center justify-between">
-                            <div class="flex items-center">
-                                <img id="selectedCompanyImage" src="" alt="" class="w-14 h-14 rounded object-cover mr-3"/>
-                                <div>
-                                    <p class="text-xs text-green-700">Tanlangan kompaniya</p>
-                                    <h3 id="selectedCompanyName" class="text-base font-semibold text-green-800"></h3>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button id="changeCompanyAction" type="button" class="btn-outline text-sm px-3 py-2">O'zgartirish</button>
-                                <button id="unchooseCompanyAction" type="button" class="btn-secondary text-sm px-3 py-2">Bekor qilish</button>
-                            </div>
-                        </div>
-                        <div class="hidden">{{ form.company }}</div>
-                        <p class="text-xs text-text-secondary mt-1">Yuqoridan kompaniyani tanlang.</p>
-                        <p id="selectedCompanyLabel" class="text-xs text-success mt-1 hidden">Tanlangan: <span></span>
-                            <button id="changeCompanyBtn" type="button" class="ml-2 text-primary underline hover:no-underline hidden">O'zgartirish</button>
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Baho</label>
-                        <div id="starRating" class="flex items-center space-x-2" role="radiogroup" aria-label="Baho">
-                            <button type="button" class="star" data-value="1" aria-label="1 yulduz" aria-checked="false">
-                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </button>
-                            <button type="button" class="star" data-value="2" aria-label="2 yulduz" aria-checked="false">
-                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </button>
-                            <button type="button" class="star" data-value="3" aria-label="3 yulduz" aria-checked="false">
-                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </button>
-                            <button type="button" class="star" data-value="4" aria-label="4 yulduz" aria-checked="false">
-                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </button>
-                            <button type="button" class="star" data-value="5" aria-label="5 yulduz" aria-checked="false">
-                                <svg class="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </button>
-                        </div>
-                        <div class="hidden">{{ form.rating }}</div>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Ismingiz</label>
-                        {{ form.user_name }}
-                    </div>
-                </div>
-
-                <!-- Removed 'Xizmat' category-specific ratings -->
-
-                <!-- Review Text -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-primary mb-2">Batafsil sharh
-                        <a href="{% url 'community_guidelines' %}" class="ml-2 text-xs text-text-secondary underline" title="MVP bosqichida fotosuratlar qabul qilinmaydi. Batafsil: Hamjamiyat qoidalari">Nega fotosuratlar yo‘q?</a>
-                    </label>
-                    {{ form.text }}
-                    <div class="flex justify-between items-center mt-2">
-                        <p class="text-xs text-text-secondary">
-                            Maslahat: Aniq va halol fikrlaringiz boshqa mijozlarga yordam beradi
-                        </p>
-                        <span class="text-xs text-text-secondary">0/500</span>
-                    </div>
-                </div>
-
-                <!-- Language Toggle -->
-                <div class="mb-6">
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm font-semibold text-primary">Til:</span>
-                        <button class="px-3 py-1 bg-primary text-white rounded-full text-sm">O'zbek</button>
-                        <button class="px-3 py-1 bg-gray-200 text-text-secondary rounded-full text-sm hover:bg-gray-300 transition-smooth">Русский</button>
-                    </div>
-                </div>
-
-                <!-- Attachments removed for MVP -->
-
-                
-
-                <!-- Privacy Options -->
-                <div class="mb-6">
-                    <h3 class="text-sm font-semibold text-primary mb-3">Maxfiylik sozlamalari</h3>
-                    <div class="space-y-3">
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary-500" checked />
-                            <span class="ml-2 text-sm text-text-secondary">Ismimni ko'rsatish</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary-500" />
-                            <span class="ml-2 text-sm text-text-secondary">Rasmlarimda yuzimni blur qilish</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary-500" checked />
-                            <span class="ml-2 text-sm text-text-secondary">Biznesga javob berish imkoniyatini berish</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between flex-col md:flex-row gap-3 md:gap-6 mt-4">
-                    <p class="text-xs text-text-secondary md:mr-auto">
-                        Yuborish tugmasini bosish orqali siz
-                        <a href="{% url 'terms_of_service' %}" class="underline text-primary">Foydalanish shartlari</a>
-                        va
-                        <a href="{% url 'community_guidelines' %}" class="underline text-primary">Hamjamiyat qoidalari</a>
-                        bilan tanishganingizni tasdiqlaysiz.
-                    </p>
-                    <div class="flex justify-end space-x-3">
-                        <button type="reset" class="btn-outline px-6 py-3">Tozalash</button>
-                        <button type="submit" class="btn-primary px-6 py-3">Yuborish</button>
-                    </div>
-                </div>
-            </form>
-
-            <!-- Guidelines Section -->
-            <div class="card mb-8">
-                <h2 class="text-xl font-semibold text-primary mb-4">Sharh yozish qoidalari</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-semibold text-success mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Qilish kerak
-                        </h3>
-                        <ul class="space-y-2 text-sm text-text-secondary">
-                            <li>• Haqiqiy tajribangizni yozing</li>
-                            <li>• Aniq va foydali ma'lumot bering</li>
-                            <li>• Hurmatli tilda yozing</li>
-                            <li>• Konstruktiv takliflar bering</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-error mb-3 flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Qilmaslik kerak
-                        </h3>
-                        <ul class="space-y-2 text-sm text-text-secondary">
-                            <li>• Soxta sharh yozish</li>
-                            <li>• Haqoratli so'zlar ishlatish</li>
-                            <li>• Shaxsiy ma'lumotlarni oshkor qilish</li>
-                            <li>• Raqobatchilarni yomonlash</li>
-                            <li>• Spam yoki reklama</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cultural Sensitivity Notice -->
-            <div class="card mb-8 bg-primary-50 border-primary-200">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-primary mr-3 mt-1" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <div>
-                        <h3 class="font-semibold text-primary mb-2">Madaniy hurmat</h3>
-                        <p class="text-sm text-text-secondary">
-                            Sharhlaringizda O'zbekiston madaniyati va islomiy qadriyatlarni hurmat qiling. 
-                            Biznes egalarini hurmat bilan tanqid qiling va yaxshilash yo'llarini taklif eting.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Section -->
-            <div class="card">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="font-semibold text-primary mb-1">Sharhni yuborish</h3>
-                        <p class="text-sm text-text-secondary">
-                            Sharhingiz 24 soat ichida ko'rib chiqilib, tasdiqlangandan so'ng nashr etiladi
-                        </p>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button class="btn-outline px-6 py-3" type="button">Saqlash</button>
-                        <button class="btn-primary px-6 py-3" type="submit" form="reviewForm">Yuborish</button>
-                    </div>
-                </div>
-
-                <!-- Trust Indicators -->
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="grid md:grid-cols-3 gap-4 text-center">
-                        <div class="flex items-center justify-center">
-                            <svg class="w-5 h-5 text-success mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">100% xavfsiz</span>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Tasdiqlangan</span>
-                        </div>
-                        <div class="flex items-center justify-center">
-                            <svg class="w-5 h-5 text-secondary mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                            <span class="text-sm text-text-secondary">Ishonchli</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-primary text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <!-- Company Info -->
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-
-            <!-- Attachment preview script removed -->
-                        <svg class="w-8 h-8 text-secondary" viewBox="0 0 32 32" fill="currentColor">
-                            <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
-                        </svg>
-                        <span class="text-2xl font-bold">Fikrly</span>
-                    </div>
-                    <p class="text-primary-200 mb-4">
-                        O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, ishonchli tanlov.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                            </svg>
-                        </a>
-                        <a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
-                            </svg>
-                        </a>
-                        <a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Tezkor havolalar</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'index' %}" class="text-primary-200 hover:text-white transition-smooth">Bosh sahifa</a></li>
-                        <li><a href="{% url 'category_browse' %}" class="text-primary-200 hover:text-white transition-smooth">Kategoriyalar</a></li>
-                        <li><a href="{% url 'business_profile' %}" class="text-primary-200 hover:text-white transition-smooth">Bizneslar</a></li>
-                        <li><a href="{% url 'review_submission' %}" class="text-primary-200 hover:text-white transition-smooth">Sharh yozish</a></li>
-                    </ul>
-                </div>
-
-                <!-- Business -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Biznes uchun</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'business_dashboard' %}" class="text-primary-200 hover:text-white transition-smooth">Biznes paneli</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Biznesni ro'yxatga olish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Reklama berish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Analitika</a></li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Yordam</h3>
-                    <ul class="space-y-2">
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="border-t border-primary-700 mt-8 pt-8 text-center">
-                <p class="text-primary-200">© 2025 Fikrly. Barcha huquqlar himoyalangan.</p>
-            </div>
-        </div>
-    </footer>
-    {% load static %}
-    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
-    <script>
-    (function() {
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Company Selection Logic ---
         const searchInput = document.getElementById('companySearchInput');
-        const list = document.getElementById('companySuggestionsInline');
-    const select = document.querySelector('#reviewForm select[name="company"]');
-    const selectedLabel = document.getElementById('selectedCompanyLabel');
-    const changeCompanyBtn = document.getElementById('changeCompanyBtn');
-    const finder = document.getElementById('businessFinder');
-    const headerEl = document.getElementById('companySearchHeader');
-    const starContainer = document.getElementById('starRating');
-    const gridEl = list && list.querySelector('.grid');
-    // Summary elements
-    const summary = document.getElementById('selectedCompanySummary');
-    const summaryName = document.getElementById('selectedCompanyName');
-    const summaryImage = document.getElementById('selectedCompanyImage');
-    const changeCompanyAction = document.getElementById('changeCompanyAction');
-    const unchooseCompanyAction = document.getElementById('unchooseCompanyAction');
-        const ratingInput = document.querySelector('#reviewForm input[name="rating"], #reviewForm select[name="rating"], #reviewForm [name="rating"]');
+        const companyContainer = document.getElementById('companySuggestions');
+        const companySelect = document.querySelector('select[name="company"]');
+        const selectionArea = document.getElementById('companySelectionArea');
+        const selectedView = document.getElementById('selectedCompanyView');
+        const selectedImg = document.getElementById('selectedCompanyImg');
+        const selectedName = document.getElementById('selectedCompanyName');
+        const changeBtn = document.getElementById('changeCompanyBtn');
 
-        function applyFilter(term) {
-            const q = (term || '').trim().toLowerCase();
-            list && list.querySelectorAll('.company-suggest').forEach(btn => {
-                const text = btn.innerText.toLowerCase();
-                btn.style.display = text.includes(q) ? '' : 'none';
+        // Store initial content to restore if search is cleared
+        let initialContent = '';
+        if (companyContainer) {
+            initialContent = companyContainer.innerHTML;
+        }
+
+        function selectCompany(id, name, img) {
+             if (companySelect) companySelect.value = id;
+             if (selectedImg) selectedImg.src = img;
+             if (selectedName) selectedName.textContent = name;
+             if (selectionArea) selectionArea.classList.add('hidden');
+             if (selectedView) selectedView.classList.remove('hidden');
+        }
+
+        function attachCardListeners() {
+            document.querySelectorAll('.company-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    selectCompany(card.dataset.id, card.dataset.name, card.dataset.image);
+                });
             });
         }
 
-        function foldFinder(selectedBtn) {
-            if (!list) return;
-            // Show only the selected card, hide others
-            list.querySelectorAll('.company-suggest').forEach(el => {
-                el.style.display = (el === selectedBtn) ? '' : 'none';
+        // Initial attach
+        attachCardListeners();
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Search with API
+        if (searchInput && companyContainer) {
+            searchInput.addEventListener('input', debounce((e) => {
+                const term = e.target.value.trim();
+
+                if (term.length < 2) {
+                    if (term.length === 0) {
+                        companyContainer.innerHTML = initialContent;
+                        attachCardListeners();
+                    }
+                    return;
+                }
+
+                fetch(`{% url 'search_suggestions_api' %}?q=${encodeURIComponent(term)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        companyContainer.innerHTML = '';
+                        if (data.results.length === 0) {
+                            companyContainer.innerHTML = `<div class="col-span-full text-center py-4 text-gray-500">{% trans "Hech narsa topilmadi" %}</div>`;
+                            return;
+                        }
+
+                        data.results.forEach(c => {
+                            if (c.type === 'company') {
+                                const logoUrl = c.logo || c.image || "{% static 'images/placeholder.png' %}";
+                                const scale = c.logo_scale || 100;
+                                const html = `
+                                <div class="company-card cursor-pointer group relative flex items-center p-3 rounded-xl border border-gray-200 hover:border-primary-400 hover:shadow-md transition-all bg-white"
+                                        data-id="${c.id}"
+                                        data-name="${c.name}"
+                                        data-image="${logoUrl}"
+                                        data-scale="${scale}">
+                                    <div class="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-gray-100 mr-3 relative">
+                                        <img src="${logoUrl}"
+                                             alt="${c.name}"
+                                             class="h-full w-full object-cover absolute inset-0"
+                                             style="transform: scale(${scale / 100});"
+                                             onerror="this.src='{% static 'images/placeholder.png' %}'">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600 transition-colors">${c.name}</p>
+                                        <p class="text-xs text-gray-500 truncate">${c.category || "{% trans "Kategoriya yo'q" %}"}</p>
+                                    </div>
+                                    <div class="md:hidden ml-2">
+                                        <span class="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
+                                    </div>
+                                    <div class="absolute inset-0 border-2 border-primary-500 rounded-xl opacity-0 scale-95 transition-all pointer-events-none selection-ring"></div>
+                                </div>`;
+                                companyContainer.insertAdjacentHTML('beforeend', html);
+                            }
+                        });
+                        attachCardListeners();
+                    });
+            }, 300));
+        }
+
+        // Change company
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => {
+                selectionArea.classList.remove('hidden');
+                selectedView.classList.add('hidden');
+                searchInput.value = '';
+                searchInput.focus();
+                companyContainer.innerHTML = initialContent;
+                attachCardListeners();
             });
-            // Make grid one column so the card spans full width
-            const grid = gridEl || (list && list.querySelector('.grid'));
-            if (grid) {
-                grid.classList.remove('grid-cols-2','md:grid-cols-3','lg:grid-cols-4');
-                grid.classList.add('grid-cols-1');
-            }
-            // Hide search header and show change button
-            if (headerEl) headerEl.classList.add('hidden');
-            if (changeCompanyBtn) changeCompanyBtn.classList.remove('hidden');
-            // Completely hide the finder to avoid giant image/card area
-            if (finder) finder.classList.add('hidden');
         }
 
-        function unfoldFinder() {
-            if (!list) return;
-            // Reveal all cards again
-            list.querySelectorAll('.company-suggest').forEach(el => {
-                el.style.display = '';
+        // Pre-selection check (if form validation failed and page reloaded)
+        if (companySelect && companySelect.value) {
+            const preSelectedCard = document.querySelector(`.company-card[data-id="${companySelect.value}"]`);
+            if (preSelectedCard) {
+                preSelectedCard.click();
+            }
+        }
+
+        // --- Star Rating Logic ---
+        const starBtns = document.querySelectorAll('.star-btn');
+        const ratingInput = document.querySelector('select[name="rating"], input[name="rating"]');
+        const ratingLabel = document.getElementById('ratingLabel');
+        const labels = [
+            "{% trans 'Juda yomon' %}",
+            "{% trans 'Yomon' %}",
+            "{% trans "O'rtacha" %}",
+            "{% trans 'Yaxshi' %}",
+            "{% trans "A'lo" %}"
+        ];
+
+        function updateStars(value) {
+            starBtns.forEach((btn, index) => {
+                if (index < value) {
+                    btn.classList.add('is-active');
+                    btn.querySelector('svg').classList.remove('text-gray-300');
+                    btn.querySelector('svg').classList.add('text-amber-400');
+                    btn.querySelector('svg').setAttribute('fill', 'currentColor');
+                } else {
+                    btn.classList.remove('is-active');
+                    btn.querySelector('svg').classList.add('text-gray-300');
+                    btn.querySelector('svg').classList.remove('text-amber-400');
+                    btn.querySelector('svg').setAttribute('fill', 'currentColor');
+                }
             });
-            // Restore multi-column grid
-            const grid = gridEl || (list && list.querySelector('.grid'));
-            if (grid) {
-                grid.classList.remove('grid-cols-1');
-                grid.classList.add('grid-cols-2','md:grid-cols-3','lg:grid-cols-4');
+            if (value > 0 && value <= 5) {
+                ratingLabel.textContent = labels[value - 1];
+                ratingLabel.className = "mt-3 text-sm font-bold text-amber-500 h-5";
+            } else {
+                ratingLabel.textContent = "{% trans 'Baho tanlang' %}";
+                ratingLabel.className = "mt-3 text-sm font-medium text-gray-500 h-5";
             }
-            if (headerEl) headerEl.classList.remove('hidden');
-            if (summary) summary.classList.add('hidden');
-            if (changeCompanyBtn) changeCompanyBtn.classList.add('hidden');
-            if (searchInput) setTimeout(() => searchInput.focus(), 0);
-            // Show the finder again
-            if (finder) finder.classList.remove('hidden');
         }
 
-        function choose(btn) {
-            const id = btn.getAttribute('data-company-id');
-            const name = btn.getAttribute('data-company-name') || btn.innerText.trim();
-            if (select) {
-                select.value = id;
-            }
-            list && list.querySelectorAll('.company-suggest').forEach(el => el.classList.remove('is-selected','ring-2','ring-secondary','bg-gray-50'));
-            btn.classList.add('is-selected');
-            if (selectedLabel) {
-                selectedLabel.querySelector('span').textContent = name;
-                selectedLabel.classList.remove('hidden');
-            }
-            // Fill summary and keep only the chosen company visible
-            const img = btn.querySelector('img');
-            const imgSrc = img ? img.src : '';
-            if (summaryName) summaryName.textContent = name;
-            if (summaryImage && imgSrc) summaryImage.src = imgSrc;
-            if (summary) summary.classList.remove('hidden');
-            foldFinder(btn);
-        }
+        starBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.dataset.value;
+                if (ratingInput) ratingInput.value = val;
+                updateStars(val);
+            });
 
-        // Star rating helpers
-        function paintStars(value) {
-            if (!starContainer) return;
-            const stars = starContainer.querySelectorAll('.star svg');
-            stars.forEach((svg, idx) => {
-                const on = idx < value;
-                svg.classList.toggle('text-secondary', on);
-                svg.classList.toggle('text-gray-300', !on);
+            btn.addEventListener('mouseenter', () => {
+                const val = btn.dataset.value;
+                updateStars(val);
+            });
+        });
+
+        const starWidget = document.getElementById('starRatingWidget');
+        if (starWidget) {
+            starWidget.addEventListener('mouseleave', () => {
+                const currentVal = ratingInput ? ratingInput.value : 0;
+                updateStars(currentVal);
             });
         }
 
-        function setRating(val) {
-            const v = Math.max(1, Math.min(5, Number(val) || 0));
-            if (ratingInput) ratingInput.value = v;
-            paintStars(v);
-            if (starContainer) {
-                starContainer.querySelectorAll('.star').forEach((btn, idx) => btn.setAttribute('aria-checked', String(idx+1 === v)));
-            }
+        // Initialize rating if value exists
+        if (ratingInput && ratingInput.value) {
+            updateStars(ratingInput.value);
         }
 
-        if (list) {
-            list.addEventListener('click', (e) => {
-                const btn = e.target.closest('.company-suggest');
-                if (!btn) return;
-                choose(btn);
-            });
-            list.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    const btn = e.target.closest('.company-suggest');
-                    if (btn) { e.preventDefault(); choose(btn); }
+        // --- Character Count ---
+        const textarea = document.querySelector('textarea[name="text"]');
+        const charCount = document.getElementById('charCount');
+        if (textarea && charCount) {
+            textarea.addEventListener('input', () => {
+                const len = textarea.value.length;
+                charCount.textContent = `${len}/500`;
+                if (len > 500) {
+                    charCount.classList.add('text-red-600');
+                } else {
+                    charCount.classList.remove('text-red-600');
                 }
             });
         }
 
-        searchInput && searchInput.addEventListener('input', () => applyFilter(searchInput.value));
-
-        // Preselect highlight
-        if (select && select.value && list) {
-            const pre = list.querySelector(`.company-suggest[data-company-id="${CSS.escape(select.value)}"]`);
-            if (pre) choose(pre);
-        }
-
-        // Allow user to change company (re-open the finder)
-        if (changeCompanyBtn) {
-            changeCompanyBtn.addEventListener('click', () => unfoldFinder());
-        }
-        if (changeCompanyAction) {
-            changeCompanyAction.addEventListener('click', () => unfoldFinder());
-        }
-        if (unchooseCompanyAction) {
-            unchooseCompanyAction.addEventListener('click', () => {
-                // Clear selection completely
-                if (select) select.value = '';
-                list && list.querySelectorAll('.company-suggest').forEach(el => el.classList.remove('is-selected'));
-                if (selectedLabel) selectedLabel.classList.add('hidden');
-                if (summary) summary.classList.add('hidden');
-                unfoldFinder();
+        // --- File Size Validation ---
+        const fileInput = document.getElementById('{{ form.receipt.id_for_label }}');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file && file.size > 5 * 1024 * 1024) { // 5MB
+                    alert("{% trans 'Fayl hajmi 5MB dan oshmasligi kerak.' %}");
+                    this.value = ''; // Clear the input
+                }
             });
         }
-
-        // Wire up stars
-        if (starContainer) {
-            starContainer.addEventListener('click', (e) => {
-                const btn = e.target.closest('.star');
-                if (!btn) return;
-                const val = Number(btn.getAttribute('data-value')) || 0;
-                setRating(val);
-            });
-            starContainer.addEventListener('mousemove', (e) => {
-                const btn = e.target.closest('.star');
-                if (!btn) return;
-                const val = Number(btn.getAttribute('data-value')) || 0;
-                paintStars(val);
-            });
-            starContainer.addEventListener('mouseleave', () => {
-                const current = Number(ratingInput && ratingInput.value) || 0;
-                paintStars(current);
-            });
-
-            // Initialize from existing rating value
-            const startVal = Number(ratingInput && ratingInput.value) || 0;
-            if (startVal) paintStars(startVal);
-        }
-    })();
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}

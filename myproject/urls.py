@@ -19,19 +19,34 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
-from frontend.sitemaps import CompanySitemap, StaticSitemap
-from frontend.views import robots_txt
+from frontend.sitemaps import CompanySitemap, StaticSitemap, CategorySitemap
+from frontend.views import robots_txt, bing_site_auth, favicon_file
+from django.views.generic.base import RedirectView
+from django.templatetags.static import static as static_url
+from django.conf.urls.i18n import i18n_patterns
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
-    path('', include('frontend.urls')),  # Include the frontend app's URLs
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('robots.txt', robots_txt, name='robots_txt'),
+    path('BingSiteAuth.xml', bing_site_auth, name='bing_site_auth'),
     path('sitemap.xml', sitemap, { 'sitemaps': {
         'companies': CompanySitemap,
+        'categories': CategorySitemap,
         'static': StaticSitemap,
     }}, name='sitemap'),
-    path('robots.txt', robots_txt, name='robots_txt'),
+    path('favicon.ico', favicon_file, name='favicon'),
 ]
 
+urlpatterns += i18n_patterns(
+    path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    path('', include('frontend.urls')),
+    prefix_default_language=False,
+)
+
 if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

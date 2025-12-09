@@ -1,0 +1,2060 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-07 16:49+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: frontend/forms.py:8 frontend/templates/pages/user_profile.html:116
+msgid "Ism"
+msgstr "Имя"
+
+#: frontend/forms.py:9 frontend/templates/pages/user_profile.html:120
+msgid "Familiya"
+msgstr "Фамилия"
+
+#: frontend/forms.py:45 frontend/templates/pages/review_submission.html:185
+#: frontend/views.py:52
+msgid "Xarid cheki (ixtiyoriy)"
+msgstr "Чек покупки (необязательно)"
+
+#: frontend/forms.py:52 frontend/views.py:59
+msgid "Fayl hajmi 5MB dan oshmasligi kerak."
+msgstr "Размер файла не должен превышать 5 МБ."
+
+#: frontend/forms.py:72 frontend/templates/pages/report_review.html:61
+msgid "Sabab"
+msgstr ""
+
+#: frontend/forms.py:73 frontend/templates/pages/report_review.html:66
+msgid "Qo‘shimcha maʼlumot (ixtiyoriy)"
+msgstr ""
+
+#: frontend/forms.py:80
+msgid "Form xatosi. Iltimos qayta urinib ko‘ring."
+msgstr ""
+
+#: frontend/forms.py:87 frontend/templates/pages/business_list.html:323
+#: frontend/templates/pages/home.html:353
+#: frontend/templates/pages/manager_company_edit.html:46
+msgid "Kategoriya"
+msgstr "Категория"
+
+#: frontend/forms.py:108
+#, fuzzy
+#| msgid "Tasdiqlashni so'rash - Fikrly"
+msgid "Tasdiqlashni so'rashni tasdiqlayman"
+msgstr "Запрос подтверждения - Fikrly"
+
+#: frontend/forms.py:119 frontend/templates/pages/company_detail.html:331
+#: frontend/templates/pages/manager_review_response.html:27
+#: frontend/templates/pages/manager_review_response.html:59
+#: frontend/templates/pages/public_profile.html:84
+msgid "Biznes javobi"
+msgstr "Ответ бизнеса"
+
+#: frontend/forms.py:136 frontend/templates/pages/review_submission.html:155
+msgid "Ismingiz"
+msgstr "Ваше имя"
+
+#: frontend/forms.py:137
+msgid "Email manzilingiz"
+msgstr ""
+
+#: frontend/forms.py:138
+msgid "Mavzu"
+msgstr ""
+
+#: frontend/forms.py:139
+msgid "Xabar"
+msgstr ""
+
+#: frontend/models.py:27
+msgid "Nom (Rus tilida)"
+msgstr ""
+
+#: frontend/models.py:29
+msgid "SVG path content"
+msgstr ""
+
+#: frontend/models.py:30
+#, fuzzy
+#| msgid "Kategoriya"
+msgid "Kategoriya rangi"
+msgstr "Категория"
+
+#: frontend/models.py:31
+#, fuzzy
+#| msgid "Bosh sahifaga qaytish"
+msgid "Bosh sahifada ko'rsatish"
+msgstr "Вернуться на главную"
+
+#: frontend/models.py:58 frontend/templates/pages/manager_company_edit.html:61
+msgid "Tavsif (Rus tilida)"
+msgstr ""
+
+#: frontend/models.py:61
+msgid "Kompaniya logotipi (kvadrat shaklda tavsiya etiladi)"
+msgstr ""
+
+#: frontend/models.py:62
+msgid "Logo uchun tashqi URL (agar fayl yuklanmasa)"
+msgstr ""
+
+#: frontend/models.py:63
+msgid ""
+"Logo masshtabi foizda (masalan: 100 = asl o'lcham, 150 = 1.5x "
+"kattalashtirish)"
+msgstr ""
+
+#: frontend/models.py:64
+msgid "Rasmiy veb-sayt, masalan: https://example.com"
+msgstr ""
+
+#: frontend/models.py:65
+msgid "Masalan: example.com (ixtiyoriy)"
+msgstr ""
+
+#: frontend/models.py:66
+msgid "INN/СТИР (ixtiyoriy)"
+msgstr ""
+
+#: frontend/models.py:68
+msgid "Mo'ljal (ixtiyoriy)"
+msgstr ""
+
+#: frontend/models.py:76
+msgid "Haftalik ish vaqtlari JSON ko'rinishida"
+msgstr ""
+
+#: frontend/models.py:78
+#, fuzzy
+#| msgid "Fayllar: media/company_library"
+msgid "Masalan: company_library/mylogo.png"
+msgstr "Файлы: media/company_library"
+
+#: frontend/models.py:81
+msgid "Agar o'chirilsa, saytda ko'rinmaydi"
+msgstr ""
+
+#: frontend/templates/account/login.html:8
+#, fuzzy
+#| msgid "Sharhni o'chirish | Fikrly"
+msgid "Tizimga kirish | Fikrly"
+msgstr "Удалить отзыв | Fikrly"
+
+#: frontend/templates/account/login.html:51
+#: frontend/templates/account/signup.html:51
+#, fuzzy
+#| msgid "Ishonchli sharhchi"
+msgid "Ishonchli sharhlar platformasi"
+msgstr "Надежный рецензент"
+
+#: frontend/templates/account/login.html:65
+#, fuzzy
+#| msgid "O'zgartirish"
+msgid "Tizimga kirish"
+msgstr "Изменить"
+
+#: frontend/templates/account/login.html:66
+msgid "Hisobingizga kiring yoki ijtimoiy tarmoq orqali davom eting"
+msgstr ""
+
+#: frontend/templates/account/login.html:76
+msgid "Email yoki username"
+msgstr ""
+
+#: frontend/templates/account/login.html:77
+msgid "email yoki username"
+msgstr ""
+
+#: frontend/templates/account/login.html:83
+#: frontend/templates/account/signup.html:91
+msgid "Parol"
+msgstr ""
+
+#: frontend/templates/account/login.html:92
+msgid "Eslab qolish"
+msgstr ""
+
+#: frontend/templates/account/login.html:94
+msgid "Parolni unutdingizmi?"
+msgstr ""
+
+#: frontend/templates/account/login.html:96 frontend/templates/base.html:151
+msgid "Kirish"
+msgstr "Войти"
+
+#: frontend/templates/account/login.html:105
+#: frontend/templates/account/signup.html:117
+msgid "Yoki"
+msgstr ""
+
+#: frontend/templates/account/phone_signin.html:8
+#, fuzzy
+#| msgid "Sharhni o'chirish | Fikrly"
+msgid "Telefon bilan kirish | Fikrly"
+msgstr "Удалить отзыв | Fikrly"
+
+#: frontend/templates/account/phone_signin.html:45
+msgid "Telefon raqam bilan kirish"
+msgstr ""
+
+#: frontend/templates/account/phone_signin.html:49
+#, fuzzy
+#| msgid "Telefon"
+msgid "Telefon raqami"
+msgstr "Телефон"
+
+#: frontend/templates/account/phone_signin.html:55
+#, fuzzy
+#| msgid "Yuborish"
+msgid "Kod yuborish"
+msgstr "Отправить"
+
+#: frontend/templates/account/phone_signin.html:57
+msgid ""
+"Kodni qabul qilishda muammo bo‘lsa, 1 daqiqadan keyin qayta urinib ko‘ring."
+msgstr ""
+
+#: frontend/templates/account/phone_signin.html:59
+#, fuzzy
+#| msgid "Profilni ko'rish"
+msgid "Parol bilan kirish"
+msgstr "Посмотреть профиль"
+
+#: frontend/templates/account/phone_verify.html:8
+#, fuzzy
+#| msgid "Tasdiqlashni so'rash - Fikrly"
+msgid "Tasdiqlash kodi | Fikrly"
+msgstr "Запрос подтверждения - Fikrly"
+
+#: frontend/templates/account/phone_verify.html:45
+#, fuzzy
+#| msgid "Tasdiqlashni so'rash"
+msgid "Tasdiqlash kodi"
+msgstr "Запросить подтверждение"
+
+#: frontend/templates/account/phone_verify.html:46
+#, python-format
+msgid "%(phone)s raqamiga yuborilgan 6 xonali kodni kiriting."
+msgstr ""
+
+#: frontend/templates/account/phone_verify.html:53
+#: frontend/templates/pages/manager_request_approval.html:22
+#, fuzzy
+#| msgid "Tasdiqlangan"
+msgid "Tasdiqlash"
+msgstr "Подтвержден"
+
+#: frontend/templates/account/phone_verify.html:58
+msgid "Kodni qayta yuborish"
+msgstr ""
+
+#: frontend/templates/account/signup.html:8
+#: frontend/templates/socialaccount/signup.html:8
+#, fuzzy
+#| msgid "Sharhni o'chirish | Fikrly"
+msgid "Ro'yxatdan o'tish | Fikrly"
+msgstr "Удалить отзыв | Fikrly"
+
+#: frontend/templates/account/signup.html:65
+#: frontend/templates/account/signup.html:108
+#: frontend/templates/socialaccount/signup.html:96
+#, fuzzy
+#| msgid "Ro'yxatdan o'tgan bizneslar"
+msgid "Ro'yxatdan o'tish"
+msgstr "Зарегистрированные бизнесы"
+
+#: frontend/templates/account/signup.html:66
+msgid "Hisob yarating yoki ijtimoiy tarmoq orqali davom eting"
+msgstr ""
+
+#: frontend/templates/account/signup.html:76
+#: frontend/templates/pages/company_detail.html:480
+msgid "Email"
+msgstr "Email"
+
+#: frontend/templates/account/signup.html:78
+msgid "Faqat Gmail domeniga ruxsat berilgan."
+msgstr ""
+
+#: frontend/templates/account/signup.html:84
+msgid "Username"
+msgstr ""
+
+#: frontend/templates/account/signup.html:98
+msgid "Parol (tasdiq)"
+msgstr ""
+
+#: frontend/templates/account/verification_sent.html:7
+#, fuzzy
+#| msgid "Email tasdiqlash yuborildi. Pochtangizni tekshiring."
+msgid "Email tasdiqlash yuborildi"
+msgstr "Подтверждение email отправлено. Проверьте вашу почту."
+
+#: frontend/templates/account/verification_sent.html:26
+#, fuzzy
+#| msgid "Email tasdiqlash yuborildi. Pochtangizni tekshiring."
+msgid "Email tasdiqlash yuborildi. Iltimos, pochtangizni tekshiring..."
+msgstr "Подтверждение email отправлено. Проверьте вашу почту."
+
+#: frontend/templates/base.html:13
+#, fuzzy
+#| msgid "Haqiqiy fikrlar,"
+msgid "Haqiqiy fikrlar, ishonchli tanlov"
+msgstr "Реальные отзывы,"
+
+#: frontend/templates/base.html:112 frontend/templates/base.html:167
+#: frontend/templates/base.html:233
+#: frontend/templates/pages/business_list.html:30
+#: frontend/templates/pages/category_browse.html:15
+#: frontend/templates/pages/community_guidelines.html:40
+#: frontend/templates/pages/company_detail.html:31
+#: frontend/templates/pages/company_detail.html:86
+#: frontend/templates/pages/home.html:252
+#: frontend/templates/pages/privacy_policy.html:21
+msgid "Bosh sahifa"
+msgstr "Главная"
+
+#: frontend/templates/base.html:113 frontend/templates/base.html:168
+#: frontend/templates/base.html:234
+#: frontend/templates/pages/business_list.html:37
+#: frontend/templates/pages/business_list.html:196
+#: frontend/templates/pages/category_browse.html:5
+#: frontend/templates/pages/category_browse.html:20
+#: frontend/templates/pages/category_browse.html:31
+#: frontend/templates/pages/company_detail.html:92
+#: frontend/templates/pages/home.html:259
+msgid "Kategoriyalar"
+msgstr "Категории"
+
+#: frontend/templates/base.html:114 frontend/templates/base.html:169
+#: frontend/templates/base.html:235
+#: frontend/templates/pages/business_list.html:50
+#: frontend/templates/pages/company_detail.html:36
+#: frontend/templates/pages/home.html:266
+#: frontend/templates/pages/user_profile.html:88
+msgid "Bizneslar"
+msgstr "Бизнесы"
+
+#: frontend/templates/base.html:115 frontend/templates/base.html:170
+#: frontend/templates/base.html:236
+#: frontend/templates/pages/business_list.html:177
+#: frontend/templates/pages/company_detail.html:182
+#: frontend/templates/pages/company_detail.html:360
+#: frontend/templates/pages/company_detail.html:534
+#: frontend/templates/pages/home.html:188
+#: frontend/templates/pages/home.html:226
+#: frontend/templates/pages/home.html:273
+msgid "Sharh yozish"
+msgstr "Написать отзыв"
+
+#: frontend/templates/base.html:136
+#: frontend/templates/pages/business_list.html:90
+#: frontend/templates/pages/home.html:45
+msgid "Qidirish"
+msgstr "Поиск"
+
+#: frontend/templates/base.html:147
+msgid "Chiqish"
+msgstr "Выйти"
+
+#: frontend/templates/base.html:150 frontend/templates/base.html:242
+msgid "Biznes uchun"
+msgstr "Для бизнеса"
+
+#: frontend/templates/base.html:156
+msgid "Asosiy menyu"
+msgstr ""
+
+#: frontend/templates/base.html:199
+msgid ""
+"O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, ishonchli "
+"tanlov."
+msgstr ""
+"Самая надежная платформа отзывов в Узбекистане. Реальные мнения, надежный "
+"выбор."
+
+#: frontend/templates/base.html:231
+msgid "Tezkor havolalar"
+msgstr "Быстрые ссылки"
+
+#: frontend/templates/base.html:244
+msgid "Biznes paneli"
+msgstr "Панель бизнеса"
+
+#: frontend/templates/base.html:245
+msgid "Biznesni ro'yxatga olish"
+msgstr "Регистрация бизнеса"
+
+#: frontend/templates/base.html:246
+msgid "Reklama berish"
+msgstr "Реклама"
+
+#: frontend/templates/base.html:252
+msgid "Yordam"
+msgstr "Помощь"
+
+#: frontend/templates/base.html:254
+#: frontend/templates/pages/company_detail.html:441
+msgid "Bog'lanish"
+msgstr "Связаться"
+
+#: frontend/templates/base.html:255
+#: frontend/templates/pages/privacy_policy.html:29
+#: frontend/templates/pages/terms_of_service.html:43
+msgid "Maxfiylik siyosati"
+msgstr "Политика конфиденциальности"
+
+#: frontend/templates/base.html:256
+#: frontend/templates/pages/review_submission.html:237
+#: frontend/templates/pages/terms_of_service.html:23
+#, fuzzy
+msgid "Foydalanish shartlari"
+msgstr ""
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Условия использования\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Условиями использования\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Условия использования"
+
+#: frontend/templates/base.html:257
+#: frontend/templates/pages/community_guidelines.html:6
+#: frontend/templates/pages/community_guidelines.html:23
+#: frontend/templates/pages/review_submission.html:237
+#, fuzzy
+msgid "Hamjamiyat qoidalari"
+msgstr ""
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Правилами сообщества\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Правила сообщества"
+
+#: frontend/templates/base.html:263
+msgid "© 2025 Fikrly. Barcha huquqlar himoyalangan."
+msgstr "© 2025 Fikrly. Все права защищены."
+
+#: frontend/templates/pages/business_list.html:9
+msgid "Bizneslar - Fikrly"
+msgstr "Бизнесы - Fikrly"
+
+#: frontend/templates/pages/business_list.html:15
+#, python-format
+msgid ""
+"Eng yaxshi %(cat)s kompaniyalari va xizmatlari haqida haqiqiy sharhlar. "
+"Fikrly orqali to'g'ri tanlov qiling."
+msgstr ""
+
+#: frontend/templates/pages/business_list.html:17
+msgid ""
+"Fikrly - O'zbekistondagi barcha bizneslar va xizmatlar ro'yxati. Sharhlar "
+"o'qing va qoldiring."
+msgstr ""
+
+#: frontend/templates/pages/business_list.html:65
+msgid "Qidiruv natijalari"
+msgstr "Результаты поиска"
+
+#: frontend/templates/pages/business_list.html:68
+#: frontend/templates/pages/manager_dashboard.html:17
+msgid "Barcha bizneslar"
+msgstr "Все бизнесы"
+
+#: frontend/templates/pages/business_list.html:72
+#, python-format
+msgid "\"%(query)s\" bo'yicha %(count)s ta natija"
+msgstr "%(count)s результатов по запросу \"%(query)s\""
+
+#: frontend/templates/pages/business_list.html:74
+msgid "Eng yaxshi kompaniyalar va xizmatlarni toping"
+msgstr "Найдите лучшие компании и услуги"
+
+#: frontend/templates/pages/business_list.html:80
+#, fuzzy
+#| msgid "Kompaniya nomini qidiring..."
+msgid "Kompaniya nomini qidiring"
+msgstr "Поиск названия компании..."
+
+#: frontend/templates/pages/business_list.html:80
+msgid "Kompaniya nomini qidiring..."
+msgstr "Поиск названия компании..."
+
+#: frontend/templates/pages/business_list.html:150
+#, python-format
+msgid "%(count)s sharh"
+msgstr "%(count)s отзывов"
+
+#: frontend/templates/pages/business_list.html:187
+#: frontend/templates/pages/review_submission.html:317
+msgid "Hech narsa topilmadi"
+msgstr "Ничего не найдено"
+
+#: frontend/templates/pages/business_list.html:188
+msgid ""
+"So'rovingiz bo'yicha hech qanday biznes topilmadi. Iltimos, boshqa kalit "
+"so'zlarni sinab ko'ring yoki kategoriyalarni ko'zdan kechiring."
+msgstr ""
+"По вашему запросу ничего не найдено. Пожалуйста, попробуйте другие ключевые "
+"слова или просмотрите категории."
+
+#: frontend/templates/pages/business_list.html:192
+msgid "Qidiruv takliflari:"
+msgstr "Предложения поиска:"
+
+#: frontend/templates/pages/business_list.html:206
+msgid "Shaharlar"
+msgstr "Города"
+
+#: frontend/templates/pages/business_list.html:219
+#, fuzzy
+#| msgid "Barchasini ko'rish"
+msgid "Barcha bizneslarni ko'rish"
+msgstr "Посмотреть все"
+
+#: frontend/templates/pages/business_list.html:232
+#: frontend/templates/pages/company_detail.html:372
+msgid "Oldingi"
+msgstr "Предыдущая"
+
+#: frontend/templates/pages/business_list.html:251
+#: frontend/templates/pages/company_detail.html:391
+msgid "Keyingi"
+msgstr "Следующая"
+
+#: frontend/templates/pages/business_list.html:348
+#: frontend/templates/pages/home.html:372
+#, fuzzy
+#| msgid "Bizneslar"
+msgid "Biznes"
+msgstr "Бизнесы"
+
+#: frontend/templates/pages/category_browse.html:32
+msgid "O'zingizga kerakli xizmat yoki mahsulot turini toping"
+msgstr "Найдите нужную вам услугу или тип продукта"
+
+#: frontend/templates/pages/category_browse.html:42
+msgid "Kategoriyalarni qidiring..."
+msgstr "Поиск категорий..."
+
+#: frontend/templates/pages/category_browse.html:44
+#, python-format
+msgid "%(count)s ta kategoriya mavjud"
+msgstr "%(count)s категорий доступно"
+
+#: frontend/templates/pages/category_browse.html:83
+msgid "Kategoriyalar topilmadi"
+msgstr "Категории не найдены"
+
+#: frontend/templates/pages/category_browse.html:84
+msgid "Hozircha hech qanday kategoriya mavjud emas."
+msgstr "Пока нет доступных категорий."
+
+#: frontend/templates/pages/category_browse.html:96
+msgid "Natija topilmadi"
+msgstr "Результатов не найдено"
+
+#: frontend/templates/pages/category_browse.html:97
+msgid "Boshqa so'z bilan qidirib ko'ring"
+msgstr "Попробуйте поискать другими словами"
+
+#: frontend/templates/pages/category_browse.html:105
+msgid "ta kategoriya mavjud"
+msgstr "категорий доступно"
+
+#: frontend/templates/pages/category_browse.html:106
+msgid "ta natija topildi"
+msgstr "результатов найдено"
+
+#: frontend/templates/pages/community_guidelines.html:25
+#: frontend/templates/pages/terms_of_service.html:25
+msgid "Oxirgi yangilanish: 2025-09-22"
+msgstr "Последнее обновление: 2025-09-22"
+
+#: frontend/templates/pages/community_guidelines.html:26
+msgid ""
+"Fikrly hamjamiyati – foydali va hurmatli muhit. Quyidagi qoidalarga amal "
+"qiling:"
+msgstr ""
+"Сообщество Fikrly — это полезная и уважительная среда. Следуйте этим "
+"правилам:"
+
+#: frontend/templates/pages/community_guidelines.html:28
+msgid "Nafrat, haqorat, kamsitish, shaxsiyatga tegish taqiqlanadi."
+msgstr "Запрещены ненависть, оскорбления, дискриминация и переход на личности."
+
+#: frontend/templates/pages/community_guidelines.html:29
+msgid "Yolgʻon, notoʻgʻri yoki manipulyativ kontentga ruxsat berilmaydi."
+msgstr "Ложный, вводящий в заблуждение или манипулятивный контент запрещен."
+
+#: frontend/templates/pages/community_guidelines.html:30
+msgid "Reklama/spam faqat ruxsat etilgan joylarda."
+msgstr "Реклама/спам разрешены только в специально отведенных местах."
+
+#: frontend/templates/pages/community_guidelines.html:31
+msgid "Shaxsiy maʼlumotlarni oshkor qilmang."
+msgstr "Не разглашайте личную информацию."
+
+#: frontend/templates/pages/community_guidelines.html:32
+msgid "Muammo ko‘rsangiz,"
+msgstr "Если вы видите проблему,"
+
+#: frontend/templates/pages/community_guidelines.html:32
+#: frontend/templates/pages/company_detail.html:349
+#: frontend/templates/pages/report_review.html:22
+msgid "Shikoyat"
+msgstr "Пожаловаться"
+
+#: frontend/templates/pages/community_guidelines.html:32
+msgid "funksiyasidan foydalaning."
+msgstr "воспользуйтесь функцией."
+
+#: frontend/templates/pages/community_guidelines.html:34
+msgid ""
+"Qoidalarni buzish uyaltirish, kontentni olib tashlash yoki hisobni "
+"cheklashga olib kelishi mumkin."
+msgstr ""
+"Нарушение правил может привести к предупреждению, удалению контента или "
+"ограничению аккаунта."
+
+#: frontend/templates/pages/company_claim.html:8
+#: frontend/templates/pages/company_claim.html:18
+#: frontend/templates/pages/company_detail.html:520
+#, fuzzy
+msgid "Kompaniyani tasdiqlash"
+msgstr ""
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Подтвердить компанию\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Подтверждение компании"
+
+#: frontend/templates/pages/company_claim.html:20
+#, python-format
+msgid ""
+"<span class=\"font-semibold text-gray-900\">%(name)s</span> kompaniyasi "
+"uchun ishchi emailingizni kiriting. Tasdiqlash havolasi yuboriladi."
+msgstr ""
+
+#: frontend/templates/pages/company_claim.html:34
+msgid "Email manzil"
+msgstr ""
+
+#: frontend/templates/pages/company_claim.html:43
+msgid "Ortga qaytish"
+msgstr "Вернуться назад"
+
+#: frontend/templates/pages/company_claim.html:46
+#: frontend/templates/pages/manager_request_approval.html:76
+#: frontend/templates/pages/report_review.html:75
+#: frontend/templates/pages/review_submission.html:244
+msgid "Yuborish"
+msgstr "Отправить"
+
+#: frontend/templates/pages/company_detail.html:9
+#, python-format
+msgid "Reyting: %(rating)s ⭐ • %(count)s sharh. %(desc)s"
+msgstr "Рейтинг: %(rating)s ⭐ • %(count)s отзывов. %(desc)s"
+
+#: frontend/templates/pages/company_detail.html:16
+#: frontend/templates/pages/company_detail.html:21
+#, python-format
+msgid "Reyting: %(rating)s ⭐ • %(count)s sharh"
+msgstr "Рейтинг: %(rating)s ⭐ • %(count)s отзывов"
+
+#: frontend/templates/pages/company_detail.html:173
+#, fuzzy, python-format
+#| msgid "3 yil saytda"
+msgid "%(years)s yil saytda"
+msgstr "3 года на сайте"
+
+#: frontend/templates/pages/company_detail.html:205
+msgid "Kompaniya haqida"
+msgstr "О компании"
+
+#: frontend/templates/pages/company_detail.html:212
+msgid "Veb-saytga o'tish"
+msgstr "Перейти на сайт"
+
+#: frontend/templates/pages/company_detail.html:251
+#, fuzzy, python-format
+#| msgid "%(count)s sharh"
+msgid "%(count)s ta sharh asosida"
+msgstr "%(count)s отзывов"
+
+#: frontend/templates/pages/company_detail.html:272
+#: frontend/templates/pages/manager_dashboard.html:243
+#: frontend/templates/pages/public_profile.html:34
+#: frontend/templates/pages/user_profile.html:80
+msgid "Sharhlar"
+msgstr "Отзывы"
+
+#: frontend/templates/pages/company_detail.html:278
+msgid "Eng ko'p layk"
+msgstr "Больше всего лайков"
+
+#: frontend/templates/pages/company_detail.html:279
+msgid "Eng yangi"
+msgstr "Новые"
+
+#: frontend/templates/pages/company_detail.html:280
+msgid "Yuqori baho"
+msgstr "Высокая оценка"
+
+#: frontend/templates/pages/company_detail.html:281
+msgid "Past baho"
+msgstr "Низкая оценка"
+
+#: frontend/templates/pages/company_detail.html:311
+msgid "Foydalanuvchi xarid chekini taqdim etgan"
+msgstr "Пользователь предоставил чек покупки"
+
+#: frontend/templates/pages/company_detail.html:313
+msgid "Tasdiqlangan xarid"
+msgstr "Подтвержденная покупка"
+
+#: frontend/templates/pages/company_detail.html:358
+#: frontend/templates/pages/user_profile.html:264
+msgid "Hozircha sharhlar yo'q"
+msgstr "Пока нет отзывов"
+
+#: frontend/templates/pages/company_detail.html:359
+msgid "Birinchi bo'lib o'z fikringizni qoldiring!"
+msgstr "Будьте первым, кто оставит отзыв!"
+
+#: frontend/templates/pages/company_detail.html:407
+#, fuzzy
+#| msgid "Mening kompaniyalarim"
+msgid "O'xshash kompaniyalar"
+msgstr "Мои компании"
+
+#: frontend/templates/pages/company_detail.html:449
+msgid "Manzil"
+msgstr "Адрес"
+
+#: frontend/templates/pages/company_detail.html:452
+msgid "Xaritada ko'rish"
+msgstr "Посмотреть на карте"
+
+#: frontend/templates/pages/company_detail.html:464
+msgid "Telefon"
+msgstr "Телефон"
+
+#: frontend/templates/pages/company_detail.html:466
+#: frontend/templates/pages/company_detail.html:468
+msgid "Raqamni ko'rsatish"
+msgstr "Показать номер"
+
+#: frontend/templates/pages/company_detail.html:482
+#: frontend/templates/pages/company_detail.html:484
+msgid "Emailni ko'rsatish"
+msgstr "Показать email"
+
+#: frontend/templates/pages/company_detail.html:497
+msgid "Ish vaqti"
+msgstr "Рабочее время"
+
+#: frontend/templates/pages/company_detail.html:516
+msgid "Bu sizning biznesingizmi?"
+msgstr "Это ваш бизнес?"
+
+#: frontend/templates/pages/company_detail.html:517
+msgid "Kompaniyani tasdiqlang va ma'lumotlarni boshqaring."
+msgstr "Подтвердите компанию и управляйте данными."
+
+#: frontend/templates/pages/company_detail.html:528
+msgid "Xaridingizni tasdiqlang"
+msgstr "Подтвердите покупку"
+
+#: frontend/templates/pages/company_detail.html:531
+msgid ""
+"Sharh yozishda xarid chekini yuklang va 'Tasdiqlangan xarid' belgisiga ega "
+"bo'ling."
+msgstr ""
+
+#: frontend/templates/pages/contact_us.html:5
+#, fuzzy
+#| msgid "Admin bilan bog'lanish"
+msgid "Biz bilan bog'lanish - Fikrly"
+msgstr "Связаться с админом"
+
+#: frontend/templates/pages/contact_us.html:12
+#, fuzzy
+#| msgid "Admin bilan bog'lanish"
+msgid "Biz bilan bog'lanish"
+msgstr "Связаться с админом"
+
+#: frontend/templates/pages/contact_us.html:14
+msgid ""
+"Savollaringiz bormi? Taklif yoki shikoyatlaringizni yuboring. Biz har doim "
+"yordam berishga tayyormiz."
+msgstr ""
+
+#: frontend/templates/pages/contact_us.html:71
+#, fuzzy
+#| msgid "Javobni ko'rish"
+msgid "Xabarni yuborish"
+msgstr "Посмотреть ответ"
+
+#: frontend/templates/pages/home.html:5
+#, fuzzy
+#| msgid ""
+#| "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, "
+#| "ishonchli tanlov."
+msgid "Fikrly - O'zbekistonning eng ishonchli sharhlar platformasi"
+msgstr ""
+"Самая надежная платформа отзывов в Узбекистане. Реальные мнения, надежный "
+"выбор."
+
+#: frontend/templates/pages/home.html:8
+msgid ""
+"Fikrly orqali O'zbekistondagi eng yaxshi kompaniyalar va xizmatlarni toping. "
+"Haqiqiy mijozlar sharhlarini o'qing va o'z fikringizni qoldiring."
+msgstr ""
+
+#: frontend/templates/pages/home.html:21
+msgid "Haqiqiy fikrlar,"
+msgstr "Реальные отзывы,"
+
+#: frontend/templates/pages/home.html:22
+msgid "ishonchli tanlov"
+msgstr "надежный выбор"
+
+#: frontend/templates/pages/home.html:25
+#, fuzzy
+#| msgid ""
+#| "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, "
+#| "ishonchli tanlov."
+msgid ""
+"O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy mijozlar fikrlari "
+"orqali eng yaxshi bizneslarni toping."
+msgstr ""
+"Самая надежная платформа отзывов в Узбекистане. Реальные мнения, надежный "
+"выбор."
+
+#: frontend/templates/pages/home.html:36
+#, fuzzy
+#| msgid "Biznesni rivojlantirish"
+msgid "Bizneslarni qidirish"
+msgstr "Развитие бизнеса"
+
+#: frontend/templates/pages/home.html:36
+msgid "Biznes nomi, kategoriya yoki joylashuvni qidiring..."
+msgstr "Поиск по названию бизнеса, категории или местоположению..."
+
+#: frontend/templates/pages/home.html:56
+msgid "Mashhur:"
+msgstr "Популярное:"
+
+#: frontend/templates/pages/home.html:68
+msgid "Kategoriyalarni ko'rish"
+msgstr "Просмотр категорий"
+
+#: frontend/templates/pages/home.html:69
+msgid ""
+"O'zingizga kerakli xizmat turini tanlang va eng yaxshi takliflarni toping"
+msgstr "Выберите нужную услугу и найдите лучшие предложения"
+
+#: frontend/templates/pages/home.html:89
+#, python-format
+msgid "%(count)s ta biznes"
+msgstr "%(count)s бизнесов"
+
+#: frontend/templates/pages/home.html:96
+msgid "Barcha kategoriyalarni ko'rish"
+msgstr "Посмотреть все категории"
+
+#: frontend/templates/pages/home.html:108
+msgid "Mashhur bizneslar"
+msgstr "Популярные бизнесы"
+
+#: frontend/templates/pages/home.html:109
+msgid "Foydalanuvchilar tomonidan eng ko'p ko'rilgan"
+msgstr "Самые просматриваемые пользователями"
+
+#: frontend/templates/pages/home.html:112
+#: frontend/templates/pages/home.html:173
+msgid "Barchasini ko'rish"
+msgstr "Посмотреть все"
+
+#: frontend/templates/pages/home.html:160
+#, fuzzy, python-format
+#| msgid "%(count)s sharh"
+msgid "%(count)s ta sharh"
+msgstr "%(count)s отзывов"
+
+#: frontend/templates/pages/home.html:161
+msgid "Batafsil"
+msgstr "Подробнее"
+
+#: frontend/templates/pages/home.html:167
+msgid "Hozircha ma'lumot yo'q."
+msgstr "Пока нет данных."
+
+#: frontend/templates/pages/home.html:183
+msgid "So'nggi sharhlar"
+msgstr "Последние отзывы"
+
+#: frontend/templates/pages/home.html:184
+msgid "Foydalanuvchilarimiz nima deyishmoqda"
+msgstr "Что говорят наши пользователи"
+
+#: frontend/templates/pages/home.html:215
+#, fuzzy
+#| msgid "Oldingi"
+msgid "oldin"
+msgstr "Предыдущая"
+
+#: frontend/templates/pages/home.html:220
+#: frontend/templates/pages/public_profile.html:91
+#, fuzzy
+#| msgid "Hozircha sharhlar yo'q"
+msgid "Hozircha sharhlar yo'q."
+msgstr "Пока нет отзывов"
+
+#: frontend/templates/pages/home.html:253
+msgid "Fikrly bosh sahifasi"
+msgstr "Главная страница Fikrly"
+
+#: frontend/templates/pages/home.html:260
+#, fuzzy
+#| msgid "Barcha kategoriyalar ro'yxati"
+msgid "Barcha kategoriyalar ro\\"
+msgstr "Список всех категорий"
+
+#: frontend/templates/pages/home.html:267
+msgid "Ro\\"
+msgstr ""
+
+#: frontend/templates/pages/home.html:274
+msgid "O\\"
+msgstr ""
+
+#: frontend/templates/pages/home.html:393
+msgid "Qidirilmoqda..."
+msgstr "Поиск..."
+
+#: frontend/templates/pages/index.html:74
+msgid "Fikrly sharhlar platformasiga xush kelibsiz"
+msgstr "Добро пожаловать на платформу отзывов Fikrly"
+
+#: frontend/templates/pages/index.html:76
+#, fuzzy
+#| msgid "Bosh sahifaga qaytish"
+msgid "Bosh sahifaga yo'naltirilmoqda..."
+msgstr "Вернуться на главную"
+
+#: frontend/templates/pages/manager_company_edit.html:5
+msgid "Kompaniyani tahrirlash - Fikrly"
+msgstr "Редактирование компании - Fikrly"
+
+#: frontend/templates/pages/manager_company_edit.html:16
+#: frontend/templates/pages/manager_dashboard.html:13
+#: frontend/templates/pages/manager_request_approval.html:16
+#: frontend/templates/pages/manager_review_response.html:16
+msgid "Menejer paneli"
+msgstr "Панель менеджера"
+
+#: frontend/templates/pages/manager_company_edit.html:22
+#: frontend/templates/pages/manager_dashboard.html:143
+#: frontend/templates/pages/user_profile.html:251
+msgid "Tahrirlash"
+msgstr "Редактировать"
+
+#: frontend/templates/pages/manager_company_edit.html:27
+#, python-format
+msgid "%(name)s — tahrirlash"
+msgstr "%(name)s — редактирование"
+
+#: frontend/templates/pages/manager_company_edit.html:42
+msgid "Nomi"
+msgstr "Название"
+
+#: frontend/templates/pages/manager_company_edit.html:50
+msgid "Shahar"
+msgstr "Город"
+
+#: frontend/templates/pages/manager_company_edit.html:56
+msgid "Tavsif"
+msgstr "Описание"
+
+#: frontend/templates/pages/manager_company_edit.html:67
+msgid "Rasm yuklash"
+msgstr "Загрузить изображение"
+
+#: frontend/templates/pages/manager_company_edit.html:71
+msgid "Kutubxona rasmi"
+msgstr "Изображение из библиотеки"
+
+#: frontend/templates/pages/manager_company_edit.html:73
+msgid "Fayllar: media/company_library"
+msgstr "Файлы: media/company_library"
+
+#: frontend/templates/pages/manager_company_edit.html:78
+msgid "Tashqi rasm URL"
+msgstr "URL внешнего изображения"
+
+#: frontend/templates/pages/manager_company_edit.html:84
+#: frontend/templates/pages/manager_request_approval.html:73
+#: frontend/templates/pages/manager_review_response.html:64
+#: frontend/templates/pages/report_review.html:72
+#: frontend/templates/pages/review_delete_confirm.html:20
+#: frontend/templates/pages/review_edit.html:42
+msgid "Bekor qilish"
+msgstr "Отмена"
+
+#: frontend/templates/pages/manager_company_edit.html:87
+#: frontend/templates/pages/manager_review_response.html:67
+#: frontend/templates/pages/review_edit.html:45
+#: frontend/templates/pages/user_profile.html:131
+msgid "Saqlash"
+msgstr "Сохранить"
+
+#: frontend/templates/pages/manager_dashboard.html:5
+msgid "Menejer paneli - Fikrly"
+msgstr "Панель менеджера - Fikrly"
+
+#: frontend/templates/pages/manager_dashboard.html:14
+#, fuzzy
+#| msgid "Kompaniyani tasdiqlang va ma'lumotlarni boshqaring."
+msgid "Kompaniyalaringiz va sharhlarni boshqaring"
+msgstr "Подтвердите компанию и управляйте данными."
+
+#: frontend/templates/pages/manager_dashboard.html:31
+#, fuzzy
+#| msgid "Kompaniya:"
+msgid "Kompaniyalar"
+msgstr "Компания:"
+
+#: frontend/templates/pages/manager_dashboard.html:45
+#, fuzzy
+#| msgid "O'rtacha"
+msgid "O'rtacha reyting"
+msgstr "Среднее"
+
+#: frontend/templates/pages/manager_dashboard.html:59
+msgid "Jami sharhlar"
+msgstr "Всего отзывов"
+
+#: frontend/templates/pages/manager_dashboard.html:74
+msgid "Ko'rishlar"
+msgstr "Просмотры"
+
+#: frontend/templates/pages/manager_dashboard.html:88
+msgid "Kontaktlar"
+msgstr ""
+
+#: frontend/templates/pages/manager_dashboard.html:97
+msgid "So'nggi 30 kunlik faollik"
+msgstr ""
+
+#: frontend/templates/pages/manager_dashboard.html:107
+msgid "Mening kompaniyalarim"
+msgstr "Мои компании"
+
+#: frontend/templates/pages/manager_dashboard.html:138
+#, fuzzy
+#| msgid "Sharh:"
+msgid "sharh"
+msgstr "Отзыв:"
+
+#: frontend/templates/pages/manager_dashboard.html:155
+#, fuzzy
+#| msgid "Kompaniya haqida"
+msgid "Kompaniyalar yo'q"
+msgstr "О компании"
+
+#: frontend/templates/pages/manager_dashboard.html:156
+#, fuzzy
+#| msgid "Sizga biriktirilgan kompaniyalar yo'q."
+msgid "Sizga biriktirilgan kompaniyalar mavjud emas."
+msgstr "У вас нет привязанных компаний."
+
+#: frontend/templates/pages/manager_dashboard.html:157
+#, fuzzy
+#| msgid "Kategoriyalarni ko'rish"
+msgid "Kompaniyalarni ko'rish"
+msgstr "Просмотр категорий"
+
+#: frontend/templates/pages/manager_dashboard.html:165
+msgid "Kutayotgan sharhlar"
+msgstr "Ожидающие отзывы"
+
+#: frontend/templates/pages/manager_dashboard.html:199
+msgid "So'rov yuborilgan"
+msgstr "Запрос отправлен"
+
+#: frontend/templates/pages/manager_dashboard.html:205
+#: frontend/templates/pages/manager_request_approval.html:27
+msgid "Tasdiqlashni so'rash"
+msgstr "Запросить подтверждение"
+
+#: frontend/templates/pages/manager_dashboard.html:218
+#, fuzzy
+#| msgid "Kutayotgan sharhlar"
+msgid "Kutayotgan sharhlar yo'q"
+msgstr "Ожидающие отзывы"
+
+#: frontend/templates/pages/manager_dashboard.html:219
+#, fuzzy
+#| msgid "Hozircha hech qanday kategoriya mavjud emas."
+msgid "Hozircha tasdiqlash uchun yangi sharhlar mavjud emas."
+msgstr "Пока нет доступных категорий."
+
+#: frontend/templates/pages/manager_dashboard.html:251
+msgid "Kontakt ko\\"
+msgstr ""
+
+#: frontend/templates/pages/manager_request_approval.html:5
+msgid "Tasdiqlashni so'rash - Fikrly"
+msgstr "Запрос подтверждения - Fikrly"
+
+#: frontend/templates/pages/manager_request_approval.html:32
+#: frontend/templates/pages/manager_review_response.html:32
+#: frontend/templates/pages/report_review.html:32
+#, fuzzy
+#| msgid "Sharh matni"
+msgid "Sharh ma'lumotlari"
+msgstr "Текст отзыва"
+
+#: frontend/templates/pages/manager_request_approval.html:67
+msgid "Ushbu sharh uchun admin tasdiqlashini so'rash"
+msgstr ""
+
+#: frontend/templates/pages/manager_review_response.html:5
+#, fuzzy
+#| msgid "Biznes paneli - Fikrly"
+msgid "Biznes javobi - Fikrly"
+msgstr "Панель бизнеса - Fikrly"
+
+#: frontend/templates/pages/manager_review_response.html:22
+msgid "Javob berish"
+msgstr "Ответить"
+
+#: frontend/templates/pages/privacy_policy.html:9
+msgid "Maxfiylik siyosati | Fikrly"
+msgstr "Политика конфиденциальности | Fikrly"
+
+#: frontend/templates/pages/privacy_policy.html:31
+msgid ""
+"Ushbu Maxfiylik siyosati Fikrly platformasidan foydalanganda siz "
+"haqingizdagi ma'lumotlar qanday to'planishi, saqlanishi va ishlatilishini "
+"tushuntiradi."
+msgstr ""
+"Эта Политика конфиденциальности объясняет, как собирается, хранится и "
+"используется информация о вас при использовании платформы Fikrly."
+
+#: frontend/templates/pages/privacy_policy.html:35
+msgid "1. To'planadigan ma'lumotlar"
+msgstr "1. Собираемая информация"
+
+#: frontend/templates/pages/privacy_policy.html:37
+msgid ""
+"Hisob qaydnomasini yaratishda kiritilgan ma'lumotlar (ism, email va hokazo)"
+msgstr "Информация, введенная при создании учетной записи (имя, email и т.д.)"
+
+#: frontend/templates/pages/privacy_policy.html:38
+msgid ""
+"Platformada yozgan sharhlaringiz, baholaringiz va yuklagan rasm(lar)ingiz"
+msgstr "Ваши отзывы, оценки и загруженные изображения на платформе"
+
+#: frontend/templates/pages/privacy_policy.html:39
+msgid ""
+"Texnik ma'lumotlar: qurilma turi, brauzer, IP manzil, cookie va sessiya "
+"ma'lumotlari"
+msgstr ""
+"Технические данные: тип устройства, браузер, IP-адрес, cookie и данные сессии"
+
+#: frontend/templates/pages/privacy_policy.html:44
+msgid "2. Ma'lumotlardan foydalanish"
+msgstr "2. Использование информации"
+
+#: frontend/templates/pages/privacy_policy.html:46
+msgid "Xizmatlarimizni ko'rsatish va yaxshilash"
+msgstr "Предоставление и улучшение наших услуг"
+
+#: frontend/templates/pages/privacy_policy.html:47
+msgid ""
+"Foydalanuvchi xavfsizligini ta'minlash va suiiste'mollarning oldini olish"
+msgstr ""
+"Обеспечение безопасности пользователей и предотвращение злоупотреблений"
+
+#: frontend/templates/pages/privacy_policy.html:48
+msgid "Qonunchilik talablarini bajarish"
+msgstr "Соблюдение законодательных требований"
+
+#: frontend/templates/pages/privacy_policy.html:53
+msgid "3. Uchinchi tomonlar"
+msgstr "3. Третьи стороны"
+
+#: frontend/templates/pages/privacy_policy.html:55
+msgid ""
+"Biz texnik xizmatlar (xosting, tahlil vositalari) uchun uchinchi tomon "
+"provayderlardan foydalanishimiz mumkin. Ular bilan ma'lumotlar faqat zarur "
+"texnik maqsadlarda ulashiladi va shartnoma asosida himoyalanadi."
+msgstr ""
+"Мы можем использовать сторонних провайдеров для технических услуг (хостинг, "
+"инструменты аналитики). Данные передаются им только для необходимых "
+"технических целей и защищены договором."
+
+#: frontend/templates/pages/privacy_policy.html:60
+msgid "4. Cookie va shaxsiy sozlamalar"
+msgstr "4. Cookie и личные настройки"
+
+#: frontend/templates/pages/privacy_policy.html:62
+msgid ""
+"Cookie fayllari sayt funksionalligi va tahlil maqsadida ishlatiladi. Brauzer "
+"sozlamalari orqali cookie'larni boshqarishingiz mumkin."
+msgstr ""
+"Файлы cookie используются для функциональности сайта и аналитики. Вы можете "
+"управлять cookie через настройки браузера."
+
+#: frontend/templates/pages/privacy_policy.html:67
+msgid "5. Ma'lumotlarni saqlash muddati"
+msgstr "5. Срок хранения данных"
+
+#: frontend/templates/pages/privacy_policy.html:69
+msgid ""
+"Ma'lumotlar maqsad amalga oshirilishi uchun zarur bo'lgan muddat davomida "
+"yoki qonun talab qilgan muddatda saqlanadi."
+msgstr ""
+"Данные хранятся в течение срока, необходимого для достижения цели, или в "
+"течение срока, требуемого законом."
+
+#: frontend/templates/pages/privacy_policy.html:74
+msgid "6. Foydalanuvchi huquqlari"
+msgstr "6. Права пользователя"
+
+#: frontend/templates/pages/privacy_policy.html:76
+msgid "Ma'lumotlarga kirish va ularni yangilash"
+msgstr "Доступ к данным и их обновление"
+
+#: frontend/templates/pages/privacy_policy.html:77
+msgid "Ma'lumotlarni o'chirishni so'rash (qonuniy cheklovlar doirasida)"
+msgstr "Запрос на удаление данных (в рамках законных ограничений)"
+
+#: frontend/templates/pages/privacy_policy.html:78
+msgid "Rozilikni bekor qilish (agar qo'llanilsa)"
+msgstr "Отзыв согласия (если применимо)"
+
+#: frontend/templates/pages/privacy_policy.html:83
+msgid "7. Bog'lanish"
+msgstr "7. Связь"
+
+#: frontend/templates/pages/privacy_policy.html:85
+msgid "Savol va murojaatlar uchun:"
+msgstr "Для вопросов и обращений:"
+
+#: frontend/templates/pages/privacy_policy.html:90
+#: frontend/templates/socialaccount/authentication_error.html:75
+msgid "Bosh sahifaga qaytish"
+msgstr "Вернуться на главную"
+
+#: frontend/templates/pages/public_profile.html:38
+msgid "O'rtacha baho"
+msgstr "Средняя оценка"
+
+#: frontend/templates/pages/public_profile.html:42
+#: frontend/templates/pages/user_profile.html:84
+#: frontend/templates/pages/user_profile.html:181
+msgid "Foydali"
+msgstr "Полезно"
+
+#: frontend/templates/pages/public_profile.html:48
+msgid "Haqida"
+msgstr ""
+
+#: frontend/templates/pages/public_profile.html:56
+#, fuzzy
+msgid "Foydalanuvchi sharhlari"
+msgstr ""
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Условия использования\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Условиями использования\n"
+"#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+"Условия использования"
+
+#: frontend/templates/pages/report_review.html:5
+#, fuzzy
+#| msgid "Sharh yozish - Fikrly"
+msgid "Shikoyat yuborish - Fikrly"
+msgstr "Написать отзыв - Fikrly"
+
+#: frontend/templates/pages/report_review.html:27
+#, fuzzy
+#| msgid "Shikoyat qilish"
+msgid "Shikoyat yuborish"
+msgstr "Пожаловаться"
+
+#: frontend/templates/pages/review_delete_confirm.html:5
+msgid "Sharhni o'chirish | Fikrly"
+msgstr "Удалить отзыв | Fikrly"
+
+#: frontend/templates/pages/review_delete_confirm.html:14
+msgid "Sharhni o'chirish"
+msgstr "Удалить отзыв"
+
+#: frontend/templates/pages/review_delete_confirm.html:15
+msgid "Ushbu sharhni o'chirishni istaysizmi? Bu amalni qaytarib bo'lmaydi."
+msgstr "Вы уверены, что хотите удалить этот отзыв? Это действие необратимо."
+
+#: frontend/templates/pages/review_delete_confirm.html:23
+msgid "Ha, o'chirish"
+msgstr "Да, удалить"
+
+#: frontend/templates/pages/review_edit.html:5
+msgid "Sharhni tahrirlash | Fikrly"
+msgstr "Редактировать отзыв | Fikrly"
+
+#: frontend/templates/pages/review_edit.html:12
+msgid "Sharhni tahrirlash"
+msgstr "Редактировать отзыв"
+
+#: frontend/templates/pages/review_edit.html:25
+msgid "Baho"
+msgstr "Оценка"
+
+#: frontend/templates/pages/review_edit.html:33
+msgid "Matn"
+msgstr "Текст"
+
+#: frontend/templates/pages/review_submission.html:5
+msgid "Sharh yozish - Fikrly"
+msgstr "Написать отзыв - Fikrly"
+
+#: frontend/templates/pages/review_submission.html:39
+msgid "Tajribangizni baholang"
+msgstr "Оцените свой опыт"
+
+#: frontend/templates/pages/review_submission.html:40
+msgid ""
+"Sizning fikringiz bizneslarga o'sishga va boshqalarga to'g'ri tanlov "
+"qilishga yordam beradi."
+msgstr ""
+"Ваше мнение помогает бизнесу расти, а другим — делать правильный выбор."
+
+#: frontend/templates/pages/review_submission.html:50
+msgid "1. Biznesni tanlang"
+msgstr "1. Выберите бизнес"
+
+#: frontend/templates/pages/review_submission.html:51
+#: frontend/templates/pages/review_submission.html:126
+msgid "Majburiy"
+msgstr "Обязательно"
+
+#: frontend/templates/pages/review_submission.html:64
+msgid "Biznes nomi yoki manzilini qidiring..."
+msgstr "Поиск по названию или адресу бизнеса..."
+
+#: frontend/templates/pages/review_submission.html:70
+#: frontend/templates/pages/review_submission.html:340
+msgid "Kategoriya yo'q"
+msgstr "Без категории"
+
+#: frontend/templates/pages/review_submission.html:89
+#: frontend/templates/pages/review_submission.html:343
+msgid "Tanlash"
+msgstr "Выбрать"
+
+#: frontend/templates/pages/review_submission.html:110
+msgid "Tanlangan biznes"
+msgstr "Выбранный бизнес"
+
+#: frontend/templates/pages/review_submission.html:115
+msgid "O'zgartirish"
+msgstr "Изменить"
+
+#: frontend/templates/pages/review_submission.html:125
+msgid "2. Baholang"
+msgstr "2. Оцените"
+
+#: frontend/templates/pages/review_submission.html:139
+#: frontend/templates/pages/review_submission.html:405
+msgid "Baho tanlang"
+msgstr "Выберите оценку"
+
+#: frontend/templates/pages/review_submission.html:149
+msgid "3. Batafsil fikringiz"
+msgstr "3. Ваш подробный отзыв"
+
+#: frontend/templates/pages/review_submission.html:158
+msgid "Ismingizni kiriting"
+msgstr "Введите ваше имя"
+
+#: frontend/templates/pages/review_submission.html:168
+msgid "Sharh matni"
+msgstr "Текст отзыва"
+
+#: frontend/templates/pages/review_submission.html:173
+msgid ""
+"Nima sizga yoqdi yoki yoqmadi? Boshqalarga foydali bo'ladigan tafsilotlarni "
+"yozing..."
+msgstr ""
+"Что вам понравилось или не понравилось? Напишите детали, которые будут "
+"полезны другим..."
+
+#: frontend/templates/pages/review_submission.html:179
+msgid "Haqoratli so'zlar va shaxsiy ma'lumotlardan saqlaning."
+msgstr "Избегайте оскорблений и личных данных."
+
+#: frontend/templates/pages/review_submission.html:193
+msgid "Fayl yuklash"
+msgstr "Загрузить файл"
+
+#: frontend/templates/pages/review_submission.html:196
+msgid "yoki bu yerga tashlang"
+msgstr "или перетащите сюда"
+
+#: frontend/templates/pages/review_submission.html:199
+msgid "maks."
+msgstr "макс."
+
+#: frontend/templates/pages/review_submission.html:207
+msgid ""
+"Chek yuklash orqali siz 'Tasdiqlangan xarid' belgisini olishingiz mumkin."
+msgstr ""
+
+#: frontend/templates/pages/review_submission.html:213
+msgid "Maxfiylik sozlamalari"
+msgstr "Настройки конфиденциальности"
+
+#: frontend/templates/pages/review_submission.html:219
+msgid "Ismimni ko'rsatish"
+msgstr "Показывать мое имя"
+
+#: frontend/templates/pages/review_submission.html:226
+msgid "Biznesga javob berish imkoniyatini berish"
+msgstr "Разрешить бизнесу отвечать"
+
+#: frontend/templates/pages/review_submission.html:237
+msgid "Yuborish tugmasini bosish orqali siz"
+msgstr "Нажимая кнопку Отправить, вы соглашаетесь с"
+
+#: frontend/templates/pages/review_submission.html:237
+msgid "va"
+msgstr "и"
+
+#: frontend/templates/pages/review_submission.html:237
+msgid "ga rozilik bildirasiz."
+msgstr "."
+
+#: frontend/templates/pages/review_submission.html:241
+msgid "Tozalash"
+msgstr "Очистить"
+
+#: frontend/templates/pages/review_submission.html:380
+msgid "Juda yomon"
+msgstr "Очень плохо"
+
+#: frontend/templates/pages/review_submission.html:381
+msgid "Yomon"
+msgstr "Плохо"
+
+#: frontend/templates/pages/review_submission.html:382
+#: frontend/templates/pages/user_profile.html:92
+msgid "O'rtacha"
+msgstr "Среднее"
+
+#: frontend/templates/pages/review_submission.html:383
+msgid "Yaxshi"
+msgstr "Хорошо"
+
+#: frontend/templates/pages/review_submission.html:384
+msgid "A'lo"
+msgstr "Отлично"
+
+#: frontend/templates/pages/terms_of_service.html:9
+msgid "Foydalanish shartlari | Fikrly"
+msgstr "Условия использования | Fikrly"
+
+#: frontend/templates/pages/terms_of_service.html:26
+msgid ""
+"Ushbu Foydalanish shartlari Fikrly platformasidan foydalanish qoidalarini "
+"belgilaydi. Platformadan foydalanish orqali ushbu shartlarga rozilik "
+"bildirasiz."
+msgstr ""
+"Настоящие Условия использования определяют правила использования платформы "
+"Fikrly. Используя платформу, вы соглашаетесь с этими условиями."
+
+#: frontend/templates/pages/terms_of_service.html:27
+msgid "1. Hisob qaydnoması"
+msgstr "1. Учетная запись"
+
+#: frontend/templates/pages/terms_of_service.html:29
+msgid ""
+"Roʻyxatdan oʻtish uchun haqiqiy email talab qilinadi. Email "
+"tasdiqlanmaguncha ayrim imkoniyatlar yopiq boʻlishi mumkin."
+msgstr ""
+"Для регистрации требуется действительный адрес электронной почты. Некоторые "
+"функции могут быть недоступны до подтверждения электронной почты."
+
+#: frontend/templates/pages/terms_of_service.html:30
+msgid ""
+"Profil maʼlumotlarini yangilab turing; firibgarlik va soxtalashtirish "
+"taqiqlanadi."
+msgstr "Обновляйте данные профиля; мошенничество и фальсификация запрещены."
+
+#: frontend/templates/pages/terms_of_service.html:32
+msgid "2. Kontent va sharhlar"
+msgstr "2. Контент и отзывы"
+
+#: frontend/templates/pages/terms_of_service.html:34
+msgid "Haqorat, nafrat, yolgʻon axborot, spamlarga yoʻl qoʻyilmaydi."
+msgstr "Оскорбления, ненависть, ложная информация и спам запрещены."
+
+#: frontend/templates/pages/terms_of_service.html:35
+msgid "Sharhlar real tajribaga asoslanishi va foydali boʻlishi kerak."
+msgstr "Отзывы должны основываться на реальном опыте и быть полезными."
+
+#: frontend/templates/pages/terms_of_service.html:36
+msgid "Qoida buzilishida kontentni oʻchirish yoki cheklash huquqiga egamiz."
+msgstr ""
+"Мы оставляем за собой право удалять или ограничивать контент в случае "
+"нарушения правил."
+
+#: frontend/templates/pages/terms_of_service.html:38
+msgid "3. Biznes egalari"
+msgstr "3. Владельцы бизнеса"
+
+#: frontend/templates/pages/terms_of_service.html:40
+msgid ""
+"Javob yozishda hurmat saqlang; manipulyativ yoki sotib olingan sharhlarga "
+"ruxsat berilmaydi."
+msgstr ""
+"Соблюдайте уважение при ответе; манипулятивные или купленные отзывы "
+"запрещены."
+
+#: frontend/templates/pages/terms_of_service.html:42
+msgid "4. Maʼlumotlar va maxfiylik"
+msgstr "4. Данные и конфиденциальность"
+
+#: frontend/templates/pages/terms_of_service.html:43
+msgid "Maxfiylik siyosati bilan tanishing:"
+msgstr "Ознакомьтесь с Политикой конфиденциальности:"
+
+#: frontend/templates/pages/terms_of_service.html:44
+msgid "5. Masʼuliyat cheklovi"
+msgstr "5. Ограничение ответственности"
+
+#: frontend/templates/pages/terms_of_service.html:45
+msgid "Platformadan \\"
+msgstr ""
+
+#: frontend/templates/pages/terms_of_service.html:46
+msgid "6. Bogʻlanish"
+msgstr "6. Связь"
+
+#: frontend/templates/pages/terms_of_service.html:47
+msgid "Taklif va murojaatlar uchun:"
+msgstr "Для предложений и обращений:"
+
+#: frontend/templates/pages/user_profile.html:5
+msgid "Profil | Fikrly"
+msgstr "Профиль | Fikrly"
+
+#: frontend/templates/pages/user_profile.html:14
+msgid "Email tasdiqlash yuborildi. Pochtangizni tekshiring."
+msgstr "Подтверждение email отправлено. Проверьте вашу почту."
+
+#: frontend/templates/pages/user_profile.html:25
+msgid "Profilingiz tasdiqlanishi kutilmoqda."
+msgstr "Ваш профиль ожидает подтверждения."
+
+#: frontend/templates/pages/user_profile.html:26
+msgid "Administrator tasdiqlagandan so'ng barcha funksiyalar ochiladi."
+msgstr "Все функции будут доступны после подтверждения администратором."
+
+#: frontend/templates/pages/user_profile.html:58
+msgid "Tasdiqlangan foydalanuvchi"
+msgstr "Подтвержденный пользователь"
+
+#: frontend/templates/pages/user_profile.html:69
+msgid "Ishonchli sharhchi"
+msgstr "Надежный рецензент"
+
+#: frontend/templates/pages/user_profile.html:72
+msgid "Mahalliy ekspert"
+msgstr "Местный эксперт"
+
+#: frontend/templates/pages/user_profile.html:99
+msgid "Profilni tahrirlash"
+msgstr "Редактировать профиль"
+
+#: frontend/templates/pages/user_profile.html:126
+msgid "Bio"
+msgstr "Био"
+
+#: frontend/templates/pages/user_profile.html:127
+msgid "O'zingiz haqingizda qisqacha..."
+msgstr "Кратко о себе..."
+
+#: frontend/templates/pages/user_profile.html:142
+msgid "Yutuqlar"
+msgstr "Достижения"
+
+#: frontend/templates/pages/user_profile.html:149
+msgid "100+ Sharh"
+msgstr "100+ Отзывов"
+
+#: frontend/templates/pages/user_profile.html:150
+msgid "Faol sharhchi"
+msgstr "Активный рецензент"
+
+#: frontend/templates/pages/user_profile.html:154
+#, python-format
+msgid "100 ta sharhga yeting (Hozir: %(count)s)"
+msgstr "Достигните 100 отзывов (Сейчас: %(count)s)"
+
+#: frontend/templates/pages/user_profile.html:165
+msgid "Tasdiqlangan"
+msgstr "Подтвержден"
+
+#: frontend/templates/pages/user_profile.html:166
+msgid "Haqiqiy profil"
+msgstr "Настоящий профиль"
+
+#: frontend/templates/pages/user_profile.html:170
+msgid "Admin tasdiqlashi kutilmoqda"
+msgstr "Ожидается подтверждение администратора"
+
+#: frontend/templates/pages/user_profile.html:182
+msgid "1000+ ovoz"
+msgstr "1000+ голосов"
+
+#: frontend/templates/pages/user_profile.html:186
+#, python-format
+msgid "1000 ta foydali ovoz to'plang (Hozir: %(count)s)"
+msgstr "Соберите 1000 полезных голосов (Сейчас: %(count)s)"
+
+#: frontend/templates/pages/user_profile.html:197
+msgid "Ekspert"
+msgstr "Эксперт"
+
+#: frontend/templates/pages/user_profile.html:198
+msgid "Top sharhchi"
+msgstr "Топ рецензент"
+
+#: frontend/templates/pages/user_profile.html:202
+#, python-format
+msgid "50 ta sharhga yeting (Hozir: %(count)s)"
+msgstr "Достигните 50 отзывов (Сейчас: %(count)s)"
+
+#: frontend/templates/pages/user_profile.html:213
+msgid "Sharhlarim"
+msgstr "Мои отзывы"
+
+#: frontend/templates/pages/user_profile.html:215
+msgid "Barchasi"
+msgstr "Все"
+
+#: frontend/templates/pages/user_profile.html:216
+msgid "Saqlangan"
+msgstr "Сохраненные"
+
+#: frontend/templates/pages/user_profile.html:255
+msgid "O'chirish"
+msgstr "Удалить"
+
+#: frontend/templates/pages/user_profile.html:265
+msgid "Birinchi sharhingizni yozing!"
+msgstr "Напишите свой первый отзыв!"
+
+#: frontend/templates/pages/user_profile.html:266
+msgid "Sharh yozish &rarr;"
+msgstr "Написать отзыв &rarr;"
+
+#: frontend/templates/pages/user_profile.html:274
+msgid "Ko'proq yuklash"
+msgstr "Загрузить еще"
+
+#: frontend/templates/pages/verification_badge.html:5
+msgid "Profil belgisi haqida"
+msgstr "О значке профиля"
+
+#: frontend/templates/pages/verification_badge.html:6
+msgid "Profil belgilariga oid ma’lumotlar bu sahifada joylashgan."
+msgstr "Информация о значках профиля находится на этой странице."
+
+#: frontend/templates/socialaccount/authentication_error.html:8
+#, fuzzy
+#| msgid "Profil | Fikrly"
+msgid "Xatolik | Fikrly"
+msgstr "Профиль | Fikrly"
+
+#: frontend/templates/socialaccount/authentication_error.html:59
+msgid "Uchinchi Tomon Tizimga Kirishda Xato"
+msgstr ""
+
+#: frontend/templates/socialaccount/authentication_error.html:66
+msgid ""
+"Uchinchi tomon akkauntingiz orqali kirishga urinishda xatolik yuz berdi."
+msgstr ""
+
+#: frontend/templates/socialaccount/authentication_error.html:72
+#, fuzzy
+#| msgid "Barchasini ko'rish"
+msgid "Qayta urinib ko'rish"
+msgstr "Посмотреть все"
+
+#: frontend/templates/socialaccount/authentication_error.html:81
+#: frontend/templates/socialaccount/signup.html:102
+#, fuzzy
+#| msgid "© 2025 Fikrly. Barcha huquqlar himoyalangan."
+msgid "Barcha huquqlar himoyalangan."
+msgstr "© 2025 Fikrly. Все права защищены."
+
+#: frontend/templates/socialaccount/login.html:7
+msgid "Google orqali kirish"
+msgstr ""
+
+#: frontend/templates/socialaccount/login.html:8
+msgid ""
+"Siz Google orqali tizimga kirmoqchisiz. Davom etish uchun quyidagi tugmani "
+"bosing."
+msgstr ""
+
+#: frontend/templates/socialaccount/login.html:13
+msgid "Davom etish"
+msgstr ""
+
+#: frontend/templates/socialaccount/signup.html:50
+#, fuzzy
+#| msgid "Ro'yxatdan o'tgan bizneslar"
+msgid "Ro'yxatdan o'tishni yakunlash"
+msgstr "Зарегистрированные бизнесы"
+
+#: frontend/templates/socialaccount/signup.html:52
+#, python-format
+msgid ""
+"\n"
+"                    Siz Fikrly saytiga kirish uchun %(provider_name)s "
+"akkauntingizdan foydalanmoqchisiz. Yakuniy qadam sifatida quyidagi formani "
+"to'ldiring:\n"
+"                    "
+msgstr ""
+
+#: frontend/templatetags/company_tags.py:10
+msgid "Dushanba"
+msgstr "Понедельник"
+
+#: frontend/templatetags/company_tags.py:11
+msgid "Seshanba"
+msgstr "Вторник"
+
+#: frontend/templatetags/company_tags.py:12
+msgid "Chorshanba"
+msgstr "Среда"
+
+#: frontend/templatetags/company_tags.py:13
+msgid "Payshanba"
+msgstr "Четверг"
+
+#: frontend/templatetags/company_tags.py:14
+msgid "Juma"
+msgstr "Пятница"
+
+#: frontend/templatetags/company_tags.py:15
+msgid "Shanba"
+msgstr "Суббота"
+
+#: frontend/templatetags/company_tags.py:16
+msgid "Yakshanba"
+msgstr "Воскресенье"
+
+#: frontend/templatetags/company_tags.py:49
+#, fuzzy
+#| msgid "Hozircha ma'lumot yo'q."
+msgid "Ma'lumot yo'q"
+msgstr "Пока нет данных."
+
+#: frontend/templatetags/company_tags.py:56
+#: frontend/templatetags/company_tags.py:60
+#: frontend/templatetags/company_tags.py:70
+msgid "Yopiq"
+msgstr ""
+
+#: frontend/templatetags/company_tags.py:68
+msgid "Ochiq"
+msgstr ""
+
+#: frontend/templatetags/company_tags.py:72
+msgid "Noma'lum"
+msgstr ""
+
+#: frontend/views.py:40
+#, fuzzy
+#| msgid "Kompaniya haqida"
+msgid "Kompaniya tanlang"
+msgstr "О компании"
+
+#: myproject/settings.py:169
+msgid "O'zbek"
+msgstr ""
+
+#: myproject/settings.py:170
+msgid "Русский"
+msgstr ""
+
+#~ msgid "Yordam markazi"
+#~ msgstr "Центр помощи"
+
+#~ msgid "Restoranlar"
+#~ msgstr "Рестораны"
+
+#~ msgid "Klinikalar"
+#~ msgstr "Клиники"
+
+#~ msgid "O'quv markazlari"
+#~ msgstr "Учебные центры"
+
+#~ msgid "Go'zallik salonlari"
+#~ msgstr "Салоны красоты"
+
+#~ msgid "Do'konlar"
+#~ msgstr "Магазины"
+
+#~ msgid "Go'zallik"
+#~ msgstr "Красота"
+
+#~ msgid "Ta'lim"
+#~ msgstr "Образование"
+
+#, fuzzy
+#~ msgid ""
+#~ "Sharhingizda \"Tasdiqlangan xarid\" belgisini olish uchun xarid chekini "
+#~ "Telegram orqali yuboring."
+#~ msgstr ""
+#~ "#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+#~ "Чтобы получить значок \"Подтвержденная покупка\", отправьте чек через "
+#~ "Telegram.\n"
+#~ "#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+#~ "Чтобы получить значок \"Подтвержденная покупка\" в вашем отзыве, "
+#~ "отправьте чек покупки через Telegram."
+
+#~ msgid "Biznes boshqaruvi"
+#~ msgstr "Управление бизнесом"
+
+#~ msgid "Statistika"
+#~ msgstr "Статистика"
+
+#~ msgid "Umumiy reyting"
+#~ msgstr "Общий рейтинг"
+
+#~ msgid "Ko'rishlar soni"
+#~ msgstr "Количество просмотров"
+
+#~ msgid "Ishonch reytingi"
+#~ msgstr "Рейтинг доверия"
+
+#, fuzzy
+#~ msgid "Mijozlar fikri"
+#~ msgstr ""
+#~ "#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+#~ "Мнения клиентов\n"
+#~ "#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+#~ "Мнение клиентов\n"
+#~ "#-#-#-#-#  django.po (PACKAGE VERSION)  #-#-#-#-#\n"
+#~ "Мнение клиентов"
+
+#~ msgid "Analitika"
+#~ msgstr "Аналитика"
+
+#~ msgid "Haftalik o'sish"
+#~ msgstr "Еженедельный рост"
+
+#~ msgid "Sharhlar dinamikasi"
+#~ msgstr "Динамика отзывов"
+
+#~ msgid "Tezkor amallar"
+#~ msgstr "Быстрые действия"
+
+#~ msgid "Boshqaruv"
+#~ msgstr "Управление"
+
+#~ msgid "Ma'lumotlarni tahrirlash"
+#~ msgstr "Редактировать данные"
+
+#~ msgid "Rasmlar yuklash"
+#~ msgstr "Загрузить фото"
+
+#~ msgid "Reklama sozlamalari"
+#~ msgstr "Настройки рекламы"
+
+#~ msgid "Foydali maslahatlar"
+#~ msgstr "Полезные советы"
+
+#~ msgid "Mijozlar bilan ishlash"
+#~ msgstr "Работа с клиентами"
+
+#~ msgid "Sharhlarga javob berish madaniyati"
+#~ msgstr "Культура ответов на отзывы"
+
+#~ msgid "Profilni to'ldirish bo'yicha qo'llanma"
+#~ msgstr "Руководство по заполнению профиля"
+
+#~ msgid "Bildirishnomalar"
+#~ msgstr "Уведомления"
+
+#~ msgid "Yangi xabarlar"
+#~ msgstr "Новые сообщения"
+
+#~ msgid "Yangi sharh"
+#~ msgstr "Новый отзыв"
+
+#~ msgid "Tizim xabari"
+#~ msgstr "Системное сообщение"
+
+#~ msgid "Barchasini o'qish"
+#~ msgstr "Прочитать все"
+
+#~ msgid ""
+#~ "Oqtepa Lavash - Toshkentdagi eng mashhur fast-food tarmoqlaridan biri. "
+#~ "Biz mijozlarimizga sifatli va mazali taomlarni hamyonbop narxlarda taklif "
+#~ "etamiz. Bizning menyuimizda lavash, burger, pitsa va boshqa ko'plab "
+#~ "taomlar mavjud."
+#~ msgstr ""
+#~ "Oqtepa Lavash - одна из самых популярных сетей фаст-фуда в Ташкенте. Мы "
+#~ "предлагаем нашим клиентам качественные и вкусные блюда по доступным "
+#~ "ценам. В нашем меню есть лаваш, бургеры, пицца и многое другое."
+
+#~ msgid "1 kun oldin"
+#~ msgstr "1 день назад"
+
+#~ msgid "Ishchi Email"
+#~ msgstr "Рабочий Email"
+
+#~ msgid "Tasdiqlash havolasini yuborish"
+#~ msgstr "Отправить ссылку для подтверждения"
+
+#~ msgid "2 kun oldin"
+#~ msgstr "2 дня назад"
+
+#~ msgid "O'z fikringizni qoldiring"
+#~ msgstr "Оставьте свой отзыв"
+
+#~ msgid "Bahosi:"
+#~ msgstr "Оценка:"
+
+#~ msgid "Muallif:"
+#~ msgstr "Автор:"
+
+#~ msgid ""
+#~ "Platformadan \"boricha\" foydalaniladi; uchinchi tomon kontenti uchun "
+#~ "javobgar emasmiz."
+#~ msgstr ""
+#~ "Платформа предоставляется «как есть»; мы не несем ответственности за "
+#~ "контент третьих лиц."
+
+#~ msgid "Biznes egasi"
+#~ msgstr "Владелец бизнеса"
+
+#~ msgid "Toshkent filiali faoliyati"
+#~ msgstr "Деятельность филиала в Ташкенте"
+
+#~ msgid "O'tgan oyga nisbatan"
+#~ msgstr "По сравнению с прошлым месяцем"
+
+#~ msgid "O'rtacha 2 soat"
+#~ msgstr "В среднем 2 часа"
+
+#~ msgid "Javob berish tezligi"
+#~ msgstr "Скорость ответа"
+
+#~ msgid "1 hafta oldin"
+#~ msgstr "1 неделю назад"
+
+#~ msgid "Yangi"
+#~ msgstr "Новый"
+
+#~ msgid "Javob berilgan"
+#~ msgstr "Отвечено"
+
+#~ msgid "Reyting dinamikasi"
+#~ msgstr "Динамика рейтинга"
+
+#~ msgid "Oxirgi 30 kun"
+#~ msgstr "Последние 30 дней"
+
+#~ msgid "Oxirgi 3 oy"
+#~ msgstr "Последние 3 месяца"
+
+#~ msgid "Oxirgi 6 oy"
+#~ msgstr "Последние 6 месяцев"
+
+#~ msgid "Oxirgi yil"
+#~ msgstr "Последний год"
+
+#~ msgid "Reyting o'sish tendentsiyasi"
+#~ msgstr "Тенденция роста рейтинга"
+
+#~ msgid "4.6 dan 4.8 gacha (+4.3%)"
+#~ msgstr "С 4.6 до 4.8 (+4.3%)"
+
+#~ msgid "Sharhlarga javob berish"
+#~ msgstr "Ответить на отзывы"
+
+#~ msgid "Ma'lumotlarni yangilash"
+#~ msgstr "Обновить данные"
+
+#~ msgid "Rasm qo'shish"
+#~ msgstr "Добавить фото"
+
+#~ msgid "Muammoli sharhlar"
+#~ msgstr "Проблемные отзывы"
+
+#~ msgid "Ko'p maqtalgan"
+#~ msgstr "Часто хвалят"
+
+#~ msgid "Mazali taomlar (89% sharhlar)"
+#~ msgstr "Вкусная еда (89% отзывов)"
+
+#~ msgid "Tez xizmat (76% sharhlar)"
+#~ msgstr "Быстрое обслуживание (76% отзывов)"
+
+#~ msgid "Mehribon xodimlar (82% sharhlar)"
+#~ msgstr "Вежливый персонал (82% отзывов)"
+
+#~ msgid "Yaxshilash kerak"
+#~ msgstr "Нужно улучшить"
+
+#~ msgid "Kutish vaqti (23% sharhlar)"
+#~ msgstr "Время ожидания (23% отзывов)"
+
+#~ msgid "Joy kengligini oshirish (15% sharhlar)"
+#~ msgstr "Расширение пространства (15% отзывов)"
+
+#~ msgid "Narxlar (12% sharhlar)"
+#~ msgstr "Цены (12% отзывов)"
+
+#~ msgid "Yangi 5 yulduzli sharh"
+#~ msgstr "Новый 5-звездочный отзыв"
+
+#~ msgid "4 yulduzli sharh javob kutmoqda"
+#~ msgstr "4-звездочный отзыв ждет ответа"
+
+#~ msgid "Reytingi 4.8 ga yetdi!"
+#~ msgstr "Рейтинг достиг 4.8!"
+
+#~ msgid "Bugun"
+#~ msgstr "Сегодня"
+
+#~ msgid "FINTECH"
+#~ msgstr "ФИНТЕХ"
+
+#~ msgid "AVIAKOMPANIYA"
+#~ msgstr "АВИАКОМПАНИЯ"
+
+#~ msgid "FAST-FOOD"
+#~ msgstr "ФАСТ-ФУД"
+
+#~ msgid "BANK"
+#~ msgstr "БАНК"

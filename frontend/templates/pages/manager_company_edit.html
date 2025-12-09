@@ -1,62 +1,94 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kompaniyani tahrirlash - Fikrly</title>
-  <link rel="stylesheet" href="{% static 'main.css' %}">
-</head>
-<body class="bg-background">
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-xl font-semibold text-primary mb-6">{{ company.name }} — tahrirlash</h1>
+{% load i18n %}
 
-    <form method="post" enctype="multipart/form-data" class="space-y-4 card p-6">
-      {% csrf_token %}
-      {{ form.non_field_errors }}
+{% block title %}{% trans "Kompaniyani tahrirlash - Fikrly" %}{% endblock %}
 
-      <div class="grid md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-primary mb-1">Nomi</label>
-          {{ form.name }}
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-6">
+            <nav class="flex mb-4" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{% url 'business_dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                            {% trans "Menejer paneli" %}
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                            <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">{% trans "Tahrirlash" %}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+            <h1 class="text-2xl font-bold text-gray-900">{% blocktrans with name=company.name %}{{ name }} — tahrirlash{% endblocktrans %}</h1>
         </div>
-        <div>
-          <label class="block text-sm font-semibold text-primary mb-1">Kategoriya</label>
-          {{ form.category }}
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-primary mb-1">Shahar</label>
-          {{ form.city }}
-        </div>
-      </div>
 
-      <div>
-        <label class="block text-sm font-semibold text-primary mb-1">Tavsif</label>
-        {{ form.description }}
-      </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <form method="post" enctype="multipart/form-data" class="p-6 space-y-6">
+                {% csrf_token %}
 
-      <div class="grid md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-primary mb-1">Rasm yuklash</label>
-          {{ form.image }}
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Nomi" %}</label>
+                        {{ form.name }}
+                    </div>
+                    <div>
+                        <label for="{{ form.category_fk.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Kategoriya" %}</label>
+                        {{ form.category_fk }}
+                    </div>
+                    <div>
+                        <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Shahar" %}</label>
+                        {{ form.city }}
+                    </div>
+                </div>
+
+                <div>
+                    <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Tavsif" %}</label>
+                    {{ form.description }}
+                </div>
+
+                <div>
+                    <label for="{{ form.description_ru.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Tavsif (Rus tilida)" %}</label>
+                    {{ form.description_ru }}
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Rasm yuklash" %}</label>
+                        {{ form.image }}
+                    </div>
+                    <div>
+                        <label for="{{ form.library_image_path.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Kutubxona rasmi" %}</label>
+                        {{ form.library_image_path }}
+                        <p class="text-xs text-gray-500 mt-1">{% trans "Fayllar: media/company_library" %}</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="{{ form.image_url.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Tashqi rasm URL" %}</label>
+                    {{ form.image_url }}
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+                    <a href="{% url 'business_dashboard' %}" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        {% trans "Bekor qilish" %}
+                    </a>
+                    <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                        {% trans "Saqlash" %}
+                    </button>
+                </div>
+            </form>
         </div>
-        <div>
-          <label class="block text-sm font-semibold text-primary mb-1">Kutubxona rasmi</label>
-          {{ form.library_image_path }}
-          <p class="text-xs text-text-secondary mt-1">Fayllar: media/company_library</p>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-primary mb-1">Tashqi rasm URL</label>
-        {{ form.image_url }}
-      </div>
-
-      <div class="flex justify-end gap-3">
-        <a href="{% url 'business_dashboard' %}" class="btn-outline">Bekor qilish</a>
-        <button class="btn-primary" type="submit">Saqlash</button>
-      </div>
-    </form>
-  </main>
-</body>
-</html>
+    </div>
+</div>
+{% endblock %}

@@ -1,24 +1,54 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ro'yxatdan o'tish | Fikrly</title>
+    <title>{% trans "Ro'yxatdan o'tish | Fikrly" %}</title>
     {% load static_bust %}
-    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf9',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#00f49f',
+                            500: '#00d68b',
+                            600: '#00a86d',
+                            700: '#008f5d',
+                            800: '#006d47',
+                            900: '#004d32',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     {% load socialaccount %}
 </head>
 <body class="bg-background">
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
         <!-- Left brand panel for desktop -->
-        <div class="hidden md:flex items-center justify-center p-8">
-            <a href="/" class="inline-flex items-center space-x-3">
-                <svg class="w-12 h-12 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
+        <div class="hidden md:flex flex-col items-center justify-center p-8">
+            <a href="/" class="inline-flex items-center space-x-3 mb-4">
+                <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-12 h-12 rounded-xl shadow-lg">
                 <div>
-                    <div class="text-3xl font-bold text-primary">Fikrly</div>
-                    <p class="text-text-secondary">Ishonchli sharhlar platformasi</p>
+                    <div class="text-3xl font-bold text-gray-900">Fikrly</div>
+                    <p class="text-gray-500">{% trans "Ishonchli sharhlar platformasi" %}</p>
                 </div>
             </a>
         </div>
@@ -29,64 +59,81 @@
                 <!-- Mobile heading -->
                 <div class="text-center mb-6 md:hidden">
                     <a href="/" class="inline-flex items-center space-x-2">
-                        <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor"><path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/></svg>
-                        <span class="text-2xl font-bold text-primary">Fikrly</span>
+                        <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-10 h-10 rounded-lg shadow-md">
+                        <span class="text-2xl font-bold text-gray-900">Fikrly</span>
                     </a>
-                    <h1 class="mt-4 text-2xl font-bold text-primary">Ro'yxatdan o'tish</h1>
-                    <p class="text-text-secondary">Hisob yarating yoki ijtimoiy tarmoq orqali davom eting</p>
+                    <h1 class="mt-4 text-2xl font-bold text-gray-900">{% trans "Ro'yxatdan o'tish" %}</h1>
+                    <p class="text-gray-500">{% trans "Hisob yarating yoki ijtimoiy tarmoq orqali davom eting" %}</p>
                 </div>
 
-                <div class="card">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-primary-200">
                 <form method="post" action="{% url 'account_signup' %}" class="space-y-4">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="text-red-600 text-sm">{{ form.non_field_errors }}</div>
                     {% endif %}
                     <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Email</label>
+                        <label class="block text-sm font-semibold text-primary mb-2">{% trans "Email" %}</label>
                         <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="input-field" placeholder="your@gmail.com" required />
-                        <p class="text-xs text-text-secondary mt-1">Faqat Gmail domeniga ruxsat berilgan.</p>
+                        <p class="text-xs text-text-secondary mt-1">{% trans "Faqat Gmail domeniga ruxsat berilgan." %}</p>
                         {% if form.email.errors %}
                             <p class="text-red-600 text-xs mt-1">{{ form.email.errors|join:', ' }}</p>
                         {% endif %}
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Username</label>
+                        <label class="block text-sm font-semibold text-primary mb-2">{% trans "Username" %}</label>
                         <input type="text" name="username" value="{{ form.username.value|default:'' }}" class="input-field" placeholder="username" required />
                         {% if form.username.errors %}
                             <p class="text-red-600 text-xs mt-1">{{ form.username.errors|join:', ' }}</p>
                         {% endif %}
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Parol</label>
+                        <label class="block text-sm font-semibold text-primary mb-2">{% trans "Parol" %}</label>
                         <input type="password" name="password1" class="input-field" placeholder="••••••••" required />
                         {% if form.password1.errors %}
                             <p class="text-red-600 text-xs mt-1">{{ form.password1.errors|join:', ' }}</p>
                         {% endif %}
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-primary mb-2">Parol (tasdiq)</label>
+                        <label class="block text-sm font-semibold text-primary mb-2">{% trans "Parol (tasdiq)" %}</label>
                         <input type="password" name="password2" class="input-field" placeholder="••••••••" required />
                         {% if form.password2.errors %}
                             <p class="text-red-600 text-xs mt-1">{{ form.password2.errors|join:', ' }}</p>
                         {% endif %}
                     </div>
-                    <p class="text-xs text-text-secondary">Davom etish orqali siz 
+                    <p class="text-xs text-text-secondary">Davom etish orqali siz
                         <a href="{% url 'terms_of_service' %}" class="underline text-primary">Foydalanish shartlari</a> va
                         <a href="{% url 'community_guidelines' %}" class="underline text-primary">Hamjamiyat qoidalari</a> bilan tanishganingizni tasdiqlaysiz.
                     </p>
-                    <button type="submit" class="btn-primary w-full">Ro'yxatdan o'tish</button>
+                    <button type="submit" class="btn-primary w-full">{% trans "Ro'yxatdan o'tish" %}</button>
                 </form>
 
                 <div class="mt-6">
-                    {% get_providers as social_providers %}
-                    {% for provider in social_providers %}
-                        {% if provider.id == 'google' %}
-                            <a href="{% provider_login_url 'google' %}" class="w-full btn-outline flex items-center justify-center">
-                                <span>Google bilan davom etish</span>
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">{% trans "Yoki" %}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid gap-3">
+                        {% get_providers as socialaccount_providers %}
+                        {% for provider in socialaccount_providers %}
+                            {% if provider.id == "google" %}
+                            <a href="{% provider_login_url provider.id process='login' %}" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                                <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                                </svg>
+                                Google bilan kirish
                             </a>
-                        {% endif %}
-                    {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
                 </div>
 
@@ -101,4 +148,3 @@
     </div>
 </body>
 </html>
-

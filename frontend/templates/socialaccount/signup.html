@@ -1,0 +1,107 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% trans "Ro'yxatdan o'tish | Fikrly" %}</title>
+    {% load static_bust %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf9',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#00f49f',
+                            500: '#00d68b',
+                            600: '#00a86d',
+                            700: '#008f5d',
+                            800: '#006d47',
+                            900: '#004d32',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md">
+            <!-- Logo & Header -->
+            <div class="text-center mb-8">
+                <a href="/" class="inline-flex items-center space-x-3 mb-4">
+                    <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-12 h-12 rounded-xl shadow-lg">
+                    <span class="text-3xl font-bold text-gray-900">Fikrly</span>
+                </a>
+                <h1 class="text-2xl font-bold text-gray-900">{% trans "Ro'yxatdan o'tishni yakunlash" %}</h1>
+                <p class="mt-2 text-gray-600">
+                    {% blocktrans with provider_name=account.get_provider.name %}
+                    Siz Fikrly saytiga kirish uchun {{ provider_name }} akkauntingizdan foydalanmoqchisiz. Yakuniy qadam sifatida quyidagi formani to'ldiring:
+                    {% endblocktrans %}
+                </p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                <form class="signup space-y-6" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            {{ field.label }}
+                        </label>
+                        <div class="relative">
+                            <input type="{{ field.field.widget.input_type|default:'text' }}"
+                                   name="{{ field.name }}"
+                                   id="{{ field.id_for_label }}"
+                                   value="{{ field.value|default:'' }}"
+                                   class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm"
+                                   {% if field.field.required %}required{% endif %}>
+                        </div>
+                        {% if field.help_text %}
+                            <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                    {% endif %}
+
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all transform hover:-translate-y-0.5">
+                        {% trans "Ro'yxatdan o'tish" %}
+                    </button>
+                </form>
+            </div>
+
+            <p class="mt-8 text-center text-sm text-gray-500">
+                &copy; {% now "Y" %} Fikrly. {% trans "Barcha huquqlar himoyalangan." %}
+            </p>
+        </div>
+    </div>
+</body>
+</html>

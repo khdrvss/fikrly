@@ -2,6 +2,73 @@
 
 A Django-based reviews platform with Tailwind CSS frontend and Telegram notifications.
 
+## 🚀 How to Start (Step-by-Step)
+
+Follow these steps to get the project running locally.
+
+### 1. Prerequisites
+Ensure you have the following installed:
+- **Python 3.10+**
+- **Node.js 18+**
+- **Git**
+
+### 2. Setup Backend (Python/Django)
+
+1.  **Create a virtual environment:**
+    ```bash
+    python -m venv .venv
+    ```
+2.  **Activate the virtual environment:**
+    *   Windows (PowerShell):
+        ```powershell
+        .\.venv\Scripts\Activate
+        ```
+    *   Mac/Linux:
+        ```bash
+        source .venv/bin/activate
+        ```
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  **Configure Environment:**
+    *   Copy `.env.example` to `.env`:
+        ```bash
+        cp .env.example .env
+        ```
+    *   (Optional) Edit `.env` to configure database, email, or Telegram settings.
+
+5.  **Run Migrations:**
+    ```bash
+    python manage.py migrate
+    ```
+
+### 3. Setup Frontend (Tailwind CSS)
+
+1.  **Install Node dependencies:**
+    ```bash
+    npm install
+    ```
+    *(This installs Tailwind CSS and other build tools)*
+
+### 4. Run the Project
+
+You need two terminals running:
+
+**Terminal 1: Django Server**
+```bash
+python manage.py runserver
+```
+*Access the site at [http://127.0.0.1:8000](http://127.0.0.1:8000)*
+
+**Terminal 2: Tailwind Watcher (for CSS updates)**
+```bash
+npm run dev
+```
+*This automatically recompiles CSS when you change HTML files.*
+
+---
+
 ## Project structure
 
 - Frontend — UI templates, Tailwind CSS, assets (see `frontend/` and docs/folders.md)
@@ -15,14 +82,6 @@ More details in docs:
 - docs/folders.md — folder-by-folder guide
 - docs/routes.md — URL routes
 - docs/models.md — core models
-
-## Getting started
-
-1. Install Python deps: `pip install -r requirements.txt`
-2. Install frontend deps: `npm install`
-3. Configure environment: copy `.env.example` to `.env` and fill values
-4. Run migrations: `python manage.py migrate`
-5. Start dev server: `python manage.py runserver 0.0.0.0:8000`
 
 ## Frontend (Tailwind CSS)
 
@@ -43,42 +102,11 @@ More details in docs:
 - **NPM Scripts** - Easy-to-use commands for development and building
 - **Responsive Design** - Mobile-first approach for all screen sizes
 
-## 📋 Prerequisites
-
-- Python 3.10+
-- Node.js 18+
-- pip
-
-## 🛠️ Installation
-
-1) Backend deps
-
-```bash
-pip install -r requirements.txt
-```
-
-2) Frontend deps
-
-```bash
-npm install
-```
-
-3) Environment
-
-Copy `.env.example` to `.env` and fill in values (see below).
-
-4) Run Django dev server
-
-```bash
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000
-```
-
 ## ⚙️ Environment (.env)
 
 Variables read from `.env` in project root:
 
-- DEFAULT_FROM_EMAIL=no-reply@fikrly.uz
+- DEFAULT_FROM_EMAIL=fikrlyuzb@gmail.com
 - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend  # optional in DEBUG for real tests
 - EMAIL_HOST=smtp.sendgrid.net
 - EMAIL_PORT=587

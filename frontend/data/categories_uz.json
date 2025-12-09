@@ -1,12 +1,13 @@
 {
-	"Automotive": "Avtomobil",
-	"Beverage": "Ichimliklar",
+	"Automotive": "Avto kompaniyalar",
+	"Ichimliklar": "Ichimliklar",
 	"Oil and Gas": "Neft va gaz",
 	"Telecommunications": "Telekommunikatsiya",
 	"Mobile Operator": "Mobil operator",
 	"Gas Transportation": "Gaz tashish",
 	"Bank": "Bank",
 	"Electronics": "Elektronika",
+	"Aviation": "Aviatsiya",
 	"Airline": "Aviakompaniya",
 	"Supermarket": "Supermarket",
 	"Railway Transportation": "Temir yo'l",
@@ -14,8 +15,8 @@
 	"E-commerce and Fintech": "E-commerce va Fintech",
 	"Metallurgy": "Metallurgiya",
 	"Mining and Metallurgy": "Konchilik va metallurgiya",
-	"Fast-food": "Fast‑food",
-	"E-commerce": "E‑commerce",
+	"Fast-food": "Fast-food",
+	"E-commerce": "E-commerce",
 	"IT Services": "IT xizmatlari",
 	"Agricultural Technology": "Qishloq xo'jaligi texnologiyalari",
 	"Startup": "Startap",
@@ -24,5 +25,7 @@
 	"Construction Materials": "Qurilish materiallari",
 	"Food Delivery": "Oziq-ovqat yetkazib berish",
 	"Real Estate": "Ko'chmas mulk",
-	"Restaurant": "Restoran"
+	"Restaurant": "Restoran",
+	"Fintech": "Fintech",
+	"IT": "IT"
 }

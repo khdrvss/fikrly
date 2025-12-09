@@ -4,9 +4,9 @@ Key routes (see `frontend/urls.py`):
 
 - `/` — Home
 - `/business-profile/` — Entry to businesses
-- `/business-list/` — All businesses grid
+- `/bizneslar/` — All businesses grid
 - `/business/<pk>/` — Company detail with reviews, filters, pagination
-- `/review-submission/` — Create a review (text-only)
+- `/sharh-yozish/` — Create a review (text-only)
 - `/reviews/<pk>/report/` — Report a review
 - Manager
   - `/business-dashboard/` — Manager dashboard

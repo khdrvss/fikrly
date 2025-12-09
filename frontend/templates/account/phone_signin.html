@@ -1,32 +1,62 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telefon bilan kirish | Fikrly</title>
+  <title>{% trans "Telefon bilan kirish | Fikrly" %}</title>
   {% load static_bust %}
-  <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+      tailwind.config = {
+          theme: {
+              extend: {
+                  fontFamily: {
+                      sans: ['Inter', 'sans-serif'],
+                  },
+                  colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+              }
+          }
+      }
+  </script>
 </head>
 <body class="bg-background">
   <div class="min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-md">
-      <div class="card">
-        <h1 class="text-xl font-bold text-primary mb-4">Telefon raqam bilan kirish</h1>
+      <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-primary-200">
+        <h1 class="text-xl font-bold text-primary mb-4">{% trans "Telefon raqam bilan kirish" %}</h1>
         <form method="post" class="space-y-3">
           {% csrf_token %}
           <div>
-            <label class="block text-sm font-semibold text-primary mb-1">Telefon raqami</label>
+            <label class="block text-sm font-semibold text-primary mb-1">{% trans "Telefon raqami" %}</label>
             <input name="phone" value="{{ form.phone.value|default:'' }}" placeholder="9989xxxxxxxx" class="input-field" required />
             {% if form.phone.errors %}
               <p class="text-red-600 text-xs mt-1">{{ form.phone.errors.0 }}</p>
             {% endif %}
           </div>
-          <button class="btn-primary w-full">Kod yuborish</button>
+          <button class="btn-primary w-full">{% trans "Kod yuborish" %}</button>
         </form>
-        <p class="text-xs text-text-secondary mt-3">Kodni qabul qilishda muammo bo‘lsa, 1 daqiqadan keyin qayta urinib ko‘ring.</p>
+        <p class="text-xs text-text-secondary mt-3">{% trans "Kodni qabul qilishda muammo bo‘lsa, 1 daqiqadan keyin qayta urinib ko‘ring." %}</p>
         <p class="text-center text-sm text-text-secondary mt-4">
-          <a class="text-primary underline" href="{% url 'account_login' %}">Parol bilan kirish</a>
+          <a class="text-primary underline" href="{% url 'account_login' %}">{% trans "Parol bilan kirish" %}</a>
         </p>
       </div>
     </div>

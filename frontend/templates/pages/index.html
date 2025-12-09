@@ -6,7 +6,11 @@
     <title>Fikrly Reviews Platform</title>
     {% load static %}
     {% load static_bust %}
-    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+    {% load i18n %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
     <style>
         body {
             margin: 0;
@@ -18,7 +22,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .redirect-container {
             text-align: center;
             background: rgba(255, 255, 255, 0.95);
@@ -28,20 +32,20 @@
             max-width: 400px;
             width: 90%;
         }
-        
+
         .logo {
             font-size: 2.5em;
             font-weight: bold;
             color: #667eea;
             margin-bottom: 20px;
         }
-        
+
         .loading-text {
             font-size: 1.2em;
             color: #555;
             margin-bottom: 30px;
         }
-        
+
         .spinner {
             width: 40px;
             height: 40px;
@@ -51,12 +55,12 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         .redirect-info {
             font-size: 0.9em;
             color: #777;
@@ -67,9 +71,9 @@
 <body>
     <div class="redirect-container">
         <div class="logo">Fikrly</div>
-        <div class="loading-text">Welcome to Fikrly Reviews Platform</div>
+        <div class="loading-text">{% trans "Fikrly sharhlar platformasiga xush kelibsiz" %}</div>
         <div class="spinner"></div>
-        <div class="redirect-info">Redirecting to homepage...</div>
+        <div class="redirect-info">{% trans "Bosh sahifaga yo'naltirilmoqda..." %}</div>
     </div>
 
     <script>
@@ -77,7 +81,7 @@
         setTimeout(function() {
             window.location.href = '/';
         }, 2000);
-        
+
         // Fallback redirect in case of any issues
         window.addEventListener('load', function() {
             setTimeout(function() {

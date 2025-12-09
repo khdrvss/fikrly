@@ -1,12 +1,16 @@
+{% load static %}
+{% load static_bust %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Foydalanish shartlari | Fikrly</title>
-  {% load static %}
-  {% load static_bust %}
-  <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+  <title>{% trans "Foydalanish shartlari | Fikrly" %}</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
 </head>
 <body class="bg-background">
   <header class="bg-surface shadow-subtle">
@@ -16,31 +20,31 @@
   </header>
 
   <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <h1 class="text-3xl font-bold text-primary mb-6">Foydalanish shartlari</h1>
+    <h1 class="text-3xl font-bold text-primary mb-6">{% trans "Foydalanish shartlari" %}</h1>
     <div class="prose max-w-none text-text-secondary">
-      <p>Oxirgi yangilanish: 2025-09-22</p>
-      <p>Ushbu Foydalanish shartlari Fikrly platformasidan foydalanish qoidalarini belgilaydi. Platformadan foydalanish orqali ushbu shartlarga rozilik bildirasiz.</p>
-      <h2 class="text-xl font-semibold text-primary mt-6">1. Hisob qaydnoması</h2>
+      <p>{% trans "Oxirgi yangilanish: 2025-09-22" %}</p>
+      <p>{% trans "Ushbu Foydalanish shartlari Fikrly platformasidan foydalanish qoidalarini belgilaydi. Platformadan foydalanish orqali ushbu shartlarga rozilik bildirasiz." %}</p>
+      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "1. Hisob qaydnoması" %}</h2>
       <ul class="list-disc ml-6">
-        <li>Roʻyxatdan oʻtish uchun haqiqiy email talab qilinadi. Email tasdiqlanmaguncha ayrim imkoniyatlar yopiq boʻlishi mumkin.</li>
-        <li>Profil maʼlumotlarini yangilab turing; firibgarlik va soxtalashtirish taqiqlanadi.</li>
+        <li>{% trans "Roʻyxatdan oʻtish uchun haqiqiy email talab qilinadi. Email tasdiqlanmaguncha ayrim imkoniyatlar yopiq boʻlishi mumkin." %}</li>
+        <li>{% trans "Profil maʼlumotlarini yangilab turing; firibgarlik va soxtalashtirish taqiqlanadi." %}</li>
       </ul>
-      <h2 class="text-xl font-semibold text-primary mt-6">2. Kontent va sharhlar</h2>
+      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "2. Kontent va sharhlar" %}</h2>
       <ul class="list-disc ml-6">
-        <li>Haqorat, nafrat, yolgʻon axborot, spamlarga yoʻl qoʻyilmaydi.</li>
-        <li>Sharhlar real tajribaga asoslanishi va foydali boʻlishi kerak.</li>
-        <li>Qoida buzilishida kontentni oʻchirish yoki cheklash huquqiga egamiz.</li>
+        <li>{% trans "Haqorat, nafrat, yolgʻon axborot, spamlarga yoʻl qoʻyilmaydi." %}</li>
+        <li>{% trans "Sharhlar real tajribaga asoslanishi va foydali boʻlishi kerak." %}</li>
+        <li>{% trans "Qoida buzilishida kontentni oʻchirish yoki cheklash huquqiga egamiz." %}</li>
       </ul>
-      <h2 class="text-xl font-semibold text-primary mt-6">3. Biznes egalari</h2>
+      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "3. Biznes egalari" %}</h2>
       <ul class="list-disc ml-6">
-        <li>Javob yozishda hurmat saqlang; manipulyativ yoki sotib olingan sharhlarga ruxsat berilmaydi.</li>
+        <li>{% trans "Javob yozishda hurmat saqlang; manipulyativ yoki sotib olingan sharhlarga ruxsat berilmaydi." %}</li>
       </ul>
-      <h2 class="text-xl font-semibold text-primary mt-6">4. Maʼlumotlar va maxfiylik</h2>
-      <p>Maxfiylik siyosati bilan tanishing: <a class="text-primary underline" href="{% url 'privacy_policy' %}">Maxfiylik siyosati</a>.</p>
-      <h2 class="text-xl font-semibold text-primary mt-6">5. Masʼuliyat cheklovi</h2>
-      <p>Platformadan "boricha" foydalaniladi; uchinchi tomon kontenti uchun javobgar emasmiz.</p>
-      <h2 class="text-xl font-semibold text-primary mt-6">6. Bogʻlanish</h2>
-      <p>Taklif va murojaatlar uchun: <a class="underline" href="mailto:support@fikrly.uz">support@fikrly.uz</a></p>
+      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "4. Maʼlumotlar va maxfiylik" %}</h2>
+      <p>{% trans "Maxfiylik siyosati bilan tanishing:" %} <a class="text-primary underline" href="{% url 'privacy_policy' %}">{% trans "Maxfiylik siyosati" %}</a>.</p>
+      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "5. Masʼuliyat cheklovi" %}</h2>
+      <p>{% trans "Platformadan \"boricha\" foydalaniladi; uchinchi tomon kontenti uchun javobgar emasmiz." %}</p>
+      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "6. Bogʻlanish" %}</h2>
+      <p>{% trans "Taklif va murojaatlar uchun:" %} <a class="underline" href="mailto:fikrlyuzb@gmail.com">fikrlyuzb@gmail.com</a></p>
     </div>
   </main>
 

@@ -16,38 +16,38 @@ class Command(BaseCommand):
     def get_category_icon_and_color(self, name):
         """Return appropriate icon and color based on category name"""
         name_lower = name.lower()
-        
-        # Icon and color mapping
+
+        # Simple stroke-based icons (the original working style)
         if any(word in name_lower for word in ['restoran', 'kafe', 'fast-food', 'ovqat']):
-            return '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>', 'red'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>', 'red'
         elif any(word in name_lower for word in ['bank', 'moliya', 'fintech']):
-            return '<path d="M12 2L3 7V8H21V7L12 2Z"/><path d="M4 9V19H20V9"/><path d="M8 15V13H10V15H8Z"/><path d="M14 15V13H16V15H14Z"/>', 'blue'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>', 'blue'
         elif any(word in name_lower for word in ['it', 'texnologiya', 'dasturlash', 'konsalting', 'raqamli']):
-            return '<path d="M9 12L11 14L15 10"/><path d="M21 12C21 16.97 16.97 21 12 21S3 16.97 3 12S7.03 3 12 3S21 7.03 21 12Z"/>', 'purple'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>', 'purple'
         elif any(word in name_lower for word in ['tibbiyot', 'klinika', 'dorixona', 'health']):
-            return '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>', 'green'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>', 'green'
         elif any(word in name_lower for word in ['ta\'lim', 'maktab', 'universitet', 'kurs']):
-            return '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>', 'orange'
-        elif any(word in name_lower for word in ['savdo', 'do\'kon', 'supermarket', 'chakana', 'commerce']):
-            return '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>', 'yellow'
-        elif any(word in name_lower for word in ['avtomobil', 'automotive', 'transport']):
-            return '<path d="M7 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M17 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M5 17H3s-1-9 1-11h16s2 2 1 11h-2"/>', 'gray'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>', 'orange'
+        elif any(word in name_lower for word in ['savdo', 'do\'kon', 'supermarket', 'chakana', 'commerce', 'elektronika']):
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>', 'yellow'
+        elif any(word in name_lower for word in ['avtomobil', 'automotive', 'transport', 'avto']):
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>', 'gray'
         elif any(word in name_lower for word in ['qurilish', 'construction', 'materiallari']):
-            return '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z"/>', 'orange'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>', 'orange'
         elif any(word in name_lower for word in ['telekommunikatsiya', 'operator', 'mobile']):
-            return '<path d="M22 16.92V19.92C22 20.51 21.39 21 20.92 21C18.95 20.87 16.95 20.22 15.21 19.27C13.15 18.15 11.26 16.26 10.14 14.2C9.19 12.46 8.54 10.46 8.41 8.49C8.4 8.18 8.56 7.65 9.01 7.65H12.01"/>', 'blue'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>', 'blue'
         elif any(word in name_lower for word in ['energetika', 'energy', 'electricity']):
-            return '<path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>', 'yellow'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>', 'yellow'
         elif any(word in name_lower for word in ['to\'qimachilik', 'textile', 'fashion']):
-            return '<path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 17L12 22L22 17"/><path d="M2 12L12 17L22 12"/>', 'pink'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>', 'pink'
         elif any(word in name_lower for word in ['metallurgiya', 'metal', 'mining', 'konchilik']):
-            return '<path d="M9 11H15L13 13L15 15H9L11 13L9 11Z"/><path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z"/>', 'gray'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>', 'gray'
         elif any(word in name_lower for word in ['aviatsiya', 'aviation', 'aircraft']):
-            return '<path d="M21 16V4.58C21 4.21 20.81 3.85 20.49 3.62C20.17 3.38 19.73 3.28 19.3 3.34L3.3 5.35C2.67 5.44 2.25 6.03 2.25 6.7V16"/>', 'blue'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>', 'blue'
         elif any(word in name_lower for word in ['beverage', 'ichimlik', 'drink']):
-            return '<path d="M5 12V7L7 5H17L19 7V12"/><path d="M5 12L2 22H22L19 12"/>', 'green'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v6a2 2 0 002 2h2m2-2V9a2 2 0 012-2h2a2 2 0 012 2v.01M15 8v.01"/>', 'green'
         elif any(word in name_lower for word in ['kimyo', 'chemical', 'sanoati']):
-            return '<path d="M10.5 2L8.5 8H15.5L13.5 2H10.5Z"/><path d="M7 8L5 16C4.72 17.2 5.54 18.36 6.76 18.64L17.24 18.64C18.46 18.36 19.28 17.2 19 16L17 8H7Z"/>', 'purple'
+            return '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>', 'purple'
         elif any(word in name_lower for word in ['mulk', 'real estate', 'property']):
             return '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z"/>', 'green'
         elif any(word in name_lower for word in ['logistika', 'yetkazib', 'delivery', 'eksport']):
@@ -66,15 +66,15 @@ class Command(BaseCommand):
 
         if options['from_companies']:
             self.stdout.write('Creating categories from company data...')
-            
+
             # Get all unique categories from companies
             company_categories = Company.objects.values_list('category', flat=True).distinct()
             company_categories = [cat for cat in company_categories if cat and cat.strip()]
-            
+
             for i, cat_name in enumerate(sorted(company_categories), 1):
                 icon_svg, color = self.get_category_icon_and_color(cat_name)
                 slug = slugify(cat_name)
-                
+
                 category_data = {
                     'slug': slug,
                     'description': f'{cat_name} sohasidagi kompaniyalar',
@@ -83,12 +83,12 @@ class Command(BaseCommand):
                     'sort_order': i * 10,
                     'is_active': True
                 }
-                
+
                 category, created = Category.objects.get_or_create(
                     name=cat_name,
                     defaults=category_data
                 )
-                
+
                 if created:
                     created_count += 1
                     self.stdout.write(
@@ -101,19 +101,19 @@ class Command(BaseCommand):
                         if getattr(category, key) != value:
                             setattr(category, key, value)
                             updated = True
-                    
+
                     if updated:
                         category.save()
                         updated_count += 1
                         self.stdout.write(
                             self.style.WARNING(f'↻ Yangilandi: {category.name}')
                         )
-        
+
         else:
             # Original manual categories data
             categories_data = [
                 {
-                    'name': 'Restoran va Kafe', 
+                    'name': 'Restoran va Kafe',
                     'slug': 'restoran-va-kafe',
                     'description': 'Ovqatlanish joylari, restoranlar, kafeler va boshqa oziq-ovqat xizmatlari',
                     'icon_svg': '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>',
@@ -121,7 +121,7 @@ class Command(BaseCommand):
                     'sort_order': 10
                 },
                 {
-                    'name': 'Bank', 
+                    'name': 'Bank',
                     'slug': 'bank',
                     'description': 'Bank xizmatlari, moliya institutlari',
                     'icon_svg': '<path d="M12 2L3 7V8H21V7L12 2Z"/><path d="M4 9V19H20V9"/><path d="M8 15V13H10V15H8Z"/><path d="M14 15V13H16V15H14Z"/>',
@@ -135,7 +135,7 @@ class Command(BaseCommand):
                     name=cat_data['name'],
                     defaults=cat_data
                 )
-                
+
                 if created:
                     created_count += 1
                     self.stdout.write(

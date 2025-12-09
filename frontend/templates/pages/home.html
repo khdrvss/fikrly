@@ -1,299 +1,413 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fikrly - Haqiqiy fikrlar, ishonchli tanlov</title>
-    {% load static %}
-    {% load static_bust %}
-    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<script type="module" src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Ffikrlyrev6441back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.6"></script>
-</head>
-<body class="bg-background">
-    <!-- Header Navigation -->
-    <header class="bg-surface shadow-subtle sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <a href="{% url 'index' %}" class="flex items-center space-x-2">
-                        <svg class="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="currentColor">
-                            <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
-                        </svg>
-                        <span class="text-2xl font-bold text-primary">Fikrly</span>
-                    </a>
-                </div>
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
 
-                <!-- Navigation Links -->
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{% url 'index' %}" class="text-primary font-semibold">Bosh sahifa</a>
-                    <a href="{% url 'category_browse' %}" class="text-text-secondary hover:text-primary transition-smooth">Kategoriyalar</a>
-                    <a href="{% url 'business_profile' %}" class="text-text-secondary hover:text-primary transition-smooth">Bizneslar</a>
-                    <a href="{% url 'review_submission' %}" class="text-text-secondary hover:text-primary transition-smooth">Sharh yozish</a>
-                </nav>
+{% block title %}Fikrly.uz — O‘zbekiston sharhlar platformasi{% endblock %}
 
-                <!-- User Actions -->
-                <div class="flex items-center space-x-4">
-                    <button class="text-text-secondary hover:text-primary transition-smooth">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </button>
-                    <a href="{% url 'account_login' %}" class="btn-outline text-sm px-4 py-2">Kirish</a>
-                    <a href="{% url 'account_login' %}" class="btn-primary text-sm px-4 py-2">Biznes uchun</a>
-                </div>
+{% block meta_description %}Fikrly.uz — O‘zbekistondagi kompaniyalar haqida haqiqiy foydalanuvchi sharhlari va reytinglari. Qaysi biri yaxshi? Fikrlar orqali bilib oling.{% endblock %}
 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden text-text-secondary">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
+{% block extra_head %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Website",
+  "name": "Fikrly.uz",
+  "alternateName": "Fikrly",
+  "url": "https://fikrly.uz/",
+  "description": "Fikrly.uz — O‘zbekiston bizneslari uchun sharhlar va reytinglar platformasi."
+}
+</script>
+{% endblock %}
 
+{% block meta_keywords %}
+<meta name="keywords" content="fikrly, fikrly.uz, fikrly uz, sharhlar, reytinglar, kompaniya sharhlari, xizmatlar sharhlari, biznes sharhlari, toshkent sharhlar, toshkent reytinglar, toshkent kompaniyalari, mijoz fikrlari toshkent, toshkentdagi eng yaxshi xizmatlar, toshkentdagi ishonchli kompaniyalar, xizmat sifati toshkent, toshkent restoran sharhlari, toshkent kafe sharhlari, toshkent klinika sharhlari, toshkent dorixona sharhlari, toshkent shifokor sharhlari, toshkent avtoservis sharhlari, toshkent qurilish kompaniyalari sharhlari, toshkent developer sharhlari, toshkent internet provider sharhlari, toshkent bank sharhlari, toshkent ta'lim markazi sharhlari, toshkent salon sharhlari, toshkent xizmatlarini solishtirish, toshkentda ishonchli biznes topish, toshkent yomon xizmat sharhlari, toshkent yaxshi xizmat sharhlari" />
+{% endblock %}
+
+{% block content %}
     <!-- Hero Section -->
-    <section class="relative bg-gradient-to-br from-primary-50 to-secondary-50 py-20">
-        <div class="absolute inset-0 bg-white/50"></div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-primary mb-6">
-                Haqiqiy fikrlar, <br />
-                <span class="text-gradient">ishonchli tanlov</span>
+    <section class="relative bg-white overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-50 to-white opacity-70"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+                {% trans "Haqiqiy fikrlar," %} <br />
+                <span class="text-primary-600">{% trans "ishonchli tanlov" %}</span>
             </h1>
-            <p class="text-xl text-text-secondary mb-8 max-w-3xl mx-auto">
-                O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy mijozlar fikrlari orqali eng yaxshi bizneslarni toping.
+            <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                {% trans "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy mijozlar fikrlari orqali eng yaxshi bizneslarni toping." %}
             </p>
 
-            <!-- Trust Metrics (hidden until real stats wired) -->
-            <div class="hidden"></div>
-
             <!-- Search Bar -->
-            <div class="max-w-2xl mx-auto">
-                <form method="get" action="{% url 'search_businesses' %}" class="relative" id="searchForm">
-                    <input type="text" name="q" id="searchInput" placeholder="Biznes nomi, kategoriya yoki joylashuvni qidiring..." class="input-field pl-12 pr-32 py-4 text-lg" />
-                    <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <button type="submit" id="searchBtn" class="absolute right-2 top-1/2 transform -translate-y-1/2 btn-primary px-6 py-2 hover:bg-primary-700 transition-colors">
-                        <span id="searchBtnText">Qidirish</span>
-                        <svg id="searchBtnSpinner" class="hidden w-4 h-4 animate-spin ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <div class="max-w-3xl mx-auto relative z-10">
+                <form method="get" action="{% url 'search_businesses' %}" class="relative group" id="searchForm">
+                    <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <svg class="h-6 w-6 text-gray-400 group-focus-within:text-primary-500 transition-colors" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                    </button>
+                    </div>
+                    <input type="text" name="q" id="searchInput" aria-label="{% trans 'Bizneslarni qidirish' %}" placeholder="{% trans 'Biznes nomi, kategoriya yoki joylashuvni qidiring...' %}" class="block w-full pl-14 pr-32 py-3 md:py-4 text-base md:text-lg bg-white border-0 rounded-2xl shadow-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-primary-500 placeholder-gray-400 transition-shadow" autocomplete="off" />
+
+                    <!-- Search Suggestions Dropdown -->
+                    <div id="searchSuggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 hidden">
+                        <!-- Content will be injected via JS -->
+                    </div>
+
+                    <div class="absolute inset-y-2 right-2">
+                        <button type="submit" id="searchBtn" class="h-full bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 md:px-8 rounded-xl transition-colors flex items-center">
+                            <span id="searchBtnText">{% trans "Qidirish" %}</span>
+                            <svg id="searchBtnSpinner" class="hidden w-4 h-4 animate-spin ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
                 </form>
+            </div>
+
+            <!-- Popular Categories Tags -->
+            <div class="mt-8 flex flex-wrap justify-center gap-3 text-sm text-gray-500">
+                <span>{% trans "Mashhur:" %}</span>
+                {% for cat in featured_categories %}
+                <a href="{% url 'business_list' %}?category={{ cat.slug }}" class="hover:text-primary-600 underline decoration-dotted">{{ cat.display_name }}</a>
+                {% endfor %}
             </div>
         </div>
     </section>
 
-    <!-- Category Navigation (link only, no fake counts) -->
-    <section class="py-16 bg-surface">
+    <!-- Category Navigation -->
+    <section class="py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center text-primary mb-12">Kategoriyalarni ko'rish</h2>
-            <div class="text-center">
-                <a href="{% url 'category_browse' %}" class="btn-primary inline-block px-6 py-3">Kategoriyalar sahifasiga o'tish</a>
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">{% trans "Kategoriyalarni ko'rish" %}</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">{% trans "O'zingizga kerakli xizmat turini tanlang va eng yaxshi takliflarni toping" %}</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {% for cat in featured_categories %}
+                <a href="{% url 'business_list' %}?category={{ cat.slug }}" class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all border border-green-200 group text-center">
+                    <div class="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform
+                        {% if cat.color == 'red' %}bg-red-50 text-red-600 group-hover:bg-red-100
+                        {% elif cat.color == 'orange' %}bg-orange-50 text-orange-600 group-hover:bg-orange-100
+                        {% elif cat.color == 'yellow' %}bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100
+                        {% elif cat.color == 'green' %}bg-green-50 text-green-600 group-hover:bg-green-100
+                        {% elif cat.color == 'blue' %}bg-primary-50 text-primary-600 group-hover:bg-primary-100
+                        {% elif cat.color == 'purple' %}bg-purple-50 text-purple-600 group-hover:bg-purple-100
+                        {% elif cat.color == 'pink' %}bg-pink-50 text-pink-600 group-hover:bg-pink-100
+                        {% else %}bg-gray-50 text-gray-600 group-hover:bg-gray-100{% endif %}">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {{ cat.icon_svg|safe }}
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">{{ cat.display_name }}</h3>
+                    <p class="text-sm text-gray-500 mt-1">{% blocktrans with count=cat.company_count %}{{ count }} ta biznes{% endblocktrans %}</p>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-10">
+                <a href="{% url 'category_browse' %}" class="inline-flex items-center text-primary-600 font-semibold hover:text-primary-700 transition-colors">
+                    {% trans "Barcha kategoriyalarni ko'rish" %}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Trending Businesses -->
-    <section class="py-16 bg-background">
+    <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-12">
-                <h2 class="text-3xl font-bold text-primary">Mashhur bizneslar</h2>
-                <a href="{% url 'category_browse' %}" class="text-primary hover:text-primary-700 font-semibold">
-                    Barchasini ko'rish →
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">{% trans "Mashhur bizneslar" %}</h2>
+                    <p class="text-gray-600">{% trans "Foydalanuvchilar tomonidan eng ko'p ko'rilgan" %}</p>
+                </div>
+                <a href="{% url 'category_browse' %}" class="hidden md:inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold transition-colors">
+                    {% trans "Barchasini ko'rish" %}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for company in trending_companies %}
-                <div class="card card-hover">
-                    <div class="relative mb-4 overflow-hidden">
-                        <div class="w-full h-20 bg-gray-100">
-                            <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-full object-cover object-center rounded-lg group-hover:scale-105 transition-transform duration-300" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                <a href="{% url 'company_detail' company.pk %}" class="block bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden hover:shadow-md transition-all group">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                        <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-gray-900 shadow-sm">
+                            {{ company.category_fk.display_name|default:company.category }}
                         </div>
-                        {% if company.is_verified %}
-                        <div class="absolute top-3 right-3 bg-success text-white px-2 py-1 rounded-full text-xs font-semibold">Tasdiqlangan</div>
-                        {% endif %}
-                    </div>
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-xl font-semibold text-primary">{{ company.name }}</h3>
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-secondary mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span class="font-semibold text-primary">{{ company.rating }}</span>
+                        <div class="absolute bottom-4 left-4 bg-white p-1 rounded-lg shadow-lg overflow-hidden">
+                            <div class="w-10 h-10 rounded-md overflow-hidden relative">
+                                {% if company.display_logo %}
+                                <img src="{{ company.display_logo }}"
+                                     alt="{{ company.name }} logo"
+                                     class="w-full h-full object-cover absolute inset-0"
+                                     style="transform: scale(calc({{ company.logo_scale|default:100 }} / 100));"
+                                     onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear';">
+                                {% else %}
+                                <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear"
+                                     alt="Logo" class="w-full h-full object-cover">
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                    <p class="text-text-secondary mb-3">{{ company.category }} • {{ company.city }}</p>
-                    <p class="text-sm text-text-secondary mb-4">{{ company.review_count }} sharh</p>
-                    <a href="{% url 'business_profile' %}" class="btn-outline w-full text-center">Batafsil ko'rish</a>
-                </div>
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors flex items-center gap-1">
+                                {{ company.name }}
+                                {% if company.is_verified %}
+                                    <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                {% endif %}
+                            </h3>
+                            <div class="flex items-center bg-green-50 px-2 py-1 rounded-lg">
+                                <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <span class="font-bold text-green-700 text-sm">{{ company.rating }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            {{ company.city }}
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                            <span class="text-sm text-gray-500">{% blocktrans with count=company.review_count %}{{ count }} ta sharh{% endblocktrans %}</span>
+                            <span class="text-primary-600 font-medium text-sm hover:text-primary-700 transition-colors">{% trans "Batafsil" %} →</span>
+                        </div>
+                    </div>
+                </a>
                 {% empty %}
-                <div class="text-text-secondary">Hozircha ma'lumot yo'q.</div>
+                <div class="col-span-full text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                    <p class="text-gray-500">{% trans "Hozircha ma'lumot yo'q." %}</p>
+                </div>
                 {% endfor %}
+            </div>
+
+            <div class="mt-8 text-center md:hidden">
+                <a href="{% url 'category_browse' %}" class="btn-outline w-full justify-center">{% trans "Barchasini ko'rish" %}</a>
             </div>
         </div>
     </section>
 
     <!-- Recent Reviews -->
-    <section class="py-16 bg-surface">
+    <section class="py-16 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center mb-12">
-                <h2 class="text-3xl font-bold text-primary">So'nggi sharhlar</h2>
-                <a href="{% url 'review_submission' %}" class="text-primary hover:text-primary-700 font-semibold">
-                    Sharh yozish →
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">{% trans "So'nggi sharhlar" %}</h2>
+                    <p class="text-gray-600">{% trans "Foydalanuvchilarimiz nima deyishmoqda" %}</p>
+                </div>
+                <a href="{% url 'review_submission' %}" class="hidden md:inline-flex items-center bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-primary-600 font-medium px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    {% trans "Sharh yozish" %}
                 </a>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for review in latest_reviews %}
-                <div class="card">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-green-200 hover:shadow-md transition-all">
                     <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center mr-4">
-                            <span class="text-primary font-semibold">{{ review.user_name|first|default:"U" }}</span>
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center mr-3 text-primary-700 font-bold text-sm">
+                            {{ review.user_name|first|default:"U" }}
                         </div>
                         <div>
-                            <h4 class="font-semibold text-primary">{{ review.user_name }}</h4>
-                            <div class="flex items-center">
-                                <div class="flex text-secondary mr-2">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                    <span class="text-sm ml-1 text-text-secondary">{{ review.rating }}/5</span>
-                                </div>
+                            <h4 class="font-semibold text-gray-900 text-sm">{{ review.user_name }}</h4>
+                            <div class="flex text-yellow-400 text-xs mt-0.5">
+                                <span class="font-medium text-gray-500 mr-2">{{ review.rating }}/5</span>
+                                {% for i in "12345"|make_list %}
+                                    <svg class="w-3 h-3 {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-200{% endif %}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
-                    <p class="text-text-secondary mb-3">"{{ review.text }}"</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-semibold text-primary">{{ review.company.name }}</span>
-                        {% if review.verified_purchase %}
-                        <div class="flex items-center text-success text-xs">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Tasdiqlangan xarid
-                        </div>
-                        {% endif %}
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-3">"{{ review.text }}"</p>
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-50">
+                        <span class="text-xs font-semibold text-gray-900 flex items-center">
+                            <svg class="w-3 h-3 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            {{ review.company.name }}
+                        </span>
+                        <span class="text-xs text-gray-400">{{ review.created_at|timesince }} {% trans "oldin" %}</span>
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-text-secondary">Hozircha sharhlar yo'q.</div>
+                <div class="col-span-full text-center py-12">
+                    <p class="text-gray-500">{% trans "Hozircha sharhlar yo'q." %}</p>
+                </div>
                 {% endfor %}
+            </div>
+
+            <div class="mt-8 text-center md:hidden">
+                <a href="{% url 'review_submission' %}" class="btn-primary w-full justify-center">{% trans "Sharh yozish" %}</a>
             </div>
         </div>
     </section>
 
-    <!-- Trust Score Highlights removed until we have real analytics -->
-    <div class="hidden"></div>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Fikrly",
+      "url": "{{ request.scheme }}://{{ request.get_host }}",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ request.scheme }}://{{ request.get_host }}{% url 'search_businesses' %}?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "SiteNavigationElement",
+          "position": 1,
+          "name": "{% trans 'Bosh sahifa' %}",
+          "description": "{% trans 'Fikrly bosh sahifasi' %}",
+          "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'index' %}"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 2,
+          "name": "{% trans 'Kategoriyalar' %}",
+          "description": "{% trans 'Barcha kategoriyalar ro\'yxati' %}",
+          "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'category_browse' %}"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 3,
+          "name": "{% trans 'Bizneslar' %}",
+          "description": "{% trans 'Ro\'yxatdan o\'tgan bizneslar' %}",
+          "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'business_profile' %}"
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "position": 4,
+          "name": "{% trans 'Sharh yozish' %}",
+          "description": "{% trans 'O\'z fikringizni qoldiring' %}",
+          "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'review_submission' %}"
+        }
+      ]
+    }
+    </script>
+{% endblock %}
 
-    <!-- Footer -->
-    <footer class="bg-primary text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <!-- Company Info -->
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <svg class="w-8 h-8 text-secondary" viewBox="0 0 32 32" fill="currentColor">
-                            <path d="M16 2L20.09 10.26L29 12L22.5 18.74L24.18 28L16 23.77L7.82 28L9.5 18.74L3 12L11.91 10.26L16 2Z"/>
-                        </svg>
-                        <span class="text-2xl font-bold">Fikrly</span>
-                    </div>
-                    <p class="text-primary-200 mb-4">
-                        O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, ishonchli tanlov.
-                    </p>
-                    <div class="flex space-x-4">
-                        <a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                            </svg>
-                        </a>
-                        <a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
-                            </svg>
-                        </a>
-                        <a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001.012.001z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Tezkor havolalar</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'index' %}" class="text-primary-200 hover:text-white transition-smooth">Bosh sahifa</a></li>
-                        <li><a href="{% url 'category_browse' %}" class="text-primary-200 hover:text-white transition-smooth">Kategoriyalar</a></li>
-                        <li><a href="{% url 'business_profile' %}" class="text-primary-200 hover:text-white transition-smooth">Bizneslar</a></li>
-                        <li><a href="{% url 'review_submission' %}" class="text-primary-200 hover:text-white transition-smooth">Sharh yozish</a></li>
-                    </ul>
-                </div>
-
-                <!-- Business -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Biznes uchun</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'business_dashboard' %}" class="text-primary-200 hover:text-white transition-smooth">Biznes paneli</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Biznesni ro'yxatga olish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Reklama berish</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Analitika</a></li>
-                    </ul>
-                </div>
-
-                <!-- Support -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Yordam</h3>
-                    <ul class="space-y-2">
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Yordam markazi</a></li>
-                        <li><a href="javascript:void(0)" class="text-primary-200 hover:text-white transition-smooth">Bog'lanish</a></li>
-                        <li><a href="{% url 'privacy_policy' %}" class="text-primary-200 hover:text-white transition-smooth">Maxfiylik siyosati</a></li>
-                        <li><a href="{% url 'terms_of_service' %}" class="text-primary-200 hover:text-white transition-smooth">Foydalanish shartlari</a></li>
-                        <li><a href="{% url 'community_guidelines' %}" class="text-primary-200 hover:text-white transition-smooth">Hamjamiyat qoidalari</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="border-t border-primary-700 mt-8 pt-8 text-center">
-                <p class="text-primary-200">© 2025 Fikrly. Barcha huquqlar himoyalangan.</p>
-            </div>
-        </div>
-    </footer>
-    {% load static %}
-    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
-    
+{% block extra_js %}
     <script>
         // Enhanced search functionality
         document.addEventListener('DOMContentLoaded', function() {
             const searchForm = document.getElementById('searchForm');
             const searchInput = document.getElementById('searchInput');
-            
+            const suggestionsBox = document.getElementById('searchSuggestions');
+            let debounceTimer;
+
             // Focus on search input when page loads
-            searchInput.focus();
-            
-            // Handle Enter key press
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (searchInput.value.trim()) {
-                        searchForm.submit();
+            if(searchInput) {
+                searchInput.focus();
+
+                // Handle Enter key press
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (searchInput.value.trim()) {
+                            searchForm.submit();
+                        }
                     }
-                }
-            });
-            
+                });
+
+                // Live Search Logic
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.trim();
+
+                    clearTimeout(debounceTimer);
+
+                    if (query.length < 2) {
+                        suggestionsBox.classList.add('hidden');
+                        suggestionsBox.innerHTML = '';
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(() => {
+                        fetch(`{% url 'search_suggestions_api' %}?q=${encodeURIComponent(query)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.results && data.results.length > 0) {
+                                    renderSuggestions(data.results);
+                                } else {
+                                    suggestionsBox.classList.add('hidden');
+                                }
+                            })
+                            .catch(err => console.error('Search error:', err));
+                    }, 300);
+                });
+
+                // Close suggestions when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!searchForm.contains(e.target)) {
+                        suggestionsBox.classList.add('hidden');
+                    }
+                });
+            }
+
+            function renderSuggestions(results) {
+                let html = '<ul class="py-2">';
+
+                results.forEach(item => {
+                    if (item.type === 'category') {
+                        html += `
+                            <li>
+                                <a href="${item.url}" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center mr-3">
+                                        ${item.icon ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>` :
+                                        `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>`}
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900">${item.name}</div>
+                                        <div class="text-xs text-gray-500">{% trans "Kategoriya" %}</div>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    } else {
+                        // Company
+                        const imgHtml = item.image
+                            ? `<img src="${item.image}" class="w-10 h-10 rounded-lg object-cover mr-3" alt="${item.name}">`
+                            : `<div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center mr-3 text-gray-400">
+                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                               </div>`;
+
+                        html += `
+                            <li>
+                                <a href="${item.url}" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                    ${imgHtml}
+                                    <div>
+                                        <div class="font-medium text-gray-900">${item.name}</div>
+                                        <div class="text-xs text-gray-500">${item.category || '{% trans "Biznes" %}'}</div>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    }
+                });
+
+                html += '</ul>';
+                suggestionsBox.innerHTML = html;
+                suggestionsBox.classList.remove('hidden');
+            }
+
             // Add loading state to search button
-            searchForm.addEventListener('submit', function() {
-                const searchBtnText = document.getElementById('searchBtnText');
-                const searchBtnSpinner = document.getElementById('searchBtnSpinner');
-                const searchBtn = document.getElementById('searchBtn');
-                
-                if (searchBtnText && searchBtnSpinner && searchBtn) {
-                    searchBtnText.textContent = 'Qidirilmoqda...';
-                    searchBtnSpinner.classList.remove('hidden');
-                    searchBtn.disabled = true;
-                }
-            });
+            if(searchForm) {
+                searchForm.addEventListener('submit', function() {
+                    const searchBtnText = document.getElementById('searchBtnText');
+                    const searchBtnSpinner = document.getElementById('searchBtnSpinner');
+                    const searchBtn = document.getElementById('searchBtn');
+
+                    if (searchBtnText && searchBtnSpinner && searchBtn) {
+                        searchBtnText.textContent = '{% trans "Qidirilmoqda..." %}';
+                        searchBtnSpinner.classList.remove('hidden');
+                        searchBtn.disabled = true;
+                    }
+                });
+            }
         });
     </script>
-</body>
-</html>
+{% endblock %}

@@ -7,7 +7,7 @@ import os
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.admin.sites import NotRegistered
-from .models import Company, Review, UserProfile, ActivityLog, ReviewReport, CompanyClaim
+from .models import Company, Review, UserProfile, ActivityLog, ReviewReport, CompanyClaim, BusinessCategory
 from pathlib import Path
 
 
@@ -127,19 +127,26 @@ class CompanyAdminForm(forms.ModelForm):
         return cleaned
 
 
+@admin.register(BusinessCategory)
+class BusinessCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'name_ru', 'slug')
+    search_fields = ('name', 'name_ru')
+    prepopulated_fields = {'slug': ('name',)}
+
+
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     form = CompanyAdminForm
-    list_display = ("name", "category", "city", "manager", "rating", "review_count", "like_count", "is_verified")
-    list_filter = ("category", "city", "is_verified")
-    search_fields = ("name", "city", "category", "tax_id")
+    list_display = ("name", "category_fk", "city", "manager", "rating", "review_count", "like_count", "is_verified", "is_active")
+    list_filter = ("category_fk", "city", "is_verified", "is_active")
+    search_fields = ("name", "city", "category_fk__name", "tax_id")
     readonly_fields = ("image_preview",)
     fieldsets = (
         ("Asosiy ma'lumot", {
-            'fields': ("name", ("category", "city"), "description"),
+            'fields': ("name", ("category_fk", "city"), "description", "description_ru"),
         }),
         ("Media", {
-            'fields': (("image_url", "image"), "library_image_path", "image_preview"),
+            'fields': (("image_url", "image"), ("logo_url", "logo"), "logo_scale", "library_image_path", "image_preview"),
         }),
         ("Aloqa", {
             'fields': (("website", "official_email_domain"), ("phone_public", "email_public")),
@@ -154,13 +161,42 @@ class CompanyAdmin(admin.ModelAdmin):
             'fields': (("facebook_url", "telegram_url", "instagram_url"),),
         }),
         ("Egalik va holat", {
-            'fields': (("manager", "is_verified"), ("rating", "review_count", "like_count")),
+            'fields': (("manager", "is_verified", "is_active"), ("rating", "review_count", "like_count")),
         }),
     )
     inlines = [CompanyActivityLogInline]
+    actions = ["toggle_visibility", "toggle_verified"]
+
+    def toggle_visibility(self, request, queryset):
+        for company in queryset:
+            company.is_active = not company.is_active
+            company.save(update_fields=['is_active'])
+        self.message_user(request, f"{queryset.count()} ta kompaniya holati o'zgartirildi.")
+    toggle_visibility.short_description = "Ko'rinish holatini o'zgartirish (Active/Inactive)"
+
+    def toggle_verified(self, request, queryset):
+        for company in queryset:
+            company.is_verified = not company.is_verified
+            company.save(update_fields=['is_verified'])
+        self.message_user(request, f"{queryset.count()} ta kompaniya tasdiqlash holati o'zgartirildi.")
+    toggle_verified.short_description = "Tasdiqlash holatini o'zgartirish (Verified/Not Verified)"
 
     def image_preview(self, obj):
         from django.utils.html import format_html
+        logo_src = None
+        if obj.logo:
+            logo_src = obj.logo.url
+        elif getattr(obj, 'logo_url', None):
+            logo_src = obj.logo_url
+
+        if logo_src:
+             return format_html(
+                 '<div style="display:flex;gap:10px;">'
+                 '<div><small>Logo:</small><br><img src="{}" style="max-height:80px;max-width:80px;border-radius:4px;object-fit:cover;"/></div>'
+                 '</div>',
+                 logo_src
+             )
+
         url = getattr(obj, 'display_image_url', '') or getattr(obj, 'image_url', '')
         if not url:
             return "—"
@@ -170,14 +206,42 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ("company", "user_name", "rating", "is_approved", "verified_purchase", "created_at")
+    list_display = ("company", "user_name", "rating", "is_approved", "verified_purchase", "created_at", "has_receipt")
     list_filter = ("is_approved", "rating", "verified_purchase", "company")
     search_fields = ("company__name", "user_name", "text")
-    actions = ["approve_reviews"]
+    actions = ["approve_reviews", "toggle_verified_purchase"]
     inlines = [ReviewActivityLogInline]
+    readonly_fields = ("receipt_preview",)
+
+    def has_receipt(self, obj):
+        return bool(obj.receipt)
+    has_receipt.boolean = True
+    has_receipt.short_description = "Chek bormi?"
+
+    def receipt_preview(self, obj):
+        if obj.receipt:
+            from django.utils.safestring import mark_safe
+            return mark_safe(f'<a href="{obj.receipt.url}" target="_blank"><img src="{obj.receipt.url}" style="max-height: 300px; max-width: 100%;" /></a>')
+        return "Chek yuklanmagan"
+    receipt_preview.short_description = "Chek ko'rinishi"
+
+    def toggle_verified_purchase(self, request, queryset):
+        for review in queryset:
+            review.verified_purchase = not review.verified_purchase
+            review.save(update_fields=['verified_purchase'])
+        self.message_user(request, f"{queryset.count()} ta sharh xarid tasdiqlanishi o'zgartirildi.")
+    toggle_verified_purchase.short_description = "Xaridni tasdiqlash/bekor qilish"
 
     def approve_reviews(self, request, queryset):
+        # Get affected company IDs before update
+        company_ids = list(queryset.values_list('company_id', flat=True).distinct())
         updated = queryset.update(is_approved=True)
+
+        # Recalculate stats for affected companies
+        from .utils import recalculate_company_stats
+        for cid in company_ids:
+            recalculate_company_stats(cid)
+
         self.message_user(request, f"{updated} ta sharh tasdiqlandi.")
     approve_reviews.short_description = "Tanlangan sharhlarni tasdiqlash"
 
@@ -190,20 +254,43 @@ except NotRegistered:
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ("username", "email", "is_active", "is_staff", "date_joined")
-    list_filter = ("is_active", "is_staff", "is_superuser")
+    list_display = ("username", "email", "is_active", "is_staff", "get_is_approved", "date_joined")
+    list_filter = ("is_active", "is_staff", "is_superuser", "profile__is_approved")
     search_fields = ("username", "email")
+    actions = ["approve_users"]
+
+    def get_is_approved(self, obj):
+        return obj.profile.is_approved if hasattr(obj, 'profile') else False
+    get_is_approved.boolean = True
+    get_is_approved.short_description = "Approved"
+
+    def approve_users(self, request, queryset):
+        from django.utils import timezone
+        count = 0
+        for user in queryset:
+            if hasattr(user, 'profile'):
+                user.profile.is_approved = True
+                user.profile.approved_at = timezone.now()
+                user.profile.save()
+                count += 1
+        self.message_user(request, f"{count} ta foydalanuvchi tasdiqlandi.")
+    approve_users.short_description = "Tanlangan foydalanuvchilarni tasdiqlash"
 
 # Register your models here.
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "is_approved", "requested_approval_at", "approved_at")
+    list_display = ("user", "get_email", "is_approved", "requested_approval_at", "approved_at")
     list_filter = ("is_approved",)
     search_fields = ("user__username", "user__email")
     actions = [
         'approve_profiles',
     ]
+
+    def get_email(self, obj):
+        return obj.user.email
+    get_email.short_description = 'Email'
+    get_email.admin_order_field = 'user__email'
 
     def approve_profiles(self, request, queryset):
         from django.utils import timezone
@@ -284,7 +371,7 @@ class CategoryAdminForm(forms.ModelForm):
         }),
         help_text="SVG path elementi. Masalan: &lt;path d='M12 2L2 7L12 12L22 7L12 2Z'/&gt;"
     )
-    
+
     class Meta:
         model = Category
         fields = '__all__'
@@ -292,13 +379,14 @@ class CategoryAdminForm(forms.ModelForm):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     form = CategoryAdminForm
-    list_display = ('name', 'slug', 'color', 'is_active', 'sort_order', 'company_count', 'review_count', 'created_at')
+    list_display = ('id', 'name', 'slug', 'color', 'is_active', 'sort_order', 'company_count', 'review_count', 'created_at')
+    list_display_links = ('id',)
     list_filter = ('color', 'is_active', 'created_at')
     search_fields = ('name', 'slug', 'description')
     prepopulated_fields = {'slug': ('name',)}
-    list_editable = ('is_active', 'sort_order', 'color')
+    list_editable = ('name', 'is_active', 'sort_order', 'color')
     ordering = ('sort_order', 'name')
-    
+
     fieldsets = (
         ('Asosiy ma\'lumotlar', {
             'fields': ('name', 'slug', 'description', 'is_active')
@@ -312,14 +400,14 @@ class CategoryAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
-    
+
     readonly_fields = ('created_at', 'updated_at')
-    
+
     def company_count(self, obj):
         """Display company count for this category"""
         return obj.company_count
     company_count.short_description = 'Kompaniyalar soni'
-    
+
     def review_count(self, obj):
         """Display review count for this category"""
         return obj.review_count

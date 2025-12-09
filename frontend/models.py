@@ -1,19 +1,71 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language
+import os
+import uuid
+
+def company_logo_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    return f"company_logos/{filename}"
+
+
+class BusinessCategory(models.Model):
+    COLOR_CHOICES = [
+        ('red', 'Red'),
+        ('orange', 'Orange'),
+        ('yellow', 'Yellow'),
+        ('green', 'Green'),
+        ('blue', 'Blue'),
+        ('purple', 'Purple'),
+        ('pink', 'Pink'),
+        ('gray', 'Gray'),
+    ]
+    name = models.CharField(max_length=100, unique=True)
+    name_ru = models.CharField(max_length=100, blank=True, verbose_name=_("Nom (Rus tilida)"))
+    slug = models.SlugField(max_length=100, unique=True)
+    icon_svg = models.TextField(blank=True, help_text=_("SVG path content"))
+    color = models.CharField(max_length=20, choices=COLOR_CHOICES, default='gray', help_text=_("Kategoriya rangi"))
+    is_featured = models.BooleanField(default=False, help_text=_("Bosh sahifada ko'rsatish"))
+
+    class Meta:
+        verbose_name_plural = "Business Categories"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('business_list_by_category', kwargs={'category_slug': self.slug})
+
+    @property
+    def display_name(self):
+        lang = get_language()
+        if lang == 'ru' and self.name_ru:
+            return self.name_ru
+        return self.name
+
 
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
     category = models.CharField(max_length=100)
+    category_fk = models.ForeignKey(BusinessCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='companies')
     city = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
+    description_ru = models.TextField(blank=True, verbose_name=_("Tavsif (Rus tilida)"))
     image_url = models.URLField(blank=True)
     image = models.ImageField(upload_to='company_images/', blank=True, null=True)
-    website = models.URLField(blank=True, help_text="Rasmiy veb-sayt, masalan: https://example.com")
-    official_email_domain = models.CharField(max_length=100, blank=True, help_text="Masalan: example.com (ixtiyoriy)")
-    tax_id = models.CharField(max_length=32, blank=True, help_text="INN/СТИР (ixtiyoriy)")
+    logo = models.ImageField(upload_to=company_logo_path, blank=True, null=True, help_text=_("Kompaniya logotipi (kvadrat shaklda tavsiya etiladi)"))
+    logo_url = models.URLField(blank=True, help_text=_("Logo uchun tashqi URL (agar fayl yuklanmasa)"))
+    logo_scale = models.PositiveIntegerField(default=100, help_text=_("Logo masshtabi foizda (masalan: 100 = asl o'lcham, 150 = 1.5x kattalashtirish)"))
+    website = models.URLField(blank=True, help_text=_("Rasmiy veb-sayt, masalan: https://example.com"))
+    official_email_domain = models.CharField(max_length=100, blank=True, help_text=_("Masalan: example.com (ixtiyoriy)"))
+    tax_id = models.CharField(max_length=32, blank=True, help_text=_("INN/СТИР (ixtiyoriy)"))
     address = models.CharField(max_length=255, blank=True)
-    landmark = models.CharField(max_length=255, blank=True, help_text="Mo'ljal (ixtiyoriy)")
+    landmark = models.CharField(max_length=255, blank=True, help_text=_("Mo'ljal (ixtiyoriy)"))
     phone_public = models.CharField(max_length=60, blank=True)
     email_public = models.EmailField(blank=True)
     facebook_url = models.URLField(blank=True)
@@ -21,22 +73,42 @@ class Company(models.Model):
     instagram_url = models.URLField(blank=True)
     lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    working_hours = models.JSONField(blank=True, null=True, help_text="Haftalik ish vaqtlari JSON ko'rinishida")
+    working_hours = models.JSONField(blank=True, null=True, help_text=_("Haftalik ish vaqtlari JSON ko'rinishida"))
     # Optional: choose a file that already exists in media/company_library
-    library_image_path = models.CharField(max_length=255, blank=True, help_text="Masalan: company_library/mylogo.png")
+    library_image_path = models.CharField(max_length=255, blank=True, help_text=_("Masalan: company_library/mylogo.png"))
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='managed_companies', on_delete=models.SET_NULL)
     is_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True, help_text=_("Agar o'chirilsa, saytda ko'rinmaydi"))
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     review_count = models.PositiveIntegerField(default=0)
     like_count = models.PositiveIntegerField(default=0)
+    view_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-review_count', '-rating', 'name']
+        indexes = [
+            models.Index(fields=['is_active', '-rating']),
+            models.Index(fields=['is_active', '-review_count']),
+        ]
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def display_description(self):
+        lang = get_language()
+        if lang == 'ru' and self.description_ru:
+            return self.description_ru
+        return self.description
+
+    @property
+    def display_logo(self) -> str:
+        """Return uploaded logo url if present, else fallback to logo_url."""
+        if self.logo:
+            return self.logo.url
+        return self.logo_url or ''
 
     @property
     def display_image_url(self) -> str:
@@ -60,7 +132,8 @@ class Review(models.Model):
     user_name = models.CharField(max_length=120)
     rating = models.PositiveSmallIntegerField()
     text = models.TextField()
-    verified_purchase = models.BooleanField(default=True)
+    verified_purchase = models.BooleanField(default=False)
+    receipt = models.ImageField(upload_to='review_receipts/', null=True, blank=True, verbose_name="Xarid cheki")
     # Moderation: show reviews only after admin approves
     is_approved = models.BooleanField(default=False, db_index=True)
     approval_requested = models.BooleanField(default=False, db_index=True)
@@ -68,12 +141,32 @@ class Review(models.Model):
     # Owner response
     owner_response_text = models.TextField(blank=True)
     owner_response_at = models.DateTimeField(null=True, blank=True)
+    like_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['company', 'is_approved', '-created_at']),
+            models.Index(fields=['user', 'is_approved', '-created_at']),
+        ]
 
     def __str__(self) -> str:
         return f"{self.user_name} → {self.company.name} ({self.rating})"
+
+
+class ReviewLike(models.Model):
+    """Per-user like for a Review."""
+    review = models.ForeignKey(Review, related_name='likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='review_likes', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('review', 'user')
+        indexes = [models.Index(fields=['review', 'user'])]
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f"Like({self.user_id} -> Review {self.review_id})"
 
 
 class CompanyLike(models.Model):
@@ -150,11 +243,11 @@ class ActivityLog(models.Model):
     ('company_liked', 'Company Liked'),
     )
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='activities')
-    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES, db_index=True)
     company = models.ForeignKey(Company, null=True, blank=True, on_delete=models.SET_NULL, related_name='activity_logs')
     review = models.ForeignKey(Review, null=True, blank=True, on_delete=models.SET_NULL, related_name='activity_logs')
     details = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -214,7 +307,7 @@ class Category(models.Model):
         ('pink', 'Pushti'),
         ('gray', 'Kulrang'),
     ]
-    
+
     name = models.CharField(max_length=100, unique=True, verbose_name="Kategoriya nomi")
     slug = models.SlugField(max_length=100, unique=True, verbose_name="URL slug")
     description = models.TextField(blank=True, verbose_name="Tavsif")
@@ -224,20 +317,20 @@ class Category(models.Model):
     sort_order = models.PositiveIntegerField(default=0, verbose_name="Tartib", help_text="Kichik raqam birinchi ko'rsatiladi")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         ordering = ['sort_order', 'name']
         verbose_name = "Kategoriya"
         verbose_name_plural = "Kategoriyalar"
-    
+
     def __str__(self):
         return self.name
-    
+
     @property
     def company_count(self):
         """Return count of companies in this category"""
         return Company.objects.filter(category=self.name).count()
-    
+
     @property
     def review_count(self):
         """Return total reviews for companies in this category"""

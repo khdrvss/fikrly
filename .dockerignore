@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.venv
+.venv_win
+env
+venv
+build
+dist
+*.egg-info
+
+# Database
+db.sqlite3
+
+# Node
+node_modules
+npm-debug.log
+
+# VS Code
+.vscode

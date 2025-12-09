@@ -1,21 +1,36 @@
 module.exports = {
-  content: ["./pages/*.{html,js}", "./index.html", "./js/*.js"],
+  content: [
+    "./frontend/templates/**/*.html",
+    "./frontend/static/**/*.js",
+    "./public/**/*.html"
+  ],
+  safelist: [
+    'btn-primary',
+    'btn-secondary',
+    'btn-outline',
+    'card',
+    'card-hover',
+    'input-field',
+    'text-gradient',
+    'shadow-subtle',
+    'transition-smooth',
+  ],
   theme: {
     extend: {
       colors: {
         // Primary Colors
         primary: {
-          DEFAULT: "#1E40AF", // blue-800
-          50: "#EFF6FF", // blue-50
-          100: "#DBEAFE", // blue-100
-          200: "#BFDBFE", // blue-200
-          300: "#93C5FD", // blue-300
-          400: "#60A5FA", // blue-400
-          500: "#3B82F6", // blue-500
-          600: "#2563EB", // blue-600
-          700: "#1D4ED8", // blue-700
-          800: "#1E40AF", // blue-800
-          900: "#1E3A8A", // blue-900
+          DEFAULT: '#008f5d',
+          50: '#f0fdf9',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#00f49f',
+          500: '#00d68b',
+          600: '#00a86d',
+          700: '#008f5d',
+          800: '#006d47',
+          900: '#004d32',
         },
         // Secondary Colors
         secondary: {

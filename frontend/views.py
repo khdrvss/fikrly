@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count, Q
-from .models import Company, Review, UserProfile
+from django.db.models import Avg, Count, Q, Sum
+from django.utils import translation
+from .models import Company, Review, UserProfile, BusinessCategory
 from .utils import compute_assessment, send_telegram_message, diff_instance_fields
 import json
 from pathlib import Path
-from .forms import ProfileForm
+from .forms import ProfileForm, ReviewForm
 from django.http import Http404, JsonResponse
 from django.contrib import messages
 from .forms import ReviewEditForm
@@ -15,48 +16,37 @@ from django.contrib.auth import login
 from django.core.cache import cache
 from django.utils.timezone import now
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
+from django.conf import settings
+import os
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.views.decorators.cache import cache_page
 from .models import PhoneOTP
 from .sms import send_otp_via_eskiz
 from django.core.paginator import Paginator
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from datetime import timedelta
-from .forms import ClaimCompanyForm
+from .forms import ClaimCompanyForm, ContactForm
 from .models import CompanyClaim, ActivityLog
 from .models import CompanyLike
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your views here.
-class ReviewForm(forms.ModelForm):
-	company = forms.ModelChoiceField(queryset=Company.objects.all(), empty_label="Kompaniya tanlang", widget=forms.Select(attrs={'class': 'input-field'}))
-
-	class Meta:
-		model = Review
-		fields = ['company', 'user_name', 'rating', 'text']
-		widgets = {
-			'user_name': forms.TextInput(attrs={'class': 'input-field'}),
-			'rating': forms.NumberInput(attrs={'min': 1, 'max': 5, 'class': 'input-field'}),
-			'text': forms.Textarea(attrs={'rows': 4, 'class': 'input-field h-32 resize-none'}),
-		}
-
-
-def _load_category_labels() -> dict:
-	data_path = Path(__file__).resolve().parent / 'data' / 'categories_uz.json'
-	try:
-		with open(data_path, 'r', encoding='utf-8') as f:
-			return json.load(f)
-	except Exception:
-		return {}
-
 
 def home(request):
-	top_companies = Company.objects.order_by('-rating')[:6]
-	trending = Company.objects.order_by('-review_count')[:6]
-	latest_reviews = Review.objects.select_related('company').all()[:6]
+	top_companies = Company.objects.filter(is_active=True).order_by('-rating')[:6]
+	trending = Company.objects.filter(is_active=True).order_by('-review_count')[:6]
+	latest_reviews = Review.objects.filter(company__is_active=True).select_related('company').all()[:6]
+
+	# Fetch popular categories for homepage (by company count)
+	featured_categories = BusinessCategory.objects.annotate(
+		company_count=Count('companies', filter=Q(companies__is_active=True))
+	).order_by('-company_count')[:4]
+
 	# attach assessments for display if needed later
 	for c in trending:
 		c.assessment = compute_assessment(float(c.rating), int(c.review_count))
@@ -64,6 +54,8 @@ def home(request):
 		'top_companies': top_companies,
 		'trending_companies': trending,
 		'latest_reviews': latest_reviews,
+		'featured_categories': featured_categories,
+		'canonical_url': request.build_absolute_uri(),
 	}
 	# If user just authenticated and no explicit redirect handled yet, nudge to profile once
 	if request.user.is_authenticated and not request.session.get('_redirected_once'):
@@ -77,9 +69,81 @@ def business_dashboard(request):
 	# Manager dashboard: show companies managed by the user and pending reviews
 	companies = Company.objects.filter(manager=request.user)
 	pending_reviews = Review.objects.filter(company__manager=request.user, is_approved=False).select_related('company')
+
+	# Calculate stats
+	stats = companies.aggregate(
+		total_reviews=Sum('review_count'),
+		avg_rating=Avg('rating'),
+		total_likes=Sum('like_count'),
+		total_views=Sum('view_count')
+	)
+
+	# Count contact reveals (calls/website clicks)
+	contact_clicks = ActivityLog.objects.filter(
+		company__in=companies,
+		action='contact_revealed'
+	).count()
+
+	# Add to stats dict
+	stats['total_clicks'] = contact_clicks
+
+	# --- Chart Data (Last 30 Days) ---
+	from django.db.models.functions import TruncDay
+
+	days_30_ago = now() - timedelta(days=29) # 30 days including today
+
+	# 1. Daily Reviews
+	daily_reviews = Review.objects.filter(
+		company__in=companies,
+		created_at__gte=days_30_ago
+	).annotate(
+		day=TruncDay('created_at')
+	).values('day').annotate(
+		count=Count('id')
+	).order_by('day')
+
+	# 2. Daily Contact Clicks
+	daily_clicks = ActivityLog.objects.filter(
+		company__in=companies,
+		action='contact_revealed',
+		created_at__gte=days_30_ago
+	).annotate(
+		day=TruncDay('created_at')
+	).values('day').annotate(
+		count=Count('id')
+	).order_by('day')
+
+	# Prepare continuous date range
+	chart_data = {}
+	for i in range(30):
+		d = (now() - timedelta(days=i)).date()
+		chart_data[d] = {'reviews': 0, 'clicks': 0}
+
+	for entry in daily_reviews:
+		if entry['day']:
+			d = entry['day'].date()
+			if d in chart_data:
+				chart_data[d]['reviews'] = entry['count']
+
+	for entry in daily_clicks:
+		if entry['day']:
+			d = entry['day'].date()
+			if d in chart_data:
+				chart_data[d]['clicks'] = entry['count']
+
+	# Sort and flatten for template
+	sorted_dates = sorted(chart_data.keys())
+	chart_labels = [d.strftime('%d.%m') for d in sorted_dates]
+	chart_reviews = [chart_data[d]['reviews'] for d in sorted_dates]
+	chart_clicks = [chart_data[d]['clicks'] for d in sorted_dates]
+
 	return render(request, 'pages/manager_dashboard.html', {
 		'companies': companies,
 		'pending_reviews': pending_reviews,
+		'stats': stats,
+		'chart_labels': json.dumps(chart_labels),
+		'chart_reviews': json.dumps(chart_reviews),
+		'chart_clicks': json.dumps(chart_clicks),
 	})
 
 
@@ -156,179 +220,167 @@ def manager_request_approval(request, pk: int):
 		'review': review,
 	})
 
-def search_businesses(request):
-	"""Dedicated search view for home page search"""
+
+
+
+@cache_page(60 * 5)  # Cache for 5 minutes
+def search_suggestions_api(request):
+	"""API endpoint for live search suggestions"""
 	query = request.GET.get('q', '').strip()
-	companies = Company.objects.all()
-	
+	if len(query) < 2:
+		return JsonResponse({'results': []})
+
+	results = []
+
+	# Search categories first
+	categories = BusinessCategory.objects.filter(
+		Q(name__icontains=query) |
+		Q(name_ru__icontains=query)
+	)[:3]
+
+	for cat in categories:
+		results.append({
+			'type': 'category',
+			'id': cat.id,
+			'name': cat.display_name,
+			'url': reverse('business_list') + f'?category={cat.slug}',
+			'icon': cat.icon_svg
+		})
+
+	# Search companies
+	companies = Company.objects.filter(is_active=True).filter(
+		Q(name__icontains=query) |
+		Q(category_fk__name__icontains=query) |
+		Q(category_fk__name_ru__icontains=query) |
+		Q(category__icontains=query)
+	).select_related('category_fk').only(
+        'id', 'name', 'category', 'category_fk',
+        'logo', 'logo_url', 'logo_scale',
+        'image', 'image_url', 'library_image_path'
+    )[:5]
+
+	for c in companies:
+		results.append({
+			'type': 'company',
+			'id': c.id,
+			'name': c.name,
+			'category': c.category_fk.display_name if c.category_fk else c.category,
+			'logo': c.display_logo,
+			'image': c.display_image_url,
+			'logo_scale': c.logo_scale,
+			'url': reverse('company_detail', args=[c.id])
+		})
+
+	return JsonResponse({'results': results})
+
+
+def business_list(request, category_slug=None):
+	"""View that lists all businesses as clickable cards"""
+	companies = Company.objects.filter(is_active=True).select_related('category_fk')
+	query = request.GET.get('q', '').strip()
+
+	if category_slug:
+		category_filter = category_slug
+	else:
+		category_filter = request.GET.get('category', '').strip()
+
 	if query:
 		# Enhanced search with multiple field matching
 		companies = companies.filter(
 			Q(name__icontains=query) |
 			Q(city__icontains=query) |
+			Q(category_fk__name__icontains=query) |
+			Q(category_fk__name_ru__icontains=query) |
 			Q(category__icontains=query) |
 			Q(description__icontains=query)
 		)
+
 		# If no results, try partial matching for better user experience
 		if not companies.exists():
 			words = query.split()
 			if len(words) > 1:
 				for word in words:
 					if len(word) > 2:
-						partial_results = Company.objects.filter(
-							Q(name__icontains=word) | Q(category__icontains=word)
+						partial_results = Company.objects.filter(is_active=True).filter(
+							Q(name__icontains=word) |
+							Q(category_fk__name__icontains=word) |
+							Q(category_fk__name_ru__icontains=word) |
+							Q(category__icontains=word)
 						)
 						if partial_results.exists():
 							companies = partial_results
 							break
-	
+
+	category_display_name = category_filter
+	if category_filter:
+		# Try to find category by slug first
+		cat_obj = BusinessCategory.objects.filter(slug=category_filter).first()
+		if cat_obj:
+			companies = companies.filter(category_fk=cat_obj)
+			category_display_name = cat_obj.display_name
+		else:
+			# Fallback to old text search
+			companies = companies.filter(category__icontains=category_filter)
+
 	companies = companies.order_by('-review_count', '-rating', 'name')
-	
-	# Get search suggestions for better UX
+
+	# Get search suggestions if no results found
 	search_suggestions = []
-	if query and not companies.exists():
-		popular_categories = Company.objects.values_list('category', flat=True).distinct()[:5]
-		popular_cities = Company.objects.values_list('city', flat=True).distinct()[:5]
+	if (query or category_filter) and not companies.exists():
+		# Suggest top categories by count
+		popular_categories = BusinessCategory.objects.annotate(
+			count=Count('companies', filter=Q(companies__is_active=True))
+		).order_by('-count')[:5].values_list('name', flat=True)
+
+		popular_cities = Company.objects.filter(is_active=True).values_list('city', flat=True).distinct()[:5]
+
 		search_suggestions = {
 			'categories': list(popular_categories),
 			'cities': list(popular_cities)
 		}
-	
-	return render(request, 'pages/business_list.html', {
-		'companies': companies,
-		'search_query': query,
-		'search_results_count': companies.count(),
-		'search_suggestions': search_suggestions
-	})
 
-def business_list(request):
-	"""View that lists all businesses as clickable cards"""
-	companies = Company.objects.all()
-	query = request.GET.get('q', '')
-	category_filter = request.GET.get('category', '')
-	
-	if query:
-		companies = companies.filter(
-			Q(name__icontains=query) | Q(city__icontains=query) | Q(category__icontains=query)
-		)
-	
-	if category_filter:
-		companies = companies.filter(category__iexact=category_filter)
-	
-	companies = companies.order_by('-review_count', '-rating', 'name')
-	
 	# Set search context
-	search_context = query or category_filter
-	search_display = query if query else f"Kategoriya: {category_filter}" if category_filter else ""
-	
-	return render(request, 'pages/business_list.html', { 
-		'companies': companies,
+	search_context = query or category_display_name
+	search_display = query if query else f"Kategoriya: {category_display_name}" if category_filter else ""
+
+	# Pagination
+	paginator = Paginator(companies, 12) # 12 companies per page
+	page_number = request.GET.get('page')
+	page_obj = paginator.get_page(page_number)
+
+	return render(request, 'pages/business_list.html', {
+		'companies': page_obj,
 		'search_query': search_context,
 		'search_results_count': companies.count(),
-		'category_filter': category_filter,
-		'search_display': search_display
+		'category_filter': category_display_name,
+		'search_display': search_display,
+		'search_suggestions': search_suggestions,
+		'canonical_url': request.build_absolute_uri(),
 	})
 
 
-def _get_category_icons():
-	"""Returns category-specific icons mapping"""
-	return {
-		'Aviatsiya': '<path d="M21 16V4.58C21 4.21 20.81 3.85 20.49 3.62C20.17 3.38 19.73 3.28 19.3 3.34L3.3 5.35C2.67 5.44 2.25 6.03 2.25 6.7V16C2.25 16.69 2.81 17.25 3.5 17.25H21C21.41 17.25 21.75 16.91 21.75 16.5C21.75 16.09 21.41 15.75 21 15.75V16Z"/>',
-		'Bank': '<path d="M12 2L3 7V8H21V7L12 2Z"/><path d="M4 9V19H20V9"/><path d="M8 15V13H10V15H8Z"/><path d="M14 15V13H16V15H14Z"/>',
-		'Ichimliklar': '<path d="M5 12V7L7 5H17L19 7V12"/><path d="M5 12L2 22H22L19 12"/><path d="M12 5V2"/>',
-		'Eksport, logistika': '<path d="M14 18V6C14 5.45 13.55 5 13 5H11C10.45 5 10 5.45 10 6V18L7 21L12 19L17 21L14 18Z"/>',
-		'Energetika': '<path d="M13 2L3 14H12L11 22L21 10H12L13 2Z"/>',
-		'Fast-food': '<path d="M8.5 8.5C9.33 8.5 10 7.83 10 7S9.33 5.5 8.5 5.5 7 6.17 7 7 7.67 8.5 8.5 8.5Z"/><path d="M12 2C10.89 2 10 2.89 10 4V7C10 8.11 10.89 9 12 9S14 8.11 14 7V4C14 2.89 13.11 2 12 2Z"/><path d="M5 9V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V9H5Z"/>',
-		'Fintech': '<path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7Z"/>',
-		'IT, Konsalting': '<path d="M20 3H4C2.9 3 2 3.9 2 5V19C2 20.1 2.9 21 4 21H20C21.1 21 22 20.1 22 19V5C22 3.9 21.1 3 20 3Z"/><path d="M8 17L12 13L16 17"/>',
-		'IT, Raqamli marketing': '<path d="M12 2L13.09 8.26L22 9L13.09 15.74L12 22L10.91 15.74L2 9L10.91 8.26L12 2Z"/>',
-		'IT, Texnologiya': '<path d="M9 12L11 14L15 10"/><path d="M21 12C21 16.97 16.97 21 12 21S3 16.97 3 12S7.03 3 12 3S21 7.03 21 12Z"/>',
-		'Kimyo sanoati': '<path d="M10.5 2L8.5 8H15.5L13.5 2H10.5Z"/><path d="M7 8L5 16C4.72 17.2 5.54 18.36 6.76 18.64L17.24 18.64C18.46 18.36 19.28 17.2 19 16L17 8H7Z"/>',
-		'Ko\'chmas mulk': '<path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z"/>',
-		'Konchilik va metallurgiya': '<path d="M12 2L15.09 8.26L22 9L16 14.74L17.18 21.02L12 18.77L6.82 21.02L8 14.74L2 9L8.91 8.26L12 2Z"/>',
-		'Metallurgiya': '<path d="M9 11H15L13 13L15 15H9L11 13L9 11Z"/><path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z"/>',
-		'Mobil operator': '<path d="M22 16.92V19.92C22 20.51 21.39 21 20.92 21C18.95 20.87 16.95 20.22 15.21 19.27C13.15 18.15 11.26 16.26 10.14 14.2C9.19 12.46 8.54 10.46 8.41 8.49C8.4 8.18 8.56 7.65 9.01 7.65H12.01"/><path d="M18 2L22 6L18 10"/><path d="M14 6H22"/>',
-		'Nodavlat notijorat tashkiloti': '<path d="M12 2L3.5 6.5V17.5L12 22L20.5 17.5V6.5L12 2Z"/><path d="M12 8C13.66 8 15 6.66 15 5S13.66 2 12 2S9 3.34 9 5S10.34 8 12 8Z"/>',
-		'Neft va gaz': '<path d="M9 2V13C9 14.1 9.9 15 11 15H13C14.1 15 15 14.1 15 13V2H9Z"/><path d="M12 15V22"/>',
-		'Oziq-ovqat ishlab chiqarish': '<path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2Z"/><path d="M8 12L11 15L16 10"/>',
-		'Oziq-ovqat yetkazib berish': '<path d="M4 16L20 16"/><path d="M4 16L8 12"/><path d="M4 16L8 20"/>',
-		'Supermarket': '<path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4"/><path d="M5 7H19L18 17H6L5 7Z"/><path d="M5 7L3 4"/>',
-		'Tashqi savdo': '<path d="M21 12C21 16.97 16.97 21 12 21S3 16.97 3 12S7.03 3 12 3S21 7.03 21 12Z"/><path d="M8 12L11 15L16 10"/>',
-		'Test 1 sharh': '<path d="M14 2H6C4.9 2 4.01 2.9 4.01 4L4 20C4 21.1 4.89 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"/><path d="M14 2V8H20"/>',
-		'Telekommunikatsiya': '<path d="M6.62 10.79C8.06 13.62 10.38 15.94 13.21 17.38L15.41 15.18C15.69 14.9 16.08 14.82 16.43 14.93C17.55 15.3 18.75 15.5 20 15.5C20.55 15.5 21 15.95 21 16.5V20C21 20.55 20.55 21 20 21A17 17 0 0 1 3 4C3 3.45 3.45 3 4 3H7.5C8.05 3 8.5 3.45 8.5 4C8.5 5.25 8.7 6.45 9.07 7.57C9.18 7.92 9.1 8.31 8.82 8.59L6.62 2.79V10.79Z"/>',
-		'To\'qimachilik': '<path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 17L12 22L22 17"/><path d="M2 12L12 17L22 12"/>'
-	}
+
 
 def category_browse(request):
-	from .models import Category
-	
-	# Get all active categories from the database
-	db_categories = Category.objects.filter(is_active=True).order_by('sort_order', 'name')
-	
-	# Get all unique categories from companies (for backwards compatibility)
-	labels = _load_category_labels()
-	category_icons = _get_category_icons()
-	
-	category_stats = (
-		Company.objects.values('category')
-		.annotate(avg_rating=Avg('reviews__rating'), total_reviews=Count('reviews'), company_count=Count('id'))
-		.order_by('category')
-	)
-	
-	# Create category list
-	categories = []
-	
-	# First, add categories from the Category model
-	for db_cat in db_categories:
-		# Find matching company stats
-		stats = next((item for item in category_stats if item['category'] == db_cat.name), None)
-		
-		review_count = int(stats['total_reviews'] or 0) if stats else 0
-		company_count = int(stats['company_count'] or 0) if stats else 0
-		avg_rating = float(stats['avg_rating'] or 0) if stats else 0
-		
-		categories.append({
-			'category': db_cat.slug,
-			'label': db_cat.name,
-			'icon': db_cat.icon_svg or '<path d="M12 2L2 7L12 12L22 7L12 2Z"/>',
-			'color': db_cat.color,
-			'description': db_cat.description,
-			'review_count': review_count,
-			'company_count': company_count,
-			'avg_rating': round(avg_rating, 1) if avg_rating > 0 else 0,
-			'from_db': True,
-		})
-	
-	# Then add any remaining categories from company data that aren't in Category model
-	db_category_names = {cat.name for cat in db_categories}
-	
-	for item in category_stats:
-		cat_key = item['category'] or 'Boshqa'
-		if cat_key == 'Boshqa' or not cat_key or cat_key in db_category_names:
-			continue
-			
-		cat_label = labels.get(cat_key, cat_key)
-		review_count = int(item['total_reviews'] or 0)
-		company_count = int(item['company_count'] or 0)
-		avg_rating = float(item['avg_rating'] or 0)
-		
-		# Get icon for this category
-		icon = category_icons.get(cat_key, '<path d="M12 2L2 7L12 12L22 7L12 2Z"/>')
-		
-		categories.append({
-			'category': cat_key,
-			'label': cat_label,
-			'icon': icon,
-			'color': 'gray',
-			'description': '',
-			'review_count': review_count,
-			'company_count': company_count,
-			'avg_rating': round(avg_rating, 1) if avg_rating > 0 else 0,
-			'from_db': False,
+	categories = BusinessCategory.objects.annotate(
+		company_count=Count('companies', filter=Q(companies__is_active=True)),
+		review_count=Count('companies__reviews', filter=Q(companies__is_active=True))
+	).filter(company_count__gt=0).order_by('name')
+
+	cat_list = []
+	for cat in categories:
+		cat_list.append({
+			'category': cat.slug,
+			'label': cat.display_name,
+			'icon': cat.icon_svg,
+			'color': cat.color,
+			'review_count': cat.review_count,
+			'company_count': cat.company_count,
+			'avg_rating': 0,
 		})
 
 	return render(request, 'pages/category_browse.html', {
-		'categories': categories,
+		'categories': cat_list,
 	})
 
 
@@ -340,12 +392,14 @@ def homepage(request):
 def claim_company(request, pk: int):
 	try:
 		company = Company.objects.get(pk=pk)
+		if not company.is_active and not request.user.is_superuser:
+			raise Http404
 	except Company.DoesNotExist:
 		raise Http404
 
 	# If already managed/verified, block
 	if company.manager_id and company.manager_id != request.user.id:
-		messages.error(request, 'Bu kompaniya allaqachon boshqarilmoqda.')
+		messages.error(request, 'Bu kompaniya allaqon boshqarilmoqda.')
 		return redirect('company_detail', pk=company.pk)
 
 	if request.method == 'POST':
@@ -400,7 +454,7 @@ def verify_claim(request, token: str):
 		raise Http404
 
 	if claim.status != 'pending':
-		messages.info(request, 'Bu so‘rov allaqachon ko‘rib chiqilgan.')
+		messages.info(request, 'Bu so‘rov allaqon ko‘rib chiqilgan.')
 		return redirect('company_detail', pk=claim.company.pk)
 
 	if now() > claim.expires_at:
@@ -551,6 +605,52 @@ def community_guidelines(request):
 	return render(request, 'pages/community_guidelines.html')
 
 
+def contact_us(request):
+	# Force Uzbek if on the default path (workaround for potential middleware issues)
+	if request.path == '/contact/' and translation.get_language() != 'uz':
+		translation.activate('uz')
+		request.LANGUAGE_CODE = 'uz'
+
+	if request.method == 'POST':
+		form = ContactForm(request.POST)
+		if form.is_valid():
+			name = form.cleaned_data['name']
+			email = form.cleaned_data['email']
+			subject = form.cleaned_data['subject']
+			message = form.cleaned_data['message']
+
+			# Send email to admins
+			full_message = f"Yuboruvchi: {name} <{email}>\n\n{message}"
+			try:
+				email_msg = EmailMessage(
+					subject=f"[Fikrly Contact] {subject}",
+					body=full_message,
+					from_email=None,  # Use DEFAULT_FROM_EMAIL
+					to=['fikrlyuzb@gmail.com'],
+					reply_to=[email]
+				)
+				email_msg.send(fail_silently=False)
+
+				# Also send telegram notification
+				send_telegram_message(f"📩 <b>Yangi xabar</b>\nKimdan: {name}\nEmail: {email}\nMavzu: {subject}\n\n{message[:200]}...")
+			except Exception as e:
+				print(f"Email sending failed: {e}")
+				# We still show success to user to not alarm them, but log it
+				pass
+
+			messages.success(request, "Xabaringiz yuborildi. Tez orada siz bilan bog'lanamiz.")
+			return redirect('contact_us')
+	else:
+		initial = {}
+		if request.user.is_authenticated:
+			initial['name'] = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
+			initial['email'] = request.user.email
+		form = ContactForm(initial=initial)
+
+	return render(request, 'pages/contact_us.html', {'form': form})
+
+
+@login_required
 def review_submission(request):
 	"""
 	Create a new review.
@@ -563,12 +663,35 @@ def review_submission(request):
 	initial = {}
 	if preselected_company_id and preselected_company_id.isdigit():
 		try:
-			initial['company'] = Company.objects.get(pk=int(preselected_company_id))
+			initial['company'] = Company.objects.get(pk=int(preselected_company_id), is_active=True)
 		except Company.DoesNotExist:
 			pass
 
 	if request.method == 'POST':
-		form = ReviewForm(request.POST)
+		# --- Rate limiting (per user/IP) ---
+		def client_key():
+			ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+			ip = ip.split(',')[0].strip() if ip else 'unknown'
+			uid = request.user.id
+			return f"review_submission_rl:{uid}:{ip}"
+
+		key = client_key()
+		window_seconds = 3600  # 1 hour
+		max_reviews = 5        # max allowed per window
+		entry = cache.get(key)
+		if entry is None:
+			entry = {"count": 0, "ts": now().timestamp()}
+		# reset window if expired
+		if now().timestamp() - entry["ts"] > window_seconds:
+			entry = {"count": 0, "ts": now().timestamp()}
+
+		if entry["count"] >= max_reviews:
+			messages.error(request, "Siz qisqa vaqt ichida juda ko'p sharh yozdingiz. Iltimos, keyinroq urinib ko'ring.")
+			if preselected_company_id:
+				return redirect('company_detail', pk=preselected_company_id)
+			return redirect('index')
+
+		form = ReviewForm(request.POST, request.FILES)
 		# Extra server-side validation for rating bounds
 		try:
 			rating_val = int(request.POST.get('rating', 0))
@@ -578,10 +701,12 @@ def review_submission(request):
 			form.add_error('rating', 'To\'g\'ri baho kiriting (1-5).')
 
 		if form.is_valid():
+			# increment counter and persist
+			entry["count"] += 1
+			cache.set(key, entry, timeout=window_seconds)
+
 			review: Review = form.save(commit=False)
-			if request.user.is_authenticated:
-				review.user = request.user
-			review.verified_purchase = True
+			review.user = request.user
 			# New reviews require admin approval
 			review.is_approved = False
 			review.save()
@@ -596,11 +721,14 @@ def review_submission(request):
 			messages.success(request, 'Sharhingiz qabul qilindi va moderator tasdiqlagandan keyin ko\'rinadi.')
 			return redirect('company_detail', pk=company.pk)
 	else:
+		if request.user.is_authenticated:
+			full_name = f"{request.user.first_name} {request.user.last_name}".strip()
+			initial['user_name'] = full_name if full_name else request.user.username
 		form = ReviewForm(initial=initial)
 
-	# Provide all companies for the inline picker (scrollable + client-side filter)
+	# Provide top companies for the inline picker (scrollable + client-side filter)
 	# Ordered by popularity first for convenience
-	suggested_companies = Company.objects.order_by('-review_count', '-rating', 'name')
+	suggested_companies = Company.objects.filter(is_active=True).order_by('-review_count', '-rating', 'name')[:20]
 
 	return render(request, 'pages/review_submission.html', {
 		'form': form,
@@ -642,9 +770,12 @@ def manager_review_response(request, pk: int):
 		'form': form,
 		'review': review,
 	})
+@login_required
 def report_review(request, pk: int):
 	try:
 		review = Review.objects.select_related('company').get(pk=pk)
+		if not review.company.is_active and not (request.user.is_superuser or (request.user.is_authenticated and review.company.manager == request.user)):
+			raise Http404
 	except Review.DoesNotExist:
 		raise Http404
 
@@ -652,7 +783,7 @@ def report_review(request, pk: int):
 	def client_key():
 		ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
 		ip = ip.split(',')[0].strip() if ip else 'unknown'
-		uid = request.user.id or 'anon'
+		uid = request.user.id
 		return f"report_rl:{uid}:{ip}"
 
 	key = client_key()
@@ -706,17 +837,55 @@ def report_review(request, pk: int):
 
 
 def robots_txt(request):
+	scheme = request.scheme
+	host = request.get_host()
+	sitemap_url = f"{scheme}://{host}/sitemap.xml"
 	content = (
 		"User-agent: *\n"
 		"Disallow: /admin/\n"
 		"Disallow: /accounts/\n"
-		"Sitemap: /sitemap.xml\n"
+		"\n"
+		f"Sitemap: {sitemap_url}\n"
 	)
 	return HttpResponse(content, content_type="text/plain")
 
 
+def bing_site_auth(request):
+	content = (
+		'<?xml version="1.0"?>\n'
+		'<users>\n'
+		'	<user>87C31115864528DD0984DF2E125A313E</user>\n'
+		'</users>'
+	)
+	return HttpResponse(content, content_type="application/xml")
+
+
+def favicon_file(request):
+	# Try serving from STATIC_ROOT (production collected files)
+	static_path = settings.STATIC_ROOT / 'favicons' / 'favicon.ico'
+	if static_path.exists():
+		return FileResponse(open(static_path, 'rb'), content_type='image/x-icon')
+
+	# Fallback to source (development)
+	source_path = settings.BASE_DIR / 'frontend' / 'static' / 'favicons' / 'favicon.ico'
+	if source_path.exists():
+		return FileResponse(open(source_path, 'rb'), content_type='image/x-icon')
+
+	return HttpResponse(status=404)
+
+
 def company_detail(request, pk: int):
-	company = Company.objects.get(pk=pk)
+	company = Company.objects.select_related('category_fk').get(pk=pk)
+	if not company.is_active and not (request.user.is_superuser or (request.user.is_authenticated and company.manager == request.user)):
+		raise Http404
+
+	# Increment view count (simple session-based debounce)
+	session_key = f'viewed_company_{pk}'
+	if not request.session.get(session_key):
+		from django.db.models import F
+		Company.objects.filter(pk=pk).update(view_count=F('view_count') + 1)
+		request.session[session_key] = True
+
 	# Recompute assessment from stored rating/review_count which reflect only approved reviews
 	company.assessment = compute_assessment(float(company.rating), int(company.review_count))
 	# Base queryset: all approved reviews
@@ -724,7 +893,7 @@ def company_detail(request, pk: int):
 	reviews_qs = base_reviews_qs
 
 	# --- Sorting & Filters ---
-	sort = request.GET.get('sort', 'newest')
+	sort = request.GET.get('sort', 'most_liked')
 	with_text = request.GET.get('with_text') in ('1', 'true', 'on')
 	with_response = request.GET.get('with_response') in ('1', 'true', 'on')
 	# Support stars as repeated params (?stars=5&stars=4) or CSV (?stars=5,4)
@@ -751,8 +920,10 @@ def company_detail(request, pk: int):
 		reviews_qs = reviews_qs.order_by('-rating', '-created_at')
 	elif sort == 'lowest':
 		reviews_qs = reviews_qs.order_by('rating', '-created_at')
-	else:  # newest (default)
+	elif sort == 'newest':
 		reviews_qs = reviews_qs.order_by('-created_at')
+	else:  # most_liked (default)
+		reviews_qs = reviews_qs.order_by('-like_count', '-created_at')
 	# Rating distribution counts per star (1..5) from all approved reviews (unfiltered)
 	dist_counts = {i: 0 for i in range(1, 6)}
 	agg = base_reviews_qs.values('rating').annotate(c=Count('id'))
@@ -786,10 +957,30 @@ def company_detail(request, pk: int):
 	if qs_no_stars:
 		qs_no_stars = qs_no_stars + '&'
 
-	reviews = page_obj.object_list
+	reviews = page_obj
+
+	# Determine if current user liked reviews
+	if request.user.is_authenticated:
+		from .models import ReviewLike
+		user_likes = set(ReviewLike.objects.filter(user=request.user, review__in=reviews).values_list('review_id', flat=True))
+		for r in reviews:
+			r.is_liked_by_user = r.id in user_likes
+
 	# numeric pagination window
 	current = page_obj.number
 	total_pages = paginator.num_pages
+
+	# Similar Companies
+	similar_companies = Company.objects.filter(
+		is_active=True,
+		category_fk=company.category_fk
+	).exclude(pk=company.pk).order_by('-rating', '-review_count')[:3]
+
+	if not similar_companies and company.category:
+		similar_companies = Company.objects.filter(
+			is_active=True,
+			category=company.category
+		).exclude(pk=company.pk).order_by('-rating')[:3]
 	window = 2
 	start = max(1, current - window)
 	end = min(total_pages, current + window)
@@ -837,6 +1028,8 @@ def company_detail(request, pk: int):
 		'years_on_site': years_on_site,
 	'map_url': map_url,
 	'liked_state': liked_state,
+	'similar_companies': similar_companies,
+	'canonical_url': request.build_absolute_uri(),
 	})
 
 
@@ -845,6 +1038,8 @@ def reveal_contact(request, pk: int, kind: str):
 	"""Reveal phone or email; increments counters and logs activity."""
 	try:
 		company = Company.objects.get(pk=pk)
+		if not company.is_active and not (request.user.is_superuser or (request.user.is_authenticated and company.manager == request.user)):
+			raise Http404
 	except Company.DoesNotExist:
 		raise Http404
 	if kind not in ('phone', 'email'):
@@ -865,6 +1060,8 @@ def reveal_contact(request, pk: int, kind: str):
 def like_company(request, pk: int):
 	try:
 		company = Company.objects.get(pk=pk)
+		if not company.is_active and not (request.user.is_superuser or (request.user.is_authenticated and company.manager == request.user)):
+			raise Http404
 	except Company.DoesNotExist:
 		raise Http404
 	# Toggle like per user using CompanyLike
@@ -884,6 +1081,30 @@ def like_company(request, pk: int):
 		ActivityLog.objects.create(actor=request.user, action='company_liked', company=company, details="unliked")
 
 	current = Company.objects.filter(pk=pk).values_list('like_count', flat=True).first()
+	return JsonResponse({'ok': True, 'like_count': int(current or 0), 'liked': liked})
+
+
+@login_required
+def like_review(request, pk: int):
+	try:
+		review = Review.objects.get(pk=pk)
+	except Review.DoesNotExist:
+		raise Http404
+
+	from .models import ReviewLike
+	liked = False
+	obj, created = ReviewLike.objects.get_or_create(review=review, user=request.user)
+
+	if created:
+		liked = True
+		from django.db.models import F
+		Review.objects.filter(pk=pk).update(like_count=F('like_count') + 1)
+	else:
+		obj.delete()
+		from django.db.models import F
+		Review.objects.filter(pk=pk, like_count__gt=0).update(like_count=F('like_count') - 1)
+
+	current = Review.objects.filter(pk=pk).values_list('like_count', flat=True).first()
 	return JsonResponse({'ok': True, 'like_count': int(current or 0), 'liked': liked})
 
 
@@ -912,7 +1133,10 @@ def user_profile(request):
 	total_reviews = int(stats.get('total_reviews') or 0)
 	avg_rating = float(stats.get('avg_rating') or 0.0)
 	unique_companies = user_reviews.values('company').distinct().count()
-	helpful_votes = 0  # Placeholder until a like/upvote model exists
+
+	# Calculate helpful votes from ReviewLike count
+	from django.db.models import Sum
+	helpful_votes = user_reviews.aggregate(total_likes=Sum('like_count'))['total_likes'] or 0
 
 	return render(request, 'pages/user_profile.html', {
 		'form': form,
@@ -940,8 +1164,10 @@ def review_edit(request, pk: int):
 	if request.method == 'POST':
 		form = ReviewEditForm(request.POST, instance=review)
 		if form.is_valid():
-			form.save()
-			messages.success(request, 'Sharh yangilandi.')
+			review = form.save(commit=False)
+			review.is_approved = False
+			review.save()
+			messages.success(request, 'Sharh yangilandi va qayta moderatsiyaga yuborildi.')
 			return redirect('user_profile')
 	else:
 		form = ReviewEditForm(instance=review)
@@ -965,3 +1191,28 @@ def review_delete(request, pk: int):
 		return redirect('user_profile')
 
 	return render(request, 'pages/review_delete_confirm.html', {'review': review})
+
+
+def public_profile(request, username: str):
+	"""Public profile view showing user's reviews and stats."""
+	user = get_object_or_404(User, username=username)
+	profile = get_object_or_404(UserProfile, user=user)
+
+	# Only show approved reviews for public profile
+	reviews = Review.objects.filter(user=user, is_approved=True).select_related('company').order_by('-created_at')
+
+	# Stats
+	total_reviews = reviews.count()
+	avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0.0
+	helpful_votes = reviews.aggregate(Sum('like_count'))['like_count__sum'] or 0
+
+	return render(request, 'pages/public_profile.html', {
+		'profile_user': user,
+		'profile': profile,
+		'reviews': reviews,
+		'stats': {
+			'total_reviews': total_reviews,
+			'avg_rating': avg_rating,
+			'helpful_votes': helpful_votes,
+		}
+	})

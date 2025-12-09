@@ -1,61 +1,280 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Menejer paneli - Fikrly</title>
-  <link rel="stylesheet" href="{% static 'main.css' %}">
-</head>
-<body class="bg-background">
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-xl font-semibold text-primary">Menejer paneli</h1>
-      <a href="{% url 'business_list' %}" class="btn-outline">Bizneslar</a>
-    </div>
+{% load i18n %}
 
-    <div class="grid md:grid-cols-2 gap-6">
-      <div class="card">
-        <h2 class="text-lg font-semibold text-primary mb-3">Mening kompaniyalarim</h2>
-        {% if companies %}
-          <ul class="divide-y divide-gray-200">
-            {% for c in companies %}
-              <li class="py-3 flex items-center justify-between">
-                <div>
-                  <p class="font-medium">{{ c.name }}</p>
-                  <p class="text-sm text-text-secondary">{{ c.category }} • {{ c.city }}</p>
-                </div>
-                <a class="btn-primary" href="{% url 'manager_company_edit' c.pk %}">Tahrirlash</a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-text-secondary">Sizga biriktirilgan kompaniyalar yo'q.</p>
-        {% endif %}
-      </div>
+{% block title %}{% trans "Menejer paneli - Fikrly" %}{% endblock %}
 
-      <div class="card">
-        <h2 class="text-lg font-semibold text-primary mb-3">Kutayotgan sharhlar</h2>
-        {% if pending_reviews %}
-          <ul class="space-y-3">
-            {% for r in pending_reviews %}
-              <li class="p-3 border rounded flex items-start justify-between">
-                <div>
-                  <p class="font-medium">{{ r.company.name }} • {{ r.user_name }} — {{ r.rating }}⭐</p>
-                  <p class="text-sm text-text-secondary">{{ r.text|truncatewords:20 }}</p>
-                  {% if r.approval_requested %}
-                    <span class="text-xs text-success">So'rov yuborilgan</span>
-                  {% endif %}
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{% trans "Menejer paneli" %}</h1>
+                <p class="text-gray-500 mt-1">{% trans "Kompaniyalaringiz va sharhlarni boshqaring" %}</p>
+            </div>
+            <a href="{% url 'business_list' %}" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                {% trans "Barcha bizneslar" %}
+            </a>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-primary-50 text-primary-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">{% trans "Kompaniyalar" %}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ companies.count }}</p>
+                    </div>
                 </div>
-                <a class="btn-outline" href="{% url 'manager_request_approval' r.pk %}">Tasdiqlashni so'rash</a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="text-text-secondary">Hozircha kutayotgan sharhlar yo'q.</p>
-        {% endif %}
-      </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-yellow-50 text-yellow-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">{% trans "O'rtacha reyting" %}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.avg_rating|default:0|floatformat:1 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-green-50 text-green-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">{% trans "Jami sharhlar" %}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_reviews|default:0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-blue-50 text-blue-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">{% trans "Ko'rishlar" %}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_views|default:0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-purple-50 text-purple-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">{% trans "Kontaktlar" %}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ stats.total_clicks|default:0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Chart -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">{% trans "So'nggi 30 kunlik faollik" %}</h2>
+            <div class="h-80">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <!-- Managed Companies -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-900">{% trans "Mening kompaniyalarim" %}</h2>
+                </div>
+                {% if companies %}
+                    <div class="divide-y divide-gray-100">
+                        {% for c in companies %}
+                            <div class="p-6 hover:bg-gray-50 transition-colors flex items-center justify-between group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden relative border border-gray-100">
+                                        {% if c.display_logo %}
+                                            <img src="{{ c.display_logo }}" alt="{{ c.name }}"
+                                                 class="w-full h-full object-cover absolute inset-0"
+                                                 style="transform: scale(calc({{ c.logo_scale|default:100 }} / 100));">
+                                        {% else %}
+                                            <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-gray-900 group-hover:text-primary-600 transition-colors">{{ c.name }}</h3>
+                                        <p class="text-sm text-gray-500">{{ c.category_fk.display_name|default:c.category }} • {{ c.city }}</p>
+                                        <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                                            <span class="flex items-center text-yellow-500">
+                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                                {{ c.rating }}
+                                            </span>
+                                            <span>•</span>
+                                            <span>{{ c.review_count }} {% trans "sharh" %}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'manager_company_edit' c.pk %}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors">
+                                    {% trans "Tahrirlash" %}
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-8 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">{% trans "Kompaniyalar yo'q" %}</h3>
+                        <p class="text-gray-500 mb-4">{% trans "Sizga biriktirilgan kompaniyalar mavjud emas." %}</p>
+                        <a href="{% url 'business_list' %}" class="text-primary-600 hover:text-primary-700 font-medium">{% trans "Kompaniyalarni ko'rish" %} &rarr;</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Pending Reviews -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-lg font-semibold text-gray-900">{% trans "Kutayotgan sharhlar" %}</h2>
+                    {% if pending_reviews %}
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            {{ pending_reviews.count }}
+                        </span>
+                    {% endif %}
+                </div>
+                {% if pending_reviews %}
+                    <div class="divide-y divide-gray-100">
+                        {% for r in pending_reviews %}
+                            <div class="p-6 hover:bg-gray-50 transition-colors">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">{{ r.company.name }}</h4>
+                                        <div class="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                                            <span>{{ r.user_name }}</span>
+                                            <span>•</span>
+                                            <span class="flex items-center text-yellow-500">
+                                                {{ r.rating }}
+                                                <svg class="w-3 h-3 ml-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-gray-400">{{ r.created_at|date:"d.m.Y" }}</span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ r.text }}</p>
+                                <div class="flex items-center justify-between">
+                                    {% if r.approval_requested %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            {% trans "So'rov yuborilgan" %}
+                                        </span>
+                                    {% else %}
+                                        <span></span>
+                                    {% endif %}
+                                    <a href="{% url 'manager_request_approval' r.pk %}" class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline">
+                                        {% trans "Tasdiqlashni so'rash" %} &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-8 text-center">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">{% trans "Kutayotgan sharhlar yo'q" %}</h3>
+                        <p class="text-gray-500">{% trans "Hozircha tasdiqlash uchun yangi sharhlar mavjud emas." %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
-  </main>
-</body>
-</html>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const labels = JSON.parse('{{ chart_labels|safe }}');
+        const reviewsData = JSON.parse('{{ chart_reviews|safe }}');
+        const clicksData = JSON.parse('{{ chart_clicks|safe }}');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "{% trans 'Sharhlar' %}",
+                        data: reviewsData,
+                        borderColor: '#10B981', // primary-500
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: "{% trans 'Kontakt ko\'rishlar' %}",
+                        data: clicksData,
+                        borderColor: '#8B5CF6', // purple-500
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,16 +1,53 @@
+{% load static %}
+{% load static_bust %}
+{% load i18n %}
 {% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Kompaniyani tasdiqlash" %} - Fikrly{% endblock %}
+
 {% block content %}
-<div class="max-w-xl mx-auto py-10">
-  <h1 class="text-2xl font-bold text-primary mb-4">Kompaniyani tasdiqlash</h1>
-  <p class="text-text-secondary mb-4">{{ company.name }} kompaniyasi uchun ishchi emailingizni kiriting. Tasdiqlash havolasi yuboriladi.</p>
-  <form method="post" class="space-y-4">
-    {% csrf_token %}
-    <div>
-      <label class="block text-sm text-text-secondary mb-1">Email</label>
-      {{ form.email }}
-      {% for e in form.email.errors %}<div class="text-error text-sm">{{ e }}</div>{% endfor %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 text-primary-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Kompaniyani tasdiqlash" %}</h1>
+                <p class="text-gray-600">
+                    {% blocktrans with name=company.name %}<span class="font-semibold text-gray-900">{{ name }}</span> kompaniyasi uchun ishchi emailingizni kiriting. Tasdiqlash havolasi yuboriladi.{% endblocktrans %}
+                </p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Email manzil" %}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center justify-between pt-4">
+                    <a href="{% url 'company_detail' company.pk %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                        {% trans "Ortga qaytish" %}
+                    </a>
+                    <button type="submit" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg shadow-sm shadow-primary-200 transition-colors">
+                        {% trans "Yuborish" %}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-    <button class="btn-primary">Tasdiqlash havolasini yuborish</button>
-  </form>
 </div>
 {% endblock %}

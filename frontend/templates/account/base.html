@@ -6,10 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block head_title %}Fikrly{% endblock %}</title>
     {% load static %}{% load static_bust %}
-    <link rel="stylesheet" href="{% static_bust 'main.css' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}?v=2">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}?v=2">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf9',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#00f49f',
+                            500: '#00d68b',
+                            600: '#00a86d',
+                            700: '#008f5d',
+                            800: '#006d47',
+                            900: '#004d32',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-background">
     {% block content %}{% endblock %}
 </body>
 </html>
-

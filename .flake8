@@ -1,0 +1,4 @@
+[flake8]
+max-line-length = 120
+exclude = .git,*/migrations/*,*/static/CACHE/*,docs,node_modules,venv,.venv,.venv_win
+ignore = E203, E266, E501, W503

@@ -1,0 +1,86 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% trans "Xatolik | Fikrly" %}</title>
+    {% load static_bust %}
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0fdf9',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#00f49f',
+                            500: '#00d68b',
+                            600: '#00a86d',
+                            700: '#008f5d',
+                            800: '#006d47',
+                            900: '#004d32',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+    <div class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md text-center">
+            <!-- Logo -->
+            <a href="/" class="inline-flex items-center space-x-3 mb-8">
+                <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-12 h-12 rounded-xl shadow-lg">
+                <span class="text-3xl font-bold text-gray-900">Fikrly</span>
+            </a>
+
+            <!-- Error Card -->
+            <div class="bg-white p-8 rounded-2xl shadow-xl border border-red-100">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+
+                <h1 class="text-xl font-bold text-gray-900 mb-2">
+                    {% trans "Uchinchi Tomon Tizimga Kirishda Xato" %}
+                </h1>
+
+                <p class="text-gray-600 mb-8">
+                    {% if auth_error %}
+                        {{ auth_error.reason }}
+                    {% else %}
+                        {% trans "Uchinchi tomon akkauntingiz orqali kirishga urinishda xatolik yuz berdi." %}
+                    {% endif %}
+                </p>
+
+                <div class="space-y-3">
+                    <a href="{% url 'account_login' %}" class="block w-full py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all">
+                        {% trans "Qayta urinib ko'rish" %}
+                    </a>
+                    <a href="/" class="block w-full py-3 px-4 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        {% trans "Bosh sahifaga qaytish" %}
+                    </a>
+                </div>
+            </div>
+
+            <p class="mt-8 text-sm text-gray-500">
+                &copy; {% now "Y" %} Fikrly. {% trans "Barcha huquqlar himoyalangan." %}
+            </p>
+        </div>
+    </div>
+</body>
+</html>
