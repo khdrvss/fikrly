@@ -2719,11 +2719,6 @@ video {
   color: rgb(17 24 39 / var(--tw-text-opacity, 1));
 }
 
-.hover\:text-pink-600:hover {
-  --tw-text-opacity: 1;
-  color: rgb(219 39 119 / var(--tw-text-opacity, 1));
-}
-
 .hover\:text-primary:hover {
   --tw-text-opacity: 1;
   color: rgb(0 143 93 / var(--tw-text-opacity, 1));
