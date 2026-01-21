@@ -1,15 +1,15 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from .models import Company, Review, BusinessCategory
+from .models import Company, BusinessCategory
 
 
 class CategorySitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.8
-    protocol = 'https'
+    protocol = "https"
 
     def items(self):
-        return BusinessCategory.objects.all().order_by('id')
+        return BusinessCategory.objects.all().order_by("id")
 
     def location(self, obj: BusinessCategory):
         return obj.get_absolute_url()
@@ -18,33 +18,33 @@ class CategorySitemap(Sitemap):
 class CompanySitemap(Sitemap):
     changefreq = "daily"
     priority = 0.9
-    protocol = 'https'
+    protocol = "https"
 
     def items(self):
-        return Company.objects.filter(is_active=True).order_by('id')
+        return Company.objects.filter(is_active=True).order_by("id")
 
     def lastmod(self, obj: Company):
         return None
 
     def location(self, obj: Company):
-        return reverse('company_detail', kwargs={'pk': obj.pk})
+        return reverse("company_detail", kwargs={"pk": obj.pk})
 
 
 class StaticSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.5
-    protocol = 'https'
+    protocol = "https"
 
     def items(self):
         return [
-            'index',
-            'business_list',
-            'category_browse',
-            'review_submission',
-            'privacy_policy',
-            'terms_of_service',
-            'community_guidelines',
-            'contact_us'
+            "index",
+            "business_list",
+            "category_browse",
+            "review_submission",
+            "privacy_policy",
+            "terms_of_service",
+            "community_guidelines",
+            "contact_us",
         ]
 
     def location(self, item):

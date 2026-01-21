@@ -112,9 +112,10 @@
             {% static 'images/placeholder.png' as default_cover %}
             <img src="{{ company.display_image_url|default:company.image_url|default:default_cover }}"
                  alt="{{ company.name }} cover"
-                 class="w-full h-full object-cover"
+                 data-lightbox="{{ company.display_image_url|default:company.image_url|default:default_cover }}"
+                 class="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
                  onerror="this.src='{{ default_cover }}'">
-            <div class="hidden md:block absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div class="hidden md:block absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -186,6 +187,14 @@
                             {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'"{% endif %}>
                         <svg id="likeIcon" class="w-5 h-5 md:w-6 md:h-6" fill="{% if liked_state %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         <span id="likeCount" class="font-medium">{{ company.like_count }}</span>
+                    </button>
+                    <button data-copy="{{ request.build_absolute_uri }}"
+                            data-copy-message="Kompaniya havolasi nusxalandi!"
+                            data-tooltip="Havolani ulashish"
+                            class="btn-outline px-3 py-2 md:px-4 md:py-3 rounded-xl border-gray-300 hover:border-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2 bg-white text-sm md:text-base">
+                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                        </svg>
                     </button>
                 </div>
             </div>

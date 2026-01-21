@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
-
-from .models import Company
 
 
 @dataclass
@@ -44,21 +41,27 @@ def send_telegram_message(message: str, chat_ids: list[str] | None = None) -> No
     import urllib.parse
     from django.conf import settings
 
-    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
-    chats = chat_ids if chat_ids is not None else getattr(settings, 'TELEGRAM_ADMIN_CHAT_IDS', [])
+    token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
+    chats = (
+        chat_ids
+        if chat_ids is not None
+        else getattr(settings, "TELEGRAM_ADMIN_CHAT_IDS", [])
+    )
     if not token or not chats:
         return
 
     base = f"https://api.telegram.org/bot{token}/sendMessage"
     payload_base = {
-        'text': message,
-        'parse_mode': 'HTML',
-        'disable_web_page_preview': 'true',
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": "true",
     }
     for chat_id in chats:
         try:
-            data = payload_base | {'chat_id': chat_id}
-            req = urllib.request.Request(base, data=urllib.parse.urlencode(data).encode('utf-8'))
+            data = payload_base | {"chat_id": chat_id}
+            req = urllib.request.Request(
+                base, data=urllib.parse.urlencode(data).encode("utf-8")
+            )
             with urllib.request.urlopen(req, timeout=5) as resp:
                 resp.read()
         except Exception:
@@ -81,9 +84,13 @@ def recalculate_company_stats(company_id: int) -> None:
 
     try:
         company = Company.objects.get(pk=company_id)
-        agg = company.reviews.filter(is_approved=True).aggregate(avg=Avg('rating'), cnt=Count('id'))
-        company.review_count = int(agg.get('cnt') or 0)
-        company.rating = round(float(agg.get('avg') or 0.0), 2) if company.review_count else 0
-        company.save(update_fields=['review_count', 'rating'])
+        agg = company.reviews.filter(is_approved=True).aggregate(
+            avg=Avg("rating"), cnt=Count("id")
+        )
+        company.review_count = int(agg.get("cnt") or 0)
+        company.rating = (
+            round(float(agg.get("avg") or 0.0), 2) if company.review_count else 0
+        )
+        company.save(update_fields=["review_count", "rating"])
     except Company.DoesNotExist:
         pass

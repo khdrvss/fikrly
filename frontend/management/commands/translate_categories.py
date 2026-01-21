@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand
 from frontend.models import Company
 
+
 class Command(BaseCommand):
-    help = 'Translates English category names to Uzbek'
+    help = "Translates English category names to Uzbek"
 
     def handle(self, *args, **options):
         # Mapping of English (or other) -> Uzbek
@@ -49,9 +50,13 @@ class Command(BaseCommand):
             if current_cat in mapping:
                 new_cat = mapping[current_cat]
                 if current_cat != new_cat:
-                    self.stdout.write(f"Renaming '{current_cat}' -> '{new_cat}' for {company.name}")
+                    self.stdout.write(
+                        f"Renaming '{current_cat}' -> '{new_cat}' for {company.name}"
+                    )
                     company.category = new_cat
                     company.save()
                     updated_count += 1
 
-        self.stdout.write(self.style.SUCCESS(f'Successfully updated {updated_count} companies.'))
+        self.stdout.write(
+            self.style.SUCCESS(f"Successfully updated {updated_count} companies.")
+        )

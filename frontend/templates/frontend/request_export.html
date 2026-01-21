@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Ma'lumotlarni yuklash - Fikrly{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold mb-8">Mening ma'lumotlarimni yuklash</h1>
+
+    <!-- Request New Export -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8 p-6">
+        <h2 class="text-xl font-bold mb-4">Yangi yuklash so'rovi</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Barcha ma'lumotlaringizni JSON yoki PDF formatida yuklang. 
+            Yuklash tayyor bo'lgach, sizga email orqali xabar yuboriladi.
+        </p>
+        
+        <form method="post" action="{% url 'request_export' %}" class="flex gap-3">
+            {% csrf_token %}
+            <select name="format" class="px-4 py-2 border rounded-lg">
+                <option value="json">JSON (kod uchun)</option>
+                <option value="pdf">PDF (o'qish uchun)</option>
+            </select>
+            
+            <button type="submit" 
+                    class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-semibold">
+                Yuklashni boshlash
+            </button>
+        </form>
+    </div>
+
+    <!-- Export History -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="p-6 border-b">
+            <h2 class="text-xl font-bold">Yuklash tarixi</h2>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Format</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Holat</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">So'ralgan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tugallangan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for export in exports %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4 text-sm">#{{ export.id }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded text-xs font-mono">
+                                {{ export.format|upper }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if export.status == 'completed' %}
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                    ✓ Tayyor
+                                </span>
+                            {% elif export.status == 'processing' %}
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                                    ⟳ Jarayonda
+                                </span>
+                            {% elif export.status == 'failed' %}
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
+                                    ✗ Xatolik
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
+                                    ⏱ Kutilmoqda
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ export.requested_at|date:"Y-m-d H:i" }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {% if export.completed_at %}
+                                {{ export.completed_at|date:"Y-m-d H:i" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if export.status == 'completed' and export.file %}
+                                <a href="{{ export.file.url }}" 
+                                   download
+                                   class="inline-flex items-center gap-2 text-primary-600 hover:underline font-semibold">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Yuklash
+                                </a>
+                            {% elif export.status == 'failed' %}
+                                <span class="text-red-600 text-xs">{{ export.error_message|default:"Xatolik yuz berdi" }}</span>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            Hozircha yuklashlar yo'q. Yuqorida yangi so'rov yarating.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if exports.has_other_pages %}
+        <div class="p-6 border-t flex justify-center gap-2">
+            {% if exports.has_previous %}
+                <a href="?page={{ exports.previous_page_number }}" 
+                   class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                    ← Oldingi
+                </a>
+            {% endif %}
+            
+            <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                {{ exports.number }} / {{ exports.paginator.num_pages }}
+            </span>
+            
+            {% if exports.has_next %}
+                <a href="?page={{ exports.next_page_number }}" 
+                   class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                    Keyingi →
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <h3 class="text-lg font-bold mb-2">ℹ Ma'lumot</h3>
+        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <li>• Yuklangan ma'lumotlar 7 kun davomida saqlanadi</li>
+            <li>• JSON format: Kod orqali ishlov berish uchun qulay</li>
+            <li>• PDF format: O'qish va chop etish uchun qulay</li>
+            <li>• Yuklash 5-10 daqiqa davom etishi mumkin</li>
+            <li>• Tayyor bo'lgach email orqali xabar keladi</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

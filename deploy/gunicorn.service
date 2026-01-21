@@ -1,0 +1,36 @@
+# Systemd service file for Fikrly Gunicorn
+# Place in: /etc/systemd/system/gunicorn.service
+# 
+# After placing:
+# sudo systemctl daemon-reload
+# sudo systemctl enable gunicorn
+# sudo systemctl start gunicorn
+# sudo systemctl status gunicorn
+
+[Unit]
+Description=Gunicorn daemon for Fikrly Django app
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/fikrly
+Environment="PATH=/var/www/fikrly/venv/bin"
+ExecStart=/var/www/fikrly/venv/bin/gunicorn \
+    --workers 4 \
+    --worker-class gthread \
+    --threads 2 \
+    --timeout 60 \
+    --bind unix:/run/gunicorn.sock \
+    --error-logfile /var/log/fikrly/gunicorn-error.log \
+    --access-logfile /var/log/fikrly/gunicorn-access.log \
+    --log-level info \
+    myproject.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

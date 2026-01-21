@@ -1,0 +1,31 @@
+{% extends 'frontend/emails/base.html' %}
+
+{% block content %}
+<div class="greeting">Assalomu alaykum, {{ user_name }}!</div>
+
+<div class="message">
+    <p>Sizning sharhingizga kompaniya egasi javob berdi!</p>
+</div>
+
+<div class="review-box">
+    <div class="company">{{ company_name }}</div>
+    <div class="text">"{{ review_text }}"</div>
+</div>
+
+<div class="response-box">
+    <strong>Kompaniya javobi:</strong>
+    <p style="margin: 8px 0 0 0;">{{ response_text }}</p>
+</div>
+
+<div class="message">
+    <p>Sharhingizni ko'rish va davomli suhbat qilish uchun:</p>
+</div>
+
+<a href="{{ review_url }}" class="button">Sharhni ko'rish</a>
+
+<div class="message">
+    <p style="color: #888; font-size: 14px;">
+        Muloqot davom ettirish va kompaniya haqida ko'proq bilish uchun sharhingizga tashrif buyuring.
+    </p>
+</div>
+{% endblock %}

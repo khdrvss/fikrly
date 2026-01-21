@@ -97,7 +97,7 @@
                     <!-- Edit Profile Form -->
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <h2 class="text-lg font-semibold text-gray-900 mb-4">{% trans "Profilni tahrirlash" %}</h2>
-                        <form method="post" enctype="multipart/form-data" class="space-y-4">
+                        <form method="post" enctype="multipart/form-data" class="space-y-4" data-validate>
                             {% csrf_token %}
                             {% if form.errors %}
                                 <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm">

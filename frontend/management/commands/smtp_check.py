@@ -8,20 +8,24 @@ class Command(BaseCommand):
     help = "Diagnose SMTP configuration: resolve host, connect, start TLS, and report settings."
 
     def add_arguments(self, parser):
-        parser.add_argument('--timeout', type=float, default=10.0)
+        parser.add_argument("--timeout", type=float, default=10.0)
 
     def handle(self, *args, **opts):
-        backend = getattr(settings, 'EMAIL_BACKEND', '')
+        backend = getattr(settings, "EMAIL_BACKEND", "")
         self.stdout.write(f"EMAIL_BACKEND: {backend}")
-        if not backend.endswith('smtp.EmailBackend'):
-            self.stdout.write(self.style.WARNING("Not using SMTP backend; set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend in .env to test sending."))
+        if not backend.endswith("smtp.EmailBackend"):
+            self.stdout.write(
+                self.style.WARNING(
+                    "Not using SMTP backend; set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend in .env to test sending."
+                )
+            )
             return
 
-        host = getattr(settings, 'EMAIL_HOST', '')
-        port = int(getattr(settings, 'EMAIL_PORT', 587))
-        use_tls = bool(getattr(settings, 'EMAIL_USE_TLS', True))
-        user = getattr(settings, 'EMAIL_HOST_USER', '')
-        from_addr = getattr(settings, 'DEFAULT_FROM_EMAIL', '')
+        host = getattr(settings, "EMAIL_HOST", "")
+        port = int(getattr(settings, "EMAIL_PORT", 587))
+        use_tls = bool(getattr(settings, "EMAIL_USE_TLS", True))
+        user = getattr(settings, "EMAIL_HOST_USER", "")
+        from_addr = getattr(settings, "DEFAULT_FROM_EMAIL", "")
 
         self.stdout.write(f"EMAIL_HOST: {host}")
         self.stdout.write(f"EMAIL_PORT: {port}")
@@ -43,7 +47,7 @@ class Command(BaseCommand):
             return
 
         # TCP connect
-        timeout = float(opts['timeout'])
+        timeout = float(opts["timeout"])
         try:
             sock = socket.create_connection((host, port), timeout=timeout)
             self.stdout.write(self.style.SUCCESS(f"TCP connect OK: {host}:{port}"))
@@ -54,7 +58,7 @@ class Command(BaseCommand):
         # Read banner (optional)
         try:
             sock.settimeout(5)
-            banner = sock.recv(256).decode(errors='ignore')
+            banner = sock.recv(256).decode(errors="ignore")
             if banner:
                 self.stdout.write(f"Banner: {banner.strip()}")
         except Exception:
@@ -71,9 +75,11 @@ class Command(BaseCommand):
                 context = ssl.create_default_context()
                 tls_sock = context.wrap_socket(sock, server_hostname=host)
                 tls_sock.sendall(b"EHLO localhost\r\n")
-                resp = tls_sock.recv(2048).decode(errors='ignore')
+                resp = tls_sock.recv(2048).decode(errors="ignore")
                 self.stdout.write(self.style.SUCCESS("STARTTLS OK"))
-                self.stdout.write("TLS EHLO response (truncated):\n" + resp.split('\n')[0])
+                self.stdout.write(
+                    "TLS EHLO response (truncated):\n" + resp.split("\n")[0]
+                )
                 tls_sock.close()
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"STARTTLS failed: {e}"))

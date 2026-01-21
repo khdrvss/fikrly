@@ -45,7 +45,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input type="text" name="q" id="searchInput" aria-label="{% trans 'Bizneslarni qidirish' %}" placeholder="{% trans 'Biznes nomi, kategoriya yoki joylashuvni qidiring...' %}" class="block w-full pl-14 pr-32 py-3 md:py-4 text-base md:text-lg bg-white border-0 rounded-2xl shadow-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-primary-500 placeholder-gray-400 transition-shadow" autocomplete="off" />
+                    <input type="text" 
+                           name="q" 
+                           id="searchInput" 
+                           aria-label="{% trans 'Bizneslarni qidirish' %}" 
+                           placeholder="{% trans 'Biznes nomi, kategoriya yoki joylashuvni qidiring...' %}" 
+                           data-search-autocomplete
+                           class="block w-full pl-14 pr-32 py-3 md:py-4 text-base md:text-lg bg-white border-0 rounded-2xl shadow-lg ring-1 ring-gray-200 focus:ring-2 focus:ring-primary-500 placeholder-gray-400 transition-shadow" 
+                           autocomplete="off" />
 
                     <!-- Search Suggestions Dropdown -->
                     <div id="searchSuggestions" class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 hidden">
@@ -129,8 +136,12 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for company in trending_companies %}
                 <a href="{% url 'company_detail' company.pk %}" class="block bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden hover:shadow-md transition-all group">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" alt="{{ company.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop'; this.onerror=null;" />
+                    <div class="relative h-48 overflow-hidden bg-gray-100">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23e5e7eb' width='100' height='100'/%3E%3C/svg%3E" 
+                             data-src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" 
+                             alt="{{ company.name }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 lazy-image" 
+                             onerror="this.dataset.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop';" />
                         <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-gray-900 shadow-sm">
                             {{ company.category_fk.display_name|default:company.category }}
                         </div>

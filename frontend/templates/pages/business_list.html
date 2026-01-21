@@ -77,8 +77,15 @@
 
                 <form method="get" class="flex w-full md:w-auto gap-2 relative" id="searchForm">
                     <div class="relative flex-1 md:w-80">
-                        <input type="text" name="q" id="searchInput" aria-label="{% trans 'Kompaniya nomini qidiring' %}" value="{{ search_query }}" placeholder="{% trans 'Kompaniya nomini qidiring...' %}"
-                               class="w-full pl-10 pr-4 py-3 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm" autocomplete="off">
+                        <input type="text" 
+                               name="q" 
+                               id="searchInput" 
+                               aria-label="{% trans 'Kompaniya nomini qidiring' %}" 
+                               value="{{ search_query }}" 
+                               placeholder="{% trans 'Kompaniya nomini qidiring...' %}"
+                               data-search-autocomplete
+                               class="w-full pl-10 pr-4 py-3 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm" 
+                               autocomplete="off">
                         <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 
                         <!-- Search Suggestions Dropdown -->
@@ -97,15 +104,22 @@
                 </form>
             </div>
 
-            <!-- Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Grid with Infinite Scroll -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" 
+                 id="businessGrid"
+                 data-infinite-scroll
+                 {% if companies.has_next %}
+                 data-next-page="{{ companies.next_page_number }}"
+                 {% endif %}
+                 data-url-template="?{% url_replace request 'page' 'PAGE_NUM' %}">
                 {% for c in companies %}
                 <div class="group bg-white rounded-2xl border border-green-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden relative">
                     <div class="relative h-48 overflow-hidden">
                         <!-- TODO: Change default company image here. Recommended size: 800x400px -->
-                        <img src="{{ c.display_image_url|default:c.image_url|default:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80' }}"
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect fill='%23f3f4f6' width='800' height='400'/%3E%3C/svg%3E"
+                             data-src="{{ c.display_image_url|default:c.image_url|default:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80' }}"
                              alt="{{ c.name }}"
-                             class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                             class="lazy-image w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                              onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
 
@@ -113,14 +127,16 @@
                             <div class="bg-white p-1 rounded-lg shadow-lg overflow-hidden">
                                 <div class="w-10 h-10 rounded-md overflow-hidden relative">
                                     {% if c.display_logo %}
-                                    <img src="{{ c.display_logo }}"
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%23f3f4f6' width='40' height='40'/%3E%3C/svg%3E"
+                                         data-src="{{ c.display_logo }}"
                                          alt="{{ c.name }} logo"
-                                         class="w-full h-full object-cover absolute inset-0"
+                                         class="lazy-image w-full h-full object-cover absolute inset-0"
                                          style="transform: scale(calc({{ c.logo_scale|default:100 }} / 100));"
                                          onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear';">
                                     {% else %}
-                                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear"
-                                         alt="Logo" class="w-full h-full object-cover">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%23f3f4f6' width='40' height='40'/%3E%3C/svg%3E"
+                                         data-src="https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear"
+                                         alt="Logo" class="lazy-image w-full h-full object-cover">
                                     {% endif %}
                                 </div>
                             </div>

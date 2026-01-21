@@ -1,0 +1,51 @@
+{% extends 'frontend/emails/base.html' %}
+
+{% block content %}
+<div class="greeting">Salom, {{ user_name }}!</div>
+
+<div class="message">
+    <p>Mana sizning haftalik Fikrly faoliyatingiz xulosasi:</p>
+</div>
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 8px; margin: 20px 0;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; text-align: center;">
+        <div>
+            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">{{ reviews_count }}</div>
+            <div style="opacity: 0.9;">Yozilgan sharhlar</div>
+        </div>
+        <div>
+            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">{{ helpful_votes }}</div>
+            <div style="opacity: 0.9;">Foydali ovozlar</div>
+        </div>
+        <div>
+            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">{{ new_responses }}</div>
+            <div style="opacity: 0.9;">Yangi javoblar</div>
+        </div>
+        <div>
+            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;">🔥</div>
+            <div style="opacity: 0.9;">Aktiv foydalanuvchi</div>
+        </div>
+    </div>
+</div>
+
+{% if trending_companies %}
+<div class="message">
+    <h3 style="color: #667eea; margin-bottom: 15px;">📈 Ushbu hafta mashhur kompaniyalar:</h3>
+    <ul style="list-style: none; padding: 0;">
+        {% for company in trending_companies %}
+        <li style="padding: 10px; background: #f8f9fa; margin-bottom: 8px; border-radius: 4px;">
+            <strong>{{ company.name }}</strong> - {{ company.review_count }} yangi sharh
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<a href="{{ profile_url }}" class="button">Profilni ko'rish</a>
+
+<div class="message">
+    <p style="color: #888; font-size: 14px;">
+        Davom eting! Har bir sharh boshqa foydalanuvchilarga to'g'ri tanlov qilishda yordam beradi. 💚
+    </p>
+</div>
+{% endblock %}

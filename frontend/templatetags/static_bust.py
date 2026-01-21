@@ -5,6 +5,7 @@ from django.conf import settings
 
 register = template.Library()
 
+
 @register.simple_tag
 def static_bust(path: str) -> str:
     """
@@ -14,7 +15,7 @@ def static_bust(path: str) -> str:
 
     # Try to resolve absolute path from STATICFILES_DIRS
     mtime = None
-    for base in getattr(settings, 'STATICFILES_DIRS', []):
+    for base in getattr(settings, "STATICFILES_DIRS", []):
         abs_path = os.path.join(str(base), path)
         if os.path.exists(abs_path):
             try:
@@ -24,7 +25,7 @@ def static_bust(path: str) -> str:
                 continue
 
     # Fallback to STATIC_ROOT during collectstatic runs
-    if mtime is None and getattr(settings, 'STATIC_ROOT', None):
+    if mtime is None and getattr(settings, "STATIC_ROOT", None):
         abs_path = os.path.join(str(settings.STATIC_ROOT), path)
         if os.path.exists(abs_path):
             try:
@@ -35,5 +36,5 @@ def static_bust(path: str) -> str:
     if mtime is None:
         return url
 
-    sep = '&' if '?' in url else '?'
+    sep = "&" if "?" in url else "?"
     return f"{url}{sep}v={mtime}"

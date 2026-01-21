@@ -1,0 +1,24 @@
+{% extends 'frontend/emails/base.html' %}
+
+{% block content %}
+<div class="greeting">Tabriklaymiz, {{ user_name }}!</div>
+
+<div class="message">
+    <p>Sizning sharhingiz moderatsiyadan o'tdi va endi barcha foydalanuvchilar uchun ko'rinadi!</p>
+</div>
+
+<div class="review-box">
+    <div class="company">{{ company_name }}</div>
+    <p style="margin: 8px 0 0 0; color: #888;">
+        Sharhingiz platformada faol va boshqa foydalanuvchilarga yordam beradi.
+    </p>
+</div>
+
+<a href="{{ review_url }}" class="button">Sharhni ko'rish</a>
+
+<div class="message">
+    <p style="color: #888; font-size: 14px;">
+        Rahmat Fikrly jamoasiga hissa qo'shganingiz uchun! 🎉
+    </p>
+</div>
+{% endblock %}

@@ -21,6 +21,12 @@
     <link rel="icon" href="{% static 'favicons/favicon.svg' %}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{% static 'favicons/apple-touch-icon.png' %}">
     <link rel="manifest" href="{% static 'manifest.json' %}">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00d68b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fikrly">
 
     <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,6 +65,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -314,6 +321,13 @@
             });
         });
     </script>
+
+    <!-- UI Enhancements: Toast, Skeleton, Form Validation -->
+    <script src="{% static 'js/ui-enhancements.js' %}"></script>
+    
+    <!-- PWA Install Prompt -->
+    <script src="{% static 'js/pwa-install.js' %}"></script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

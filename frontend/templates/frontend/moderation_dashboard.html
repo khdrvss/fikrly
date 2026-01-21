@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Moderatsiya Paneli - Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold mb-8">Moderatsiya Paneli</h1>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 class="text-sm text-gray-600 dark:text-gray-400">Kutilayotgan</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ stats.pending }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 class="text-sm text-gray-600 dark:text-gray-400">Flaglangan</h3>
+            <p class="text-3xl font-bold text-red-600">{{ stats.flagged }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 class="text-sm text-gray-600 dark:text-gray-400">Spam</h3>
+            <p class="text-3xl font-bold text-orange-600">{{ stats.spam_detected }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 class="text-sm text-gray-600 dark:text-gray-400">Jami sharhlar</h3>
+            <p class="text-3xl font-bold text-green-600">{{ stats.total_reviews }}</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+        <form method="get" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium mb-2">Status</label>
+                <select name="status" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Kutilayotgan</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Tasdiqlangan</option>
+                    <option value="flagged" {% if status_filter == 'flagged' %}selected{% endif %}>Flaglangan</option>
+                    <option value="spam" {% if status_filter == 'spam' %}selected{% endif %}>Spam</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium mb-2">Qidiruv</label>
+                <input type="text" name="q" value="{{ search_query }}" 
+                       placeholder="Sharh yoki foydalanuvchi..." 
+                       class="w-full px-4 py-2 border rounded-lg">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700">
+                    Filtrlash
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8" id="bulk-actions">
+        <h2 class="text-xl font-bold mb-4">Ommaviy amallar</h2>
+        <div class="flex gap-4">
+            <button onclick="bulkModerate('approve')" 
+                    class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
+                ✓ Tanlanganlarni tasdiqlash
+            </button>
+            <button onclick="bulkModerate('reject')" 
+                    class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                ✗ Tanlanganlarni o'chirish
+            </button>
+            <button onclick="bulkModerate('spam')" 
+                    class="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700">
+                🚫 Spam deb belgilash
+            </button>
+        </div>
+        <p class="text-sm text-gray-600 mt-2"><span id="selected-count">0</span> ta sharh tanlangan</p>
+    </div>
+
+    <!-- Flagged Reviews -->
+    {% if flagged_reviews %}
+    <div class="bg-red-50 dark:bg-red-900/20 rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-bold text-red-800 dark:text-red-400 mb-4">
+            🚩 Flaglangan sharhlar ({{ flagged_reviews|length }})
+        </h2>
+        <div class="space-y-4">
+            {% for review in flagged_reviews %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border-l-4 border-red-600">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-semibold">{{ review.user.username }} - {{ review.company.name }}</p>
+                        <p class="text-sm text-gray-600">{{ review.created_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl">{{ "⭐"|multiply:review.rating }}</span>
+                    </div>
+                </div>
+                <p class="mb-2">{{ review.text }}</p>
+                <div class="flex gap-2 mt-4">
+                    <button onclick="resolveFlag({{ review.id }}, 'approve')"
+                            class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 text-sm">
+                        Tasdiqlash
+                    </button>
+                    <button onclick="resolveFlag({{ review.id }}, 'delete')"
+                            class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 text-sm">
+                        O'chirish
+                    </button>
+                    <button onclick="resolveFlag({{ review.id }}, 'ignore')"
+                            class="bg-gray-600 text-white px-4 py-1 rounded hover:bg-gray-700 text-sm">
+                        E'tiborsiz qoldirish
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Review List -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <h2 class="text-xl font-bold p-6 border-b">
+            Sharhlar ({{ reviews|length }})
+        </h2>
+        <div class="divide-y">
+            {% for review in reviews %}
+            <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-start gap-4">
+                    <input type="checkbox" class="review-checkbox mt-1" value="{{ review.id }}">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-semibold">{{ review.user.username }}</p>
+                                <p class="text-sm text-gray-600">{{ review.company.name }} - {{ review.created_at|date:"Y-m-d H:i" }}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">{{ "⭐"|multiply:review.rating }}</span>
+                                {% if review.is_approved %}
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Tasdiqlangan</span>
+                                {% else %}
+                                <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Kutilmoqda</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if review.title %}
+                        <h3 class="font-medium mb-1">{{ review.title }}</h3>
+                        {% endif %}
+                        <p class="text-gray-700 dark:text-gray-300">{{ review.text }}</p>
+                        <div class="mt-4 flex gap-2">
+                            <button onclick="approveReview({{ review.id }})"
+                                    class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 text-sm">
+                                ✓ Tasdiqlash
+                            </button>
+                            <button onclick="deleteReview({{ review.id }})"
+                                    class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700 text-sm">
+                                ✗ O'chirish
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-12 text-center text-gray-500">
+                Sharhlar topilmadi
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Track selected reviews
+let selectedReviews = new Set();
+
+document.querySelectorAll('.review-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            selectedReviews.add(e.target.value);
+        } else {
+            selectedReviews.delete(e.target.value);
+        }
+        document.getElementById('selected-count').textContent = selectedReviews.size;
+    });
+});
+
+// Bulk moderate
+async function bulkModerate(action) {
+    if (selectedReviews.size === 0) {
+        alert('Sharhlarni tanlang');
+        return;
+    }
+    
+    if (!confirm(`${selectedReviews.size} ta sharh ${action === 'approve' ? 'tasdiqlansinmi' : 'o\'chirilsinmi'}?`)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('action', action);
+    selectedReviews.forEach(id => formData.append('review_ids[]', id));
+    
+    const response = await fetch('/admin/moderation/bulk/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+        alert(data.message);
+        location.reload();
+    }
+}
+
+// Single review actions
+async function approveReview(id) {
+    const formData = new FormData();
+    formData.append('action', 'approve');
+    formData.append('review_ids[]', id);
+    
+    const response = await fetch('/admin/moderation/bulk/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+        location.reload();
+    }
+}
+
+async function deleteReview(id) {
+    if (!confirm('Sharh o\'chirilsinmi?')) return;
+    
+    const formData = new FormData();
+    formData.append('action', 'reject');
+    formData.append('review_ids[]', id);
+    
+    const response = await fetch('/admin/moderation/bulk/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: formData
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+        location.reload();
+    }
+}
+
+async function resolveFlag(reviewId, action) {
+    // Get flag id from review (simplified - in production use proper data attributes)
+    const response = await fetch(`/admin/flags/${reviewId}/resolve/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `action=${action}`
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

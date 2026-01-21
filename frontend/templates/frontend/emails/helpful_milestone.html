@@ -1,0 +1,28 @@
+{% extends 'frontend/emails/base.html' %}
+
+{% block content %}
+<div class="greeting">Ajoyib, {{ user_name }}!</div>
+
+<div class="message">
+    <p>Sizning sharhingiz <strong>{{ vote_count }} ta foydali ovoz</strong> oldi! 🎊</p>
+</div>
+
+<div class="review-box">
+    <div class="company">{{ company_name }}</div>
+    <p style="margin: 8px 0 0 0; color: #888;">
+        Sharhingiz {{ vote_count }} ta foydalanuvchiga foydali bo'ldi.
+    </p>
+</div>
+
+<div class="message">
+    <p>Bu ajoyib natija! Sizning tajribangiz va fikrlaringiz boshqalarga to'g'ri qaror qabul qilishda yordam bermoqda.</p>
+</div>
+
+<a href="{{ review_url }}" class="button">Sharhni ko'rish</a>
+
+<div class="message">
+    <p style="color: #888; font-size: 14px;">
+        Davom eting! Har bir sharh platformani yanada foydali qiladi. 💪
+    </p>
+</div>
+{% endblock %}

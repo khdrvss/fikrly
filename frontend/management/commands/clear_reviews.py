@@ -11,6 +11,8 @@ class Command(BaseCommand):
             deleted_count, _ = Review.objects.all().delete()
             updated = Company.objects.update(rating=0, review_count=0)
 
-        self.stdout.write(self.style.SUCCESS(
-            f"Deleted {deleted_count} reviews; reset {updated} companies."
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Deleted {deleted_count} reviews; reset {updated} companies."
+            )
+        )

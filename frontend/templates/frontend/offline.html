@@ -1,0 +1,97 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block title %}Oflayn - Fikrly{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-purple-50">
+  <div class="max-w-md w-full text-center px-4">
+    <!-- Offline illustration -->
+    <div class="mb-8">
+      <svg class="w-48 h-48 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m-1.414 5.658a9 9 0 01-2.167-9.238m7.824 2.167a1 1 0 111.414 1.414 1 1 0 01-1.414-1.414zm-1.414 5.658a3 3 0 00-4.243 0M3.515 11.515a5 5 0 014.242-4.243" />
+      </svg>
+    </div>
+    
+    <!-- Message -->
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Internet aloqasi yo'q</h1>
+    <p class="text-lg text-gray-600 mb-8">
+      Hozirda internet aloqasi mavjud emas. Iltimos, ulanishni tekshiring va qayta urinib ko'ring.
+    </p>
+    
+    <!-- Connection status -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <span class="text-gray-700 font-medium">Aloqa holati</span>
+        <span id="connection-status" class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">
+          Oflayn
+        </span>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="space-y-3">
+      <button onclick="location.reload()" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+        Qayta urinish
+      </button>
+      
+      <a href="/" class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+        Bosh sahifaga qaytish
+        </a>
+    </div>
+    
+    <!-- Helpful tips -->
+    <div class="mt-12 text-left bg-blue-50 rounded-lg p-6">
+      <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        Foydali maslahatlar
+      </h3>
+      <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex items-start">
+          <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          Wi-Fi yoki mobil internetni yoqilganligini tekshiring
+        </li>
+        <li class="flex items-start">
+          <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          Parvoz rejimini o'chirilganligini tasdiqlang
+        </li>
+        <li class="flex items-start">
+          <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          Router yoki modemni qayta ishga tushiring
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Monitor connection status
+  function updateConnectionStatus() {
+    const status = document.getElementById('connection-status');
+    if (navigator.onLine) {
+      status.textContent = 'Onlayn';
+      status.className = 'px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium';
+      
+      // Auto reload when back online
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
+    } else {
+      status.textContent = 'Oflayn';
+      status.className = 'px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium';
+    }
+  }
+  
+  window.addEventListener('online', updateConnectionStatus);
+  window.addEventListener('offline', updateConnectionStatus);
+  updateConnectionStatus();
+</script>
+{% endblock %}
