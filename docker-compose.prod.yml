@@ -53,8 +53,10 @@ services:
   tunnel:
     image: cloudflare/cloudflared:latest
     restart: always
-    # REPLACE <YOUR_TOKEN> BELOW WITH THE TOKEN FROM CLOUDFLARE
-    command: tunnel --no-autoupdate run --token eyJhIjoiMWU4NDJiMjZlODFhOTM0Njk5NTA0YWIyNTFlZWE3ZWIiLCJ0IjoiODVjOWYxZjQtMjJjMi00ZWQ2LTkwOGItMGUyMmUyYTIzYmEwIiwicyI6IlltVXpNbVk0T0RFdFlUZGhOQzAwTm1NeUxUbGpZV1V0T0RaaU9XWTVNek0wTTJZMSJ9
+    # Set CLOUDFLARE_TUNNEL_TOKEN in your environment or .env.docker
+    # Example: CLOUDFLARE_TUNNEL_TOKEN=<YOUR_TUNNEL_TOKEN_FROM_CLOUDFLARE>
+    # If you are not using Cloudflare Tunnel, you can remove this service.
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
       - nginx
 

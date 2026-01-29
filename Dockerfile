@@ -22,8 +22,8 @@ WORKDIR /app
 
 # Install Python dependencies
 COPY requirements.txt requirements-prod.txt ./
-RUN pip install --user --no-warn-script-location -r requirements.txt \
-    && pip install --user --no-warn-script-location -r requirements-prod.txt
+RUN pip install -r requirements.txt \
+    && pip install -r requirements-prod.txt
 
 
 # Stage 2: Runtime stage
@@ -32,7 +32,7 @@ FROM python:3.12-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH=/root/.local/bin:$PATH
+    PIP_NO_CACHE_DIR=1
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -48,8 +48,8 @@ RUN useradd -m -u 1000 appuser && \
     mkdir -p /app /app/staticfiles /app/media /app/logs && \
     chown -R appuser:appuser /app
 
-# Copy Python dependencies from builder
-COPY --from=builder /root/.local /root/.local
+# Copy Python dependencies from builder (system-wide)
+COPY --from=builder /usr/local /usr/local
 
 # Set working directory
 WORKDIR /app

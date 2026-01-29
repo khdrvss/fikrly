@@ -12,8 +12,7 @@ services:
       - POSTGRES_DB=${DB_NAME:-fikrly_db}
       - POSTGRES_USER=${DB_USER:-fikrly_user}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-changeme123}
-    ports:
-      - "5432:5432"
+    # Don't expose DB publicly on a VPS (use `docker compose exec db psql ...`)
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-fikrly_user}"]
       interval: 10s
@@ -30,8 +29,7 @@ services:
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
-    ports:
-      - "6379:6379"
+    # Don't expose Redis publicly on a VPS
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -47,34 +45,20 @@ services:
       dockerfile: Dockerfile
     container_name: fikrly_web
     restart: unless-stopped
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             python manage.py collectstatic --noinput &&
-             gunicorn --bind 0.0.0.0:8000 
-                      --workers 4 
-                      --threads 2 
-                      --timeout 60 
-                      --access-logfile - 
-                      --error-logfile - 
-                      myproject.wsgi:application"
+    entrypoint: ["./docker/scripts/entrypoint.sh"]
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", "--timeout", "60", "--access-logfile", "-", "--error-logfile", "-", "myproject.wsgi:application"]
     volumes:
-      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
       - logs_volume:/app/logs
+    env_file:
+      - .env
     environment:
       - DEBUG=${DEBUG:-False}
-      - SECRET_KEY=${SECRET_KEY:-please-change-this-in-production}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-fikrly.uz,www.fikrly.uz,localhost,127.0.0.1}
       - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=${DB_NAME:-fikrly_db}
-      - DB_USER=${DB_USER:-fikrly_user}
-      - DB_PASSWORD=${DB_PASSWORD:-changeme123}
       - DB_HOST=db
       - DB_PORT=5432
       - REDIS_URL=redis://redis:6379/1
-      - SILK_ENABLED=${SILK_ENABLED:-False}
-      - EMAIL_BACKEND=${EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}
     depends_on:
       db:
         condition: service_healthy

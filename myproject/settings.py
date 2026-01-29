@@ -20,6 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from a .env file at project root (if present)
 load_dotenv(BASE_DIR / ".env")
 
+def _env_bool(key: str, default: bool = False) -> bool:
+    val = os.environ.get(key)
+    if val is None:
+        return default
+    return str(val).strip().lower() in ("1", "true", "t", "yes", "y", "on")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -49,17 +55,20 @@ INTERNAL_IPS = [
 # These are only applied when DEBUG=False
 if not DEBUG:
     # HTTPS/SSL Configuration
-    SECURE_SSL_REDIRECT = True
+    # For Docker bootstrap (before certs), set USE_HTTPS=False in .env.
+    USE_HTTPS = _env_bool("USE_HTTPS", default=True)
+    SECURE_SSL_REDIRECT = _env_bool("SECURE_SSL_REDIRECT", default=USE_HTTPS)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
     # HSTS (HTTP Strict Transport Security)
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    if USE_HTTPS:
+        SECURE_HSTS_SECONDS = 31536000  # 1 year
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+        SECURE_HSTS_PRELOAD = True
 
     # Secure Cookies
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = USE_HTTPS
+    CSRF_COOKIE_SECURE = USE_HTTPS
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
@@ -270,15 +279,6 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
-
-# Development vs Production security settings
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
 
 # Authentication / django-allauth
 SITE_ID = 1
