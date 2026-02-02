@@ -199,7 +199,7 @@ def send_new_review_email(company_id, review_id):
 @shared_task
 def send_weekly_digests():
     """Celery beat task to send weekly digests to all active users."""
-    from frontend.models import Review
+    from frontend.models import Review, Company
     from django.utils import timezone
     from datetime import timedelta
     
@@ -210,6 +210,9 @@ def send_weekly_digests():
         review__created_at__gte=one_week_ago
     ).distinct()
     
+    # Get trending companies for the digest (top 3 rated)
+    trending = list(Company.objects.filter(is_active=True, rating__gt=4.0).order_by('-rating', '-review_count')[:3])
+
     for user in active_users:
         # Compile stats
         user_reviews = Review.objects.filter(user=user, created_at__gte=one_week_ago)
@@ -217,7 +220,7 @@ def send_weekly_digests():
             'reviews_count': user_reviews.count(),
             'helpful_votes': sum(r.helpful_count for r in user_reviews),
             'new_responses': user_reviews.exclude(owner_response_text='').count(),
-            'trending_companies': [],  # TODO: Add trending logic
+            'trending_companies': trending,
         }
         
         EmailNotificationService.send_weekly_digest(user, stats)
