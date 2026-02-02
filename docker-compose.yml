@@ -11,7 +11,7 @@ services:
     environment:
       - POSTGRES_DB=${DB_NAME:-fikrly_db}
       - POSTGRES_USER=${DB_USER:-fikrly_user}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-changeme123}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-maymun}
     # Don't expose DB publicly on a VPS (use `docker compose exec db psql ...`)
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-fikrly_user}"]
