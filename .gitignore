@@ -1,3 +1,5 @@
+staticfiles/
+*.log
 .DS_Store
 node_modules
 .idea
@@ -10,3 +12,7 @@ media/
 .venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+staticfiles/
