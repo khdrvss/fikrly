@@ -157,7 +157,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # allauth context processors removed in recent versions; not required
+                "core.context_processors.google_analytics",
             ],
         },
     },
@@ -366,6 +366,9 @@ TELEGRAM_REVIEWS_CHAT_IDS = [
 
 # Eskiz SMS (phone OTP)
 ESKIZ_BASE = os.environ.get("ESKIZ_BASE", "https://notify.eskiz.uz")
+
+# Google Analytics
+GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "")
 
 
 # ============================================

@@ -6,11 +6,11 @@ version: '3.8'
 services:
   db:
     ports:
-      - "5433:5432"  # Different port to avoid conflicts
+      - "5435:5432"  # Changed to avoid conflict with co-found-dev-db
 
   redis:
     ports:
-      - "6380:6379"  # Different port to avoid conflicts
+      - "6381:6379"  # Changed to avoid conflict with co-found-dev-redis
 
   web:
     build:
