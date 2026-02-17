@@ -62,7 +62,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Silk profiler - only in development or when explicitly enabled
-SILK_ENABLED = getattr(settings, 'SILK_ENABLED', False)
+SILK_ENABLED = getattr(settings, "SILK_ENABLED", False)
 if SILK_ENABLED:
     urlpatterns += [
         path("silk/", include("silk.urls", namespace="silk")),

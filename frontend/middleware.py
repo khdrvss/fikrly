@@ -52,50 +52,53 @@ class PostLoginRedirectMiddleware:
 
 class QueryCountDebugMiddleware:
     """Log query count and execution time in development for performance monitoring."""
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
-        if not getattr(settings, 'DEBUG', False):
+        if not getattr(settings, "DEBUG", False):
             return self.get_response(request)
-        
+
         # Reset queries
         from django.db import reset_queries
+
         reset_queries()
-        
+
         start_time = time.time()
         response = self.get_response(request)
         end_time = time.time()
-        
+
         # Count queries
         query_count = len(connection.queries)
-        total_time = sum(float(q['time']) for q in connection.queries)
-        
+        total_time = sum(float(q["time"]) for q in connection.queries)
+
         # Add headers for debugging
-        response['X-DB-Query-Count'] = str(query_count)
-        response['X-DB-Query-Time'] = f"{total_time:.4f}"
-        response['X-Response-Time'] = f"{(end_time - start_time):.4f}"
-        
+        response["X-DB-Query-Count"] = str(query_count)
+        response["X-DB-Query-Time"] = f"{total_time:.4f}"
+        response["X-Response-Time"] = f"{(end_time - start_time):.4f}"
+
         # Log if excessive
         if query_count > 50:
-            print(f"⚠️  WARNING: {query_count} queries on {request.path} ({total_time:.4f}s)")
-        
+            print(
+                f"⚠️  WARNING: {query_count} queries on {request.path} ({total_time:.4f}s)"
+            )
+
         return response
 
 
 class GzipCompressionMiddleware:
     """Add Content-Encoding hint for upstream compression (nginx, etc.)"""
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
         response = self.get_response(request)
-        
+
         # Add Vary header for cache optimization
-        if 'Accept-Encoding' not in response.get('Vary', ''):
-            vary = response.get('Vary', '')
-            response['Vary'] = f"{vary}, Accept-Encoding" if vary else "Accept-Encoding"
-        
+        if "Accept-Encoding" not in response.get("Vary", ""):
+            vary = response.get("Vary", "")
+            response["Vary"] = f"{vary}, Accept-Encoding" if vary else "Accept-Encoding"
+
         return response

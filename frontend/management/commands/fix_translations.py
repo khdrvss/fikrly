@@ -29,10 +29,14 @@ class Command(BaseCommand):
 
                 # description -> description_uz / description_ru
                 if hasattr(obj, "description"):
-                    if hasattr(obj, "description_uz") and not getattr(obj, "description_uz"):
+                    if hasattr(obj, "description_uz") and not getattr(
+                        obj, "description_uz"
+                    ):
                         setattr(obj, "description_uz", getattr(obj, "description"))
                         changed_fields.append("description_uz")
-                    if hasattr(obj, "description_ru") and not getattr(obj, "description_ru"):
+                    if hasattr(obj, "description_ru") and not getattr(
+                        obj, "description_ru"
+                    ):
                         setattr(obj, "description_ru", getattr(obj, "description"))
                         changed_fields.append("description_ru")
 
@@ -43,4 +47,6 @@ class Command(BaseCommand):
                         # fallback to full save if partial update fails for any reason
                         obj.save()
 
-        self.stdout.write(self.style.SUCCESS("Translation fields populated successfully."))
+        self.stdout.write(
+            self.style.SUCCESS("Translation fields populated successfully.")
+        )

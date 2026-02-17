@@ -8,23 +8,50 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0016_company_address_company_email_public_and_more'),
+        ("frontend", "0016_company_address_company_email_public_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CompanyLike',
+            name="CompanyLike",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='likes', to='frontend.company')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='company_likes', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "company",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="likes",
+                        to="frontend.company",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="company_likes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['company', 'user'], name='frontend_co_company_a38b46_idx')],
-                'unique_together': {('company', 'user')},
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["company", "user"],
+                        name="frontend_co_company_a38b46_idx",
+                    )
+                ],
+                "unique_together": {("company", "user")},
             },
         ),
     ]

@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count, Q, Sum
-from django.utils import translation
+from django.db.models import Avg, Count, Q, Sum, F
 from django.utils.translation import gettext as _
 from .models import Company, Review, UserProfile, BusinessCategory
 from .utils import compute_assessment, send_telegram_message, diff_instance_fields
@@ -39,8 +38,13 @@ from datetime import timedelta
 from .forms import ClaimCompanyForm, ContactForm
 from .models import CompanyClaim, ActivityLog
 from .models import CompanyLike
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
-from django.db.models import F
+from django.contrib.postgres.search import (
+    SearchVector,
+    SearchQuery,
+    SearchRank,
+    TrigramSimilarity,
+)
+
 
 
 # Create your views here.
@@ -212,7 +216,9 @@ def manager_company_edit(request, pk: int):
 @login_required
 def manager_request_approval(request, pk: int):
     try:
-        review = Review.objects.select_related("company").get(pk=pk, company__manager=request.user)
+        review = Review.objects.select_related("company").get(
+            pk=pk, company__manager=request.user
+        )
     except Review.DoesNotExist:
         raise Http404
 
@@ -258,7 +264,7 @@ def manager_request_approval(request, pk: int):
 
 
 @cache_page(60 * 5)  # Cache for 5 minutes
-@ratelimit(key='ip', rate='30/m', method='GET')
+@ratelimit(key="ip", rate="30/m", method="GET")
 def search_suggestions_api(request):
     """API endpoint for live search suggestions"""
     query = request.GET.get("q", "").strip()
@@ -329,18 +335,20 @@ def business_list(request, category_slug=None):
     companies = Company.objects.filter(is_active=True).select_related("category_fk")
 
     # Per-language page-level caching for anonymous GET requests (HTML only).
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    is_get = request.method.upper() == 'GET'
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    is_get = request.method.upper() == "GET"
     use_cache = is_get and (not request.user.is_authenticated) and (not is_ajax)
     cache_key = None
     if use_cache:
         from django.core.cache import cache
         from django.utils.translation import get_language
+
         # include full path (querystring) and language to keep separate caches
         cache_key = f"business_list:{get_language()}:{request.get_full_path()}"
         cached_html = cache.get(cache_key)
         if cached_html:
             from django.http import HttpResponse
+
             return HttpResponse(cached_html)
 
     # Query params
@@ -360,44 +368,52 @@ def business_list(request, category_slug=None):
     # apply text search
     if query:
         # Use PostgreSQL full-text search if available, otherwise fallback to icontains
-        db_vendor = companies.db if hasattr(companies, 'db') else 'default'
+        db_vendor = companies.db if hasattr(companies, "db") else "default"
         from django.db import connection
-        
-        if connection.vendor == 'postgresql':
+
+        if connection.vendor == "postgresql":
             # PostgreSQL Full-Text Search with ranking
-            search_vector = SearchVector('name', weight='A') + \
-                           SearchVector('description', weight='B') + \
-                           SearchVector('city', weight='C') + \
-                           SearchVector('category', weight='C')
-            
-            search_query = SearchQuery(query, search_type='websearch')
-            
-            companies = companies.annotate(
-                search=search_vector,
-                rank=SearchRank(search_vector, search_query)
-            ).filter(
-                Q(search=search_query) | 
-                Q(name__icontains=query) |
-                Q(city__icontains=query) |
-                Q(category_fk__name__icontains=query) |
-                Q(category_fk__name_ru__icontains=query)
-            ).order_by('-rank', '-review_count', '-rating')
+            search_vector = (
+                SearchVector("name", weight="A")
+                + SearchVector("description", weight="B")
+                + SearchVector("city", weight="C")
+                + SearchVector("category", weight="C")
+            )
+
+            search_query = SearchQuery(query, search_type="websearch")
+
+            companies = (
+                companies.annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(
+                    Q(search=search_query)
+                    | Q(name__icontains=query)
+                    | Q(city__icontains=query)
+                    | Q(category_fk__name__icontains=query)
+                    | Q(category_fk__name_ru__icontains=query)
+                )
+                .order_by("-rank", "-review_count", "-rating")
+            )
 
             # Fallback to trigram similarity for better fuzzy matching
             if not companies.exists():
-                companies = Company.objects.filter(is_active=True).annotate(
-                    similarity=TrigramSimilarity('name', query)
-                ).filter(similarity__gt=0.3).order_by('-similarity')
+                companies = (
+                    Company.objects.filter(is_active=True)
+                    .annotate(similarity=TrigramSimilarity("name", query))
+                    .filter(similarity__gt=0.3)
+                    .order_by("-similarity")
+                )
         else:
             # SQLite fallback: Enhanced icontains search
             companies = companies.filter(
-                Q(name__icontains=query) |
-                Q(city__icontains=query) |
-                Q(category_fk__name__icontains=query) |
-                Q(category_fk__name_ru__icontains=query) |
-                Q(category__icontains=query) |
-                Q(description__icontains=query)
-            ).order_by('-review_count', '-rating', 'name')
+                Q(name__icontains=query)
+                | Q(city__icontains=query)
+                | Q(category_fk__name__icontains=query)
+                | Q(category_fk__name_ru__icontains=query)
+                | Q(category__icontains=query)
+                | Q(description__icontains=query)
+            ).order_by("-review_count", "-rating", "name")
 
     category_display_name = category_filter
     if category_filter:
@@ -462,9 +478,15 @@ def business_list(request, category_slug=None):
         companies = companies.order_by("-rating", "-review_count", "name")
 
     # If no explicit search and category filter applied by previous code, keep it ordered by defaults
-    if not query and not categories_param and not city and not min_rating and (verified is None or verified == ""):
+    if (
+        not query
+        and not categories_param
+        and not city
+        and not min_rating
+        and (verified is None or verified == "")
+    ):
         companies = companies.order_by("-review_count", "-rating", "name")
-    
+
     # Get search suggestions if no results found
     search_suggestions = []
     if (query or category_filter) and not companies.exists():
@@ -499,7 +521,9 @@ def business_list(request, category_slug=None):
     # Pagination - show 20 companies per page as required
     paginator = Paginator(companies, 20)
     page_number = request.GET.get("page", 1)
-    logger.debug(f"business_list requested page: {page_number}; total_companies={companies.count()}")
+    logger.debug(
+        f"business_list requested page: {page_number}; total_companies={companies.count()}"
+    )
 
     try:
         page_obj = paginator.page(page_number)
@@ -523,8 +547,13 @@ def business_list(request, category_slug=None):
         "search_display": search_display,
         "search_suggestions": search_suggestions,
         "canonical_url": request.build_absolute_uri(),
-        "all_categories": BusinessCategory.objects.annotate(company_count=Count('companies', filter=Q(companies__is_active=True))).order_by('name'),
-        "all_cities": Company.objects.filter(is_active=True).values_list('city', flat=True).distinct().order_by('city'),
+        "all_categories": BusinessCategory.objects.annotate(
+            company_count=Count("companies", filter=Q(companies__is_active=True))
+        ).order_by("name"),
+        "all_cities": Company.objects.filter(is_active=True)
+        .values_list("city", flat=True)
+        .distinct()
+        .order_by("city"),
         "selected_filters": {
             "q": query,
             "city": city,
@@ -538,6 +567,7 @@ def business_list(request, category_slug=None):
     if use_cache and cache_key:
         from django.template.loader import render_to_string
         from django.core.cache import cache
+
         rendered = render_to_string("pages/business_list.html", ctx, request=request)
         # cache for 5 minutes
         cache.set(cache_key, rendered, 60 * 5)
@@ -546,7 +576,6 @@ def business_list(request, category_slug=None):
         return HttpResponse(rendered)
 
     return render(request, "pages/business_list.html", ctx)
-
 
 
 def category_browse(request):
@@ -1172,20 +1201,26 @@ def service_worker(request):
     # Try serving from STATIC_ROOT (production collected files)
     static_path = settings.STATIC_ROOT / "service-worker.js"
     if static_path.exists():
-        return FileResponse(open(static_path, "rb"), content_type="application/javascript")
+        return FileResponse(
+            open(static_path, "rb"), content_type="application/javascript"
+        )
 
     # Fallback to source (development)
     source_path = settings.BASE_DIR / "frontend" / "static" / "service-worker.js"
     if source_path.exists():
-        return FileResponse(open(source_path, "rb"), content_type="application/javascript")
+        return FileResponse(
+            open(source_path, "rb"), content_type="application/javascript"
+        )
 
     return HttpResponse(status=404)
 
 
 def company_detail(request, pk: int):
-    company = Company.objects.select_related("category_fk").prefetch_related(
-        "reviews__user", "reviews__likes"
-    ).get(pk=pk)
+    company = (
+        Company.objects.select_related("category_fk")
+        .prefetch_related("reviews__user", "reviews__likes")
+        .get(pk=pk)
+    )
     if not company.is_active and not (
         request.user.is_superuser
         or (request.user.is_authenticated and company.manager == request.user)
@@ -1195,8 +1230,6 @@ def company_detail(request, pk: int):
     # Increment view count (simple session-based debounce)
     session_key = f"viewed_company_{pk}"
     if not request.session.get(session_key):
-        from django.db.models import F
-
         Company.objects.filter(pk=pk).update(view_count=F("view_count") + 1)
         request.session[session_key] = True
 
@@ -1367,7 +1400,7 @@ def company_detail(request, pk: int):
 
 
 @login_required
-@ratelimit(key='user', rate='10/m', method='POST')
+@ratelimit(key="user", rate="10/m", method="POST")
 def reveal_contact(request, pk: int, kind: str):
     """Reveal phone or email; increments counters and logs activity."""
     try:
@@ -1394,7 +1427,7 @@ def reveal_contact(request, pk: int, kind: str):
 
 
 @login_required
-@ratelimit(key='user', rate='20/m', method='POST')
+@ratelimit(key="user", rate="20/m", method="POST")
 def like_company(request, pk: int):
     try:
         company = Company.objects.get(pk=pk)
@@ -1411,8 +1444,6 @@ def like_company(request, pk: int):
     if created:
         liked = True
         # increment cached counter
-        from django.db.models import F
-
         Company.objects.filter(pk=pk).update(like_count=F("like_count") + 1)
         ActivityLog.objects.create(
             actor=request.user, action="company_liked", company=company, details="liked"
@@ -1437,7 +1468,7 @@ def like_company(request, pk: int):
 
 
 @login_required
-@ratelimit(key='user', rate='20/m', method='POST')
+@ratelimit(key="user", rate="20/m", method="POST")
 def like_review(request, pk: int):
     try:
         review = Review.objects.get(pk=pk)
@@ -1451,13 +1482,9 @@ def like_review(request, pk: int):
 
     if created:
         liked = True
-        from django.db.models import F
-
         Review.objects.filter(pk=pk).update(like_count=F("like_count") + 1)
     else:
         obj.delete()
-        from django.db.models import F
-
         Review.objects.filter(pk=pk, like_count__gt=0).update(
             like_count=F("like_count") - 1
         )
@@ -1467,81 +1494,93 @@ def like_review(request, pk: int):
 
 
 @login_required
-@ratelimit(key='user', rate='30/m', method='POST')
+@ratelimit(key="user", rate="30/m", method="POST")
 def vote_review_helpful(request, pk: int):
     """Vote on review helpfulness (helpful/not helpful)"""
-    if request.method != 'POST':
+    if request.method != "POST":
         return JsonResponse({"success": False, "error": "POST required"}, status=405)
-    
+
     try:
         review = Review.objects.select_for_update().get(pk=pk)
     except Review.DoesNotExist:
         return JsonResponse({"success": False, "error": "Review not found"}, status=404)
-    
+
     try:
         import json
+
         data = json.loads(request.body)
-        vote_type = data.get('vote_type')
-        
-        if vote_type not in ['helpful', 'not_helpful']:
-            return JsonResponse({"success": False, "error": "Invalid vote type"}, status=400)
-        
+        vote_type = data.get("vote_type")
+
+        if vote_type not in ["helpful", "not_helpful"]:
+            return JsonResponse(
+                {"success": False, "error": "Invalid vote type"}, status=400
+            )
+
         from .models import ReviewHelpfulVote
-        from django.db.models import F
         from django.db import transaction
-        
+
         # Use transaction to prevent race conditions
         with transaction.atomic():
             # Check if user already voted
-            existing_vote = ReviewHelpfulVote.objects.filter(review=review, user=request.user).first()
-        
+            existing_vote = ReviewHelpfulVote.objects.filter(
+                review=review, user=request.user
+            ).first()
+
         if existing_vote:
             # Update existing vote
             old_type = existing_vote.vote_type
-            
+
             if old_type != vote_type:
                 # Decrement old count
-                if old_type == 'helpful':
+                if old_type == "helpful":
                     Review.objects.filter(pk=pk, helpful_count__gt=0).update(
-                        helpful_count=F('helpful_count') - 1
+                        helpful_count=F("helpful_count") - 1
                     )
                 else:
                     Review.objects.filter(pk=pk, not_helpful_count__gt=0).update(
-                        not_helpful_count=F('not_helpful_count') - 1
+                        not_helpful_count=F("not_helpful_count") - 1
                     )
-                
+
                 # Increment new count
-                if vote_type == 'helpful':
-                    Review.objects.filter(pk=pk).update(helpful_count=F('helpful_count') + 1)
+                if vote_type == "helpful":
+                    Review.objects.filter(pk=pk).update(
+                        helpful_count=F("helpful_count") + 1
+                    )
                 else:
-                    Review.objects.filter(pk=pk).update(not_helpful_count=F('not_helpful_count') + 1)
-                
+                    Review.objects.filter(pk=pk).update(
+                        not_helpful_count=F("not_helpful_count") + 1
+                    )
+
                 # Update vote
                 existing_vote.vote_type = vote_type
                 existing_vote.save()
             else:
                 # Create new vote
                 ReviewHelpfulVote.objects.create(
-                    review=review,
-                    user=request.user,
-                    vote_type=vote_type
+                    review=review, user=request.user, vote_type=vote_type
                 )
-                
+
                 # Increment count
-                if vote_type == 'helpful':
-                    Review.objects.filter(pk=pk).update(helpful_count=F('helpful_count') + 1)
+                if vote_type == "helpful":
+                    Review.objects.filter(pk=pk).update(
+                        helpful_count=F("helpful_count") + 1
+                    )
                 else:
-                    Review.objects.filter(pk=pk).update(not_helpful_count=F('not_helpful_count') + 1)
-            
+                    Review.objects.filter(pk=pk).update(
+                        not_helpful_count=F("not_helpful_count") + 1
+                    )
+
             # Get updated counts
             review.refresh_from_db()
-        
-        return JsonResponse({
-            "success": True,
-            "helpful_count": review.helpful_count,
-            "not_helpful_count": review.not_helpful_count
-        })
-        
+
+        return JsonResponse(
+            {
+                "success": True,
+                "helpful_count": review.helpful_count,
+                "not_helpful_count": review.not_helpful_count,
+            }
+        )
+
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 
@@ -1680,66 +1719,66 @@ def public_profile(request, username: str):
 # UTILITY VIEWS
 # ============================================
 
+
 def health_check(request):
     """Health check endpoint for monitoring"""
     import time
     from django.db import connection
-    
-    health_status = {
-        'status': 'healthy',
-        'timestamp': time.time(),
-        'checks': {}
-    }
-    
+
+    health_status = {"status": "healthy", "timestamp": time.time(), "checks": {}}
+
     # Check database
     try:
         with connection.cursor() as cursor:
-            cursor.execute('SELECT 1')
-        health_status['checks']['database'] = 'ok'
+            cursor.execute("SELECT 1")
+        health_status["checks"]["database"] = "ok"
     except Exception as e:
-        health_status['checks']['database'] = f'error: {str(e)}'
-        health_status['status'] = 'unhealthy'
-        logger.error(f'Database health check failed: {e}')
-    
+        health_status["checks"]["database"] = f"error: {str(e)}"
+        health_status["status"] = "unhealthy"
+        logger.error(f"Database health check failed: {e}")
+
     # Check cache
     try:
-        cache.set('health_check', 'ok', 10)
-        if cache.get('health_check') == 'ok':
-            health_status['checks']['cache'] = 'ok'
+        cache.set("health_check", "ok", 10)
+        if cache.get("health_check") == "ok":
+            health_status["checks"]["cache"] = "ok"
         else:
-            health_status['checks']['cache'] = 'error: cache not working'
-            health_status['status'] = 'degraded'
+            health_status["checks"]["cache"] = "error: cache not working"
+            health_status["status"] = "degraded"
     except Exception as e:
-        health_status['checks']['cache'] = f'error: {str(e)}'
-        health_status['status'] = 'degraded'
-        logger.error(f'Cache health check failed: {e}')
-    
+        health_status["checks"]["cache"] = f"error: {str(e)}"
+        health_status["status"] = "degraded"
+        logger.error(f"Cache health check failed: {e}")
+
     # Check disk space
     try:
         import shutil
+
         total, used, free = shutil.disk_usage("/")
         free_percent = (free / total) * 100
-        
+
         if free_percent > 10:
-            health_status['checks']['disk'] = f'ok ({free_percent:.1f}% free)'
+            health_status["checks"]["disk"] = f"ok ({free_percent:.1f}% free)"
         else:
-            health_status['checks']['disk'] = f'warning ({free_percent:.1f}% free)'
-            health_status['status'] = 'degraded'
+            health_status["checks"]["disk"] = f"warning ({free_percent:.1f}% free)"
+            health_status["status"] = "degraded"
     except Exception as e:
-        health_status['checks']['disk'] = f'error: {str(e)}'
-        logger.error(f'Disk health check failed: {e}')
-    
+        health_status["checks"]["disk"] = f"error: {str(e)}"
+        logger.error(f"Disk health check failed: {e}")
+
     # Set HTTP status code
-    status_code = 200 if health_status['status'] == 'healthy' else 503
-    
+    status_code = 200 if health_status["status"] == "healthy" else 503
+
     return JsonResponse(health_status, status=status_code)
 
 
 def ratelimit_error(request, exception=None):
     """Custom view for rate limit errors"""
-    return JsonResponse({
-        'error': 'Too many requests',
-        'detail': 'Juda ko\'p so\'rov yuborildi. Iltimos, bir necha daqiqadan so\'ng qayta urinib ko\'ring.',
-        'retry_after': 60
-    }, status=429)
-
+    return JsonResponse(
+        {
+            "error": "Too many requests",
+            "detail": "Juda ko'p so'rov yuborildi. Iltimos, bir necha daqiqadan so'ng qayta urinib ko'ring.",
+            "retry_after": 60,
+        },
+        status=429,
+    )

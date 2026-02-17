@@ -8,28 +8,54 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0019_company_is_active'),
+        ("frontend", "0019_company_is_active"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='review',
-            name='like_count',
+            model_name="review",
+            name="like_count",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.CreateModel(
-            name='ReviewLike',
+            name="ReviewLike",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='likes', to='frontend.review')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='review_likes', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "review",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="likes",
+                        to="frontend.review",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="review_likes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['review', 'user'], name='frontend_re_review__1c5548_idx')],
-                'unique_together': {('review', 'user')},
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["review", "user"], name="frontend_re_review__1c5548_idx"
+                    )
+                ],
+                "unique_together": {("review", "user")},
             },
         ),
     ]

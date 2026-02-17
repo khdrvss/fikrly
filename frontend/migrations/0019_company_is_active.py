@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0018_category'),
+        ("frontend", "0018_category"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='is_active',
-            field=models.BooleanField(default=True, help_text="Agar o'chirilsa, saytda ko'rinmaydi"),
+            model_name="company",
+            name="is_active",
+            field=models.BooleanField(
+                default=True, help_text="Agar o'chirilsa, saytda ko'rinmaydi"
+            ),
         ),
     ]

@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0022_company_logo'),
+        ("frontend", "0022_company_logo"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='company',
-            name='logo',
-            field=models.ImageField(blank=True, help_text='Kompaniya logotipi (kvadrat shaklda tavsiya etiladi)', null=True, upload_to=frontend.models.company_logo_path),
+            model_name="company",
+            name="logo",
+            field=models.ImageField(
+                blank=True,
+                help_text="Kompaniya logotipi (kvadrat shaklda tavsiya etiladi)",
+                null=True,
+                upload_to=frontend.models.company_logo_path,
+            ),
         ),
     ]

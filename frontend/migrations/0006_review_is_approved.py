@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0005_reviewattachment'),
+        ("frontend", "0005_reviewattachment"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='review',
-            name='is_approved',
+            model_name="review",
+            name="is_approved",
             field=models.BooleanField(db_index=True, default=False),
         ),
     ]

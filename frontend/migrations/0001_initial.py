@@ -8,40 +8,65 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Company',
+            name="Company",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
-                ('category', models.CharField(max_length=100)),
-                ('city', models.CharField(blank=True, max_length=100)),
-                ('description', models.TextField(blank=True)),
-                ('is_verified', models.BooleanField(default=False)),
-                ('rating', models.DecimalField(decimal_places=2, default=0, max_digits=3)),
-                ('review_count', models.PositiveIntegerField(default=0)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
+                ("category", models.CharField(max_length=100)),
+                ("city", models.CharField(blank=True, max_length=100)),
+                ("description", models.TextField(blank=True)),
+                ("is_verified", models.BooleanField(default=False)),
+                (
+                    "rating",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=3),
+                ),
+                ("review_count", models.PositiveIntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
             options={
-                'ordering': ['-review_count', '-rating', 'name'],
+                "ordering": ["-review_count", "-rating", "name"],
             },
         ),
         migrations.CreateModel(
-            name='Review',
+            name="Review",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('user_name', models.CharField(max_length=120)),
-                ('rating', models.PositiveSmallIntegerField()),
-                ('text', models.TextField()),
-                ('verified_purchase', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='frontend.company')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("user_name", models.CharField(max_length=120)),
+                ("rating", models.PositiveSmallIntegerField()),
+                ("text", models.TextField()),
+                ("verified_purchase", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "company",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reviews",
+                        to="frontend.company",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
     ]

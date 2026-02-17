@@ -6,78 +6,104 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0015_company_official_email_domain_company_website_and_more'),
+        ("frontend", "0015_company_official_email_domain_company_website_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='address',
+            model_name="company",
+            name="address",
             field=models.CharField(blank=True, max_length=255),
         ),
         migrations.AddField(
-            model_name='company',
-            name='email_public',
+            model_name="company",
+            name="email_public",
             field=models.EmailField(blank=True, max_length=254),
         ),
         migrations.AddField(
-            model_name='company',
-            name='facebook_url',
+            model_name="company",
+            name="facebook_url",
             field=models.URLField(blank=True),
         ),
         migrations.AddField(
-            model_name='company',
-            name='instagram_url',
+            model_name="company",
+            name="instagram_url",
             field=models.URLField(blank=True),
         ),
         migrations.AddField(
-            model_name='company',
-            name='landmark',
-            field=models.CharField(blank=True, help_text="Mo'ljal (ixtiyoriy)", max_length=255),
+            model_name="company",
+            name="landmark",
+            field=models.CharField(
+                blank=True, help_text="Mo'ljal (ixtiyoriy)", max_length=255
+            ),
         ),
         migrations.AddField(
-            model_name='company',
-            name='lat',
-            field=models.DecimalField(blank=True, decimal_places=6, max_digits=9, null=True),
+            model_name="company",
+            name="lat",
+            field=models.DecimalField(
+                blank=True, decimal_places=6, max_digits=9, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='company',
-            name='like_count',
+            model_name="company",
+            name="like_count",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='company',
-            name='lng',
-            field=models.DecimalField(blank=True, decimal_places=6, max_digits=9, null=True),
+            model_name="company",
+            name="lng",
+            field=models.DecimalField(
+                blank=True, decimal_places=6, max_digits=9, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='company',
-            name='phone_public',
+            model_name="company",
+            name="phone_public",
             field=models.CharField(blank=True, max_length=60),
         ),
         migrations.AddField(
-            model_name='company',
-            name='tax_id',
-            field=models.CharField(blank=True, help_text='INN/СТИР (ixtiyoriy)', max_length=32),
+            model_name="company",
+            name="tax_id",
+            field=models.CharField(
+                blank=True, help_text="INN/СТИР (ixtiyoriy)", max_length=32
+            ),
         ),
         migrations.AddField(
-            model_name='company',
-            name='telegram_url',
+            model_name="company",
+            name="telegram_url",
             field=models.URLField(blank=True),
         ),
         migrations.AddField(
-            model_name='company',
-            name='updated_at',
+            model_name="company",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='company',
-            name='working_hours',
-            field=models.JSONField(blank=True, help_text="Haftalik ish vaqtlari JSON ko'rinishida", null=True),
+            model_name="company",
+            name="working_hours",
+            field=models.JSONField(
+                blank=True,
+                help_text="Haftalik ish vaqtlari JSON ko'rinishida",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='activitylog',
-            name='action',
-            field=models.CharField(choices=[('company_edit', 'Company Edited'), ('approval_requested', 'Review Approval Requested'), ('review_approved', 'Review Approved'), ('owner_responded', 'Owner Responded'), ('review_created', 'Review Created'), ('review_reported', 'Review Reported'), ('company_claim_requested', 'Company Claim Requested'), ('company_claim_verified', 'Company Claim Verified'), ('contact_revealed', 'Contact Revealed'), ('company_liked', 'Company Liked')], max_length=50),
+            model_name="activitylog",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("company_edit", "Company Edited"),
+                    ("approval_requested", "Review Approval Requested"),
+                    ("review_approved", "Review Approved"),
+                    ("owner_responded", "Owner Responded"),
+                    ("review_created", "Review Created"),
+                    ("review_reported", "Review Reported"),
+                    ("company_claim_requested", "Company Claim Requested"),
+                    ("company_claim_verified", "Company Claim Verified"),
+                    ("contact_revealed", "Contact Revealed"),
+                    ("company_liked", "Company Liked"),
+                ],
+                max_length=50,
+            ),
         ),
     ]

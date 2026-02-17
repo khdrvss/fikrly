@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0028_businesscategory_is_featured'),
+        ("frontend", "0028_businesscategory_is_featured"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='view_count',
+            model_name="company",
+            name="view_count",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

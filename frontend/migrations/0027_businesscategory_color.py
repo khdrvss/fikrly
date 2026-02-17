@@ -6,13 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0026_company_category_fk'),
+        ("frontend", "0026_company_category_fk"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='businesscategory',
-            name='color',
-            field=models.CharField(choices=[('red', 'Red'), ('orange', 'Orange'), ('yellow', 'Yellow'), ('green', 'Green'), ('blue', 'Blue'), ('purple', 'Purple'), ('pink', 'Pink'), ('gray', 'Gray')], default='gray', help_text='Kategoriya rangi', max_length=20),
+            model_name="businesscategory",
+            name="color",
+            field=models.CharField(
+                choices=[
+                    ("red", "Red"),
+                    ("orange", "Orange"),
+                    ("yellow", "Yellow"),
+                    ("green", "Green"),
+                    ("blue", "Blue"),
+                    ("purple", "Purple"),
+                    ("pink", "Pink"),
+                    ("gray", "Gray"),
+                ],
+                default="gray",
+                help_text="Kategoriya rangi",
+                max_length=20,
+            ),
         ),
     ]

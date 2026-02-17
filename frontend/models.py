@@ -71,9 +71,15 @@ class Company(models.Model):
     image_url = models.URLField(blank=True)
     image = models.ImageField(upload_to="company_images/", blank=True, null=True)
     # Generated optimized images (WEBP) in multiple sizes
-    image_400 = models.ImageField(upload_to="company_images/variants/", blank=True, null=True)
-    image_800 = models.ImageField(upload_to="company_images/variants/", blank=True, null=True)
-    image_1200 = models.ImageField(upload_to="company_images/variants/", blank=True, null=True)
+    image_400 = models.ImageField(
+        upload_to="company_images/variants/", blank=True, null=True
+    )
+    image_800 = models.ImageField(
+        upload_to="company_images/variants/", blank=True, null=True
+    )
+    image_1200 = models.ImageField(
+        upload_to="company_images/variants/", blank=True, null=True
+    )
     logo = models.ImageField(
         upload_to=company_logo_path,
         blank=True,
@@ -124,23 +130,19 @@ class Company(models.Model):
         on_delete=models.SET_NULL,
     )
     is_verified = models.BooleanField(
-        default=False,
-        help_text=_("Tasdiqlangan biznes (admin tomonidan tekshirilgan)")
+        default=False, help_text=_("Tasdiqlangan biznes (admin tomonidan tekshirilgan)")
     )
     verification_requested_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text=_("Tasdiqlash so'ralgan sana")
+        null=True, blank=True, help_text=_("Tasdiqlash so'ralgan sana")
     )
     verification_document = models.FileField(
-        upload_to='verification_docs/',
+        upload_to="verification_docs/",
         blank=True,
         null=True,
-        help_text=_("Tasdiqlash hujjati (litsenziya, guvohnoma)")
+        help_text=_("Tasdiqlash hujjati (litsenziya, guvohnoma)"),
     )
     verification_notes = models.TextField(
-        blank=True,
-        help_text=_("Admin izoh (tasdiqlash sababi)")
+        blank=True, help_text=_("Admin izoh (tasdiqlash sababi)")
     )
     is_active = models.BooleanField(
         default=True, help_text=_("Agar o'chirilsa, saytda ko'rinmaydi")
@@ -164,11 +166,11 @@ class Company(models.Model):
 
     def image_url_for_size(self, size: int):
         if size == 400 and self.image_400:
-            return getattr(self.image_400, 'url', '')
+            return getattr(self.image_400, "url", "")
         if size == 800 and self.image_800:
-            return getattr(self.image_800, 'url', '')
+            return getattr(self.image_800, "url", "")
         if size == 1200 and self.image_1200:
-            return getattr(self.image_1200, 'url', '')
+            return getattr(self.image_1200, "url", "")
         # fallback to uploaded image or external URL
         return self.display_image_url
 
@@ -188,7 +190,11 @@ class Company(models.Model):
         # If a new image file was uploaded, generate WEBP variants.
         try:
             # detect new upload by checking if `image` has a file-like object
-            new_image = getattr(self, 'image') and hasattr(self.image, 'file') and getattr(self.image.file, 'closed', False) is False
+            new_image = (
+                getattr(self, "image")
+                and hasattr(self.image, "file")
+                and getattr(self.image.file, "closed", False) is False
+            )
         except Exception:
             new_image = False
 
@@ -216,7 +222,9 @@ class Company(models.Model):
 
                 if changed:
                     # Avoid recursion by using update_fields on file fields
-                    super(Company, self).save(update_fields=['image_400', 'image_800', 'image_1200'])
+                    super(Company, self).save(
+                        update_fields=["image_400", "image_800", "image_1200"]
+                    )
             except Exception:
                 # Fail silently — preserve original upload if generation fails
                 pass
@@ -371,25 +379,28 @@ class ReviewReport(models.Model):
 
 class ReviewHelpfulVote(models.Model):
     """Track helpful/not helpful votes on reviews."""
+
     VOTE_CHOICES = [
-        ('helpful', 'Helpful'),
-        ('not_helpful', 'Not Helpful'),
+        ("helpful", "Helpful"),
+        ("not_helpful", "Not Helpful"),
     ]
-    
-    review = models.ForeignKey(Review, related_name='helpful_votes', on_delete=models.CASCADE)
+
+    review = models.ForeignKey(
+        Review, related_name="helpful_votes", on_delete=models.CASCADE
+    )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        related_name='review_helpful_votes', 
-        on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        related_name="review_helpful_votes",
+        on_delete=models.CASCADE,
     )
     vote_type = models.CharField(max_length=15, choices=VOTE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
-        unique_together = ('review', 'user')
-        indexes = [models.Index(fields=['review', 'user'])]
-        ordering = ['-created_at']
-    
+        unique_together = ("review", "user")
+        indexes = [models.Index(fields=["review", "user"])]
+        ordering = ["-created_at"]
+
     def __str__(self):
         return f"{self.user_id} -> Review {self.review_id} ({self.vote_type})"
 
@@ -563,48 +574,49 @@ class Category(models.Model):
 
 class UserGamification(models.Model):
     """Gamification data for users - levels, XP, badges"""
+
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='gamification'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="gamification"
     )
     level = models.PositiveIntegerField(default=1)
     xp = models.PositiveIntegerField(default=0)
     total_reviews = models.PositiveIntegerField(default=0)
     helpful_votes_received = models.PositiveIntegerField(default=0)
     companies_reviewed = models.PositiveIntegerField(default=0)
-    
+
     # Streak tracking
-    current_streak = models.PositiveIntegerField(default=0, help_text="Consecutive days with activity")
+    current_streak = models.PositiveIntegerField(
+        default=0, help_text="Consecutive days with activity"
+    )
     longest_streak = models.PositiveIntegerField(default=0)
     last_activity_date = models.DateField(null=True, blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = "User Gamification"
         verbose_name_plural = "User Gamifications"
-        
+
     def __str__(self):
         return f"{self.user.username} - Level {self.level}"
-    
+
     @property
     def next_level_xp(self):
         """Calculate XP needed for next level"""
         return self.level * 100  # 100 XP per level
-    
+
     @property
     def xp_progress(self):
         """Calculate progress to next level (0-100)"""
         current_level_xp = (self.level - 1) * 100
         xp_in_level = self.xp - current_level_xp
         return min(100, (xp_in_level / 100) * 100)
-    
+
     def add_xp(self, amount, reason=""):
         """Add XP and level up if needed"""
         self.xp += amount
-        
+
         # Check for level up
         while self.xp >= self.next_level_xp:
             self.level += 1
@@ -612,25 +624,25 @@ class UserGamification(models.Model):
             if self.level in [5, 10, 25, 50, 100]:
                 Badge.objects.get_or_create(
                     user=self.user,
-                    badge_type=f'level_{self.level}',
+                    badge_type=f"level_{self.level}",
                     defaults={
-                        'name': f'Level {self.level} Master',
-                        'description': f'Reached level {self.level}',
-                        'icon': '🎯'
-                    }
+                        "name": f"Level {self.level} Master",
+                        "description": f"Reached level {self.level}",
+                        "icon": "🎯",
+                    },
                 )
-        
+
         self.save()
-    
+
     def update_streak(self):
         """Update activity streak"""
         from datetime import date, timedelta
-        
+
         today = date.today()
-        
+
         if self.last_activity_date:
             days_diff = (today - self.last_activity_date).days
-            
+
             if days_diff == 1:
                 # Consecutive day
                 self.current_streak += 1
@@ -642,80 +654,81 @@ class UserGamification(models.Model):
             # Same day - no change
         else:
             self.current_streak = 1
-        
+
         self.last_activity_date = today
         self.save()
 
 
 class Badge(models.Model):
     """Achievement badges for users"""
+
     BADGE_TYPES = [
-        ('first_review', 'First Review'),
-        ('helpful_10', '10 Helpful Votes'),
-        ('helpful_50', '50 Helpful Votes'),
-        ('helpful_100', '100 Helpful Votes'),
-        ('reviews_10', '10 Reviews'),
-        ('reviews_50', '50 Reviews'),
-        ('reviews_100', '100 Reviews'),
-        ('streak_7', '7 Day Streak'),
-        ('streak_30', '30 Day Streak'),
-        ('level_5', 'Level 5'),
-        ('level_10', 'Level 10'),
-        ('level_25', 'Level 25'),
-        ('verified', 'Verified Reviewer'),
-        ('expert', 'Category Expert'),
+        ("first_review", "First Review"),
+        ("helpful_10", "10 Helpful Votes"),
+        ("helpful_50", "50 Helpful Votes"),
+        ("helpful_100", "100 Helpful Votes"),
+        ("reviews_10", "10 Reviews"),
+        ("reviews_50", "50 Reviews"),
+        ("reviews_100", "100 Reviews"),
+        ("streak_7", "7 Day Streak"),
+        ("streak_30", "30 Day Streak"),
+        ("level_5", "Level 5"),
+        ("level_10", "Level 10"),
+        ("level_25", "Level 25"),
+        ("verified", "Verified Reviewer"),
+        ("expert", "Category Expert"),
     ]
-    
+
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='badges'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="badges"
     )
     badge_type = models.CharField(max_length=50, choices=BADGE_TYPES)
     name = models.CharField(max_length=100)
     description = models.TextField()
-    icon = models.CharField(max_length=10, default='🏆')
+    icon = models.CharField(max_length=10, default="🏆")
     earned_at = models.DateTimeField(auto_now_add=True)
     is_new = models.BooleanField(default=True, help_text="Show as new notification")
-    
+
     class Meta:
-        unique_together = ['user', 'badge_type']
-        ordering = ['-earned_at']
+        unique_together = ["user", "badge_type"]
+        ordering = ["-earned_at"]
         verbose_name = "Badge"
         verbose_name_plural = "Badges"
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.name}"
 
 
 class TwoFactorAuth(models.Model):
     """Two-factor authentication settings for users"""
+
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='two_factor'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="two_factor"
     )
     is_enabled = models.BooleanField(default=False)
     secret_key = models.CharField(max_length=32, blank=True)
     backup_codes = models.JSONField(default=list, help_text="List of backup codes")
     last_used = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = "Two-Factor Authentication"
         verbose_name_plural = "Two-Factor Authentications"
-    
+
     def __str__(self):
-        return f"{self.user.username} - 2FA {'Enabled' if self.is_enabled else 'Disabled'}"
-    
+        return (
+            f"{self.user.username} - 2FA {'Enabled' if self.is_enabled else 'Disabled'}"
+        )
+
     def generate_backup_codes(self, count=10):
         """Generate backup codes"""
         import secrets
+
         codes = [secrets.token_hex(4).upper() for _ in range(count)]
         self.backup_codes = codes
         self.save()
         return codes
-    
+
     def use_backup_code(self, code):
         """Use a backup code (one-time use)"""
         if code in self.backup_codes:
@@ -727,48 +740,44 @@ class TwoFactorAuth(models.Model):
 
 class ReviewImage(models.Model):
     """Images attached to reviews"""
+
     review = models.ForeignKey(
-        'Review',
-        on_delete=models.CASCADE,
-        related_name='images'
+        "Review", on_delete=models.CASCADE, related_name="images"
     )
     image = models.ImageField(
-        upload_to='review_images/',
-        help_text="Review image (will be compressed automatically)"
+        upload_to="review_images/",
+        help_text="Review image (will be compressed automatically)",
     )
     caption = models.CharField(max_length=200, blank=True)
     order = models.PositiveIntegerField(default=0)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
-        ordering = ['order', 'uploaded_at']
+        ordering = ["order", "uploaded_at"]
         verbose_name = "Review Image"
         verbose_name_plural = "Review Images"
-    
+
     def __str__(self):
         return f"Image for review {self.review.id}"
 
 
 class ReviewFlag(models.Model):
     """Flagged reviews for moderation"""
+
     FLAG_REASONS = [
-        ('spam', 'Spam'),
-        ('fake', 'Fake Review'),
-        ('inappropriate', 'Inappropriate Content'),
-        ('offensive', 'Offensive Language'),
-        ('duplicate', 'Duplicate Review'),
-        ('other', 'Other'),
+        ("spam", "Spam"),
+        ("fake", "Fake Review"),
+        ("inappropriate", "Inappropriate Content"),
+        ("offensive", "Offensive Language"),
+        ("duplicate", "Duplicate Review"),
+        ("other", "Other"),
     ]
-    
-    review = models.ForeignKey(
-        'Review',
-        on_delete=models.CASCADE,
-        related_name='flags'
-    )
+
+    review = models.ForeignKey("Review", on_delete=models.CASCADE, related_name="flags")
     flagged_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='flagged_reviews'
+        related_name="flagged_reviews",
     )
     reason = models.CharField(max_length=20, choices=FLAG_REASONS)
     description = models.TextField(blank=True)
@@ -778,66 +787,62 @@ class ReviewFlag(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='resolved_flags'
+        related_name="resolved_flags",
     )
     resolved_at = models.DateTimeField(null=True, blank=True)
     action_taken = models.CharField(
         max_length=100,
         blank=True,
-        help_text="What action was taken (deleted, approved, warned)"
+        help_text="What action was taken (deleted, approved, warned)",
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         verbose_name = "Review Flag"
         verbose_name_plural = "Review Flags"
-    
+
     def __str__(self):
         return f"Flag: {self.review.id} - {self.reason}"
 
 
 class DataExport(models.Model):
     """Track data export requests"""
+
     EXPORT_TYPES = [
-        ('reviews_pdf', 'Reviews PDF'),
-        ('reviews_excel', 'Reviews Excel'),
-        ('user_data', 'User Data (GDPR)'),
-        ('business_data', 'Business Data'),
+        ("reviews_pdf", "Reviews PDF"),
+        ("reviews_excel", "Reviews Excel"),
+        ("user_data", "User Data (GDPR)"),
+        ("business_data", "Business Data"),
     ]
-    
+
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('processing', 'Processing'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed'),
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
     ]
-    
+
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='data_exports'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="data_exports"
     )
     export_type = models.CharField(max_length=20, choices=EXPORT_TYPES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    file = models.FileField(upload_to='exports/', blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    file = models.FileField(upload_to="exports/", blank=True, null=True)
     filters = models.JSONField(
-        default=dict,
-        help_text="Export filters (company_id, date_range, etc.)"
+        default=dict, help_text="Export filters (company_id, date_range, etc.)"
     )
     error_message = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     expires_at = models.DateTimeField(
-        null=True,
-        blank=True,
-        help_text="File auto-deletes after this date (7 days)"
+        null=True, blank=True, help_text="File auto-deletes after this date (7 days)"
     )
-    
+
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         verbose_name = "Data Export"
         verbose_name_plural = "Data Exports"
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.export_type} - {self.status}"

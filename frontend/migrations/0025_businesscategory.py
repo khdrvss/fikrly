@@ -6,22 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0024_company_description_ru'),
+        ("frontend", "0024_company_description_ru"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='BusinessCategory',
+            name="BusinessCategory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('name_ru', models.CharField(blank=True, max_length=100, verbose_name='Nom (Rus tilida)')),
-                ('slug', models.SlugField(max_length=100, unique=True)),
-                ('icon_svg', models.TextField(blank=True, help_text='SVG path content')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, unique=True)),
+                (
+                    "name_ru",
+                    models.CharField(
+                        blank=True, max_length=100, verbose_name="Nom (Rus tilida)"
+                    ),
+                ),
+                ("slug", models.SlugField(max_length=100, unique=True)),
+                (
+                    "icon_svg",
+                    models.TextField(blank=True, help_text="SVG path content"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Business Categories',
-                'ordering': ['name'],
+                "verbose_name_plural": "Business Categories",
+                "ordering": ["name"],
             },
         ),
     ]

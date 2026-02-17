@@ -1,9 +1,10 @@
 from django.db import migrations
 from django.utils.text import slugify
 
+
 def rename_category(apps, schema_editor):
-    BusinessCategory = apps.get_model('frontend', 'BusinessCategory')
-    Company = apps.get_model('frontend', 'Company')
+    BusinessCategory = apps.get_model("frontend", "BusinessCategory")
+    Company = apps.get_model("frontend", "Company")
 
     # Update BusinessCategory
     try:
@@ -15,11 +16,14 @@ def rename_category(apps, schema_editor):
         pass
 
     # Update Company strings (if any still rely on the string field)
-    Company.objects.filter(category="Avtomobilsozlik").update(category="Avto kompaniyalar")
+    Company.objects.filter(category="Avtomobilsozlik").update(
+        category="Avto kompaniyalar"
+    )
+
 
 def reverse_rename(apps, schema_editor):
-    BusinessCategory = apps.get_model('frontend', 'BusinessCategory')
-    Company = apps.get_model('frontend', 'Company')
+    BusinessCategory = apps.get_model("frontend", "BusinessCategory")
+    Company = apps.get_model("frontend", "Company")
 
     try:
         cat = BusinessCategory.objects.get(name="Avto kompaniyalar")
@@ -29,12 +33,15 @@ def reverse_rename(apps, schema_editor):
     except BusinessCategory.DoesNotExist:
         pass
 
-    Company.objects.filter(category="Avto kompaniyalar").update(category="Avtomobilsozlik")
+    Company.objects.filter(category="Avto kompaniyalar").update(
+        category="Avtomobilsozlik"
+    )
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0033_alter_activitylog_action_and_more'),
+        ("frontend", "0033_alter_activitylog_action_and_more"),
     ]
 
     operations = [

@@ -4,7 +4,17 @@ from django.contrib.auth import get_user_model
 from allauth.account.signals import user_signed_up
 from django.contrib.auth.signals import user_logged_in
 from django.utils import timezone
-from .models import UserProfile, Review, ReviewReport, ActivityLog, Company, UserGamification, Badge, ReviewHelpfulVote, ReviewImage
+from .models import (
+    UserProfile,
+    Review,
+    ReviewReport,
+    ActivityLog,
+    Company,
+    UserGamification,
+    Badge,
+    ReviewHelpfulVote,
+    ReviewImage,
+)
 from .utils import send_telegram_message
 
 User = get_user_model()
@@ -140,29 +150,41 @@ def optimize_company_images(sender, instance, **kwargs):
         # New company - optimize images if uploaded
         if instance.image:
             from .image_optimization import optimize_image
-            optimized = optimize_image(instance.image, max_width=1200, max_height=800, quality=85)
+
+            optimized = optimize_image(
+                instance.image, max_width=1200, max_height=800, quality=85
+            )
             if optimized:
                 instance.image = optimized
-        
+
         if instance.logo:
             from .image_optimization import optimize_image
-            optimized = optimize_image(instance.logo, max_width=400, max_height=400, quality=90)
+
+            optimized = optimize_image(
+                instance.logo, max_width=400, max_height=400, quality=90
+            )
             if optimized:
                 instance.logo = optimized
     else:
         # Existing company - only optimize if image changed
         try:
             old_instance = Company.objects.get(pk=instance.pk)
-            
+
             if instance.image and old_instance.image != instance.image:
                 from .image_optimization import optimize_image
-                optimized = optimize_image(instance.image, max_width=1200, max_height=800, quality=85)
+
+                optimized = optimize_image(
+                    instance.image, max_width=1200, max_height=800, quality=85
+                )
                 if optimized:
                     instance.image = optimized
-            
+
             if instance.logo and old_instance.logo != instance.logo:
                 from .image_optimization import optimize_image
-                optimized = optimize_image(instance.logo, max_width=400, max_height=400, quality=90)
+
+                optimized = optimize_image(
+                    instance.logo, max_width=400, max_height=400, quality=90
+                )
                 if optimized:
                     instance.logo = optimized
         except Company.DoesNotExist:
@@ -180,12 +202,18 @@ def optimize_avatar(sender, instance, **kwargs):
                 old_instance = UserProfile.objects.get(pk=instance.pk)
                 if old_instance.avatar != instance.avatar:
                     from .image_optimization import optimize_image
-                    optimized = optimize_image(instance.avatar, max_width=400, max_height=400, quality=90)
+
+                    optimized = optimize_image(
+                        instance.avatar, max_width=400, max_height=400, quality=90
+                    )
                     if optimized:
                         instance.avatar = optimized
             else:
                 from .image_optimization import optimize_image
-                optimized = optimize_image(instance.avatar, max_width=400, max_height=400, quality=90)
+
+                optimized = optimize_image(
+                    instance.avatar, max_width=400, max_height=400, quality=90
+                )
                 if optimized:
                     instance.avatar = optimized
         except UserProfile.DoesNotExist:
@@ -195,6 +223,7 @@ def optimize_avatar(sender, instance, **kwargs):
 # ============================================
 # GAMIFICATION SIGNALS
 # ============================================
+
 
 @receiver(post_save, sender=User)
 def create_gamification_profile(sender, instance, created, **kwargs):
@@ -208,63 +237,65 @@ def update_gamification_on_review(sender, instance, created, **kwargs):
     """Update user's gamification stats when they post a review"""
     if not instance.user or kwargs.get("raw", False):
         return
-    
+
     gamification, _ = UserGamification.objects.get_or_create(user=instance.user)
-    
+
     if created and instance.is_approved:
         # New approved review
         gamification.total_reviews += 1
         gamification.add_xp(10, "Review posted")
         gamification.update_streak()
-        
+
         # Check for unique companies reviewed
-        unique_companies = Review.objects.filter(
-            user=instance.user,
-            is_approved=True
-        ).values('company').distinct().count()
+        unique_companies = (
+            Review.objects.filter(user=instance.user, is_approved=True)
+            .values("company")
+            .distinct()
+            .count()
+        )
         gamification.companies_reviewed = unique_companies
         gamification.save()
-        
+
         # Award badges
         if gamification.total_reviews == 1:
             Badge.objects.get_or_create(
                 user=instance.user,
-                badge_type='first_review',
+                badge_type="first_review",
                 defaults={
-                    'name': 'Birinchi sharh',
-                    'description': 'Birinchi sharhingizni yozdingiz!',
-                    'icon': '🎉'
-                }
+                    "name": "Birinchi sharh",
+                    "description": "Birinchi sharhingizni yozdingiz!",
+                    "icon": "🎉",
+                },
             )
         elif gamification.total_reviews == 10:
             Badge.objects.get_or_create(
                 user=instance.user,
-                badge_type='reviews_10',
+                badge_type="reviews_10",
                 defaults={
-                    'name': '10 sharh',
-                    'description': '10 ta sharh yozdingiz',
-                    'icon': '📝'
-                }
+                    "name": "10 sharh",
+                    "description": "10 ta sharh yozdingiz",
+                    "icon": "📝",
+                },
             )
         elif gamification.total_reviews == 50:
             Badge.objects.get_or_create(
                 user=instance.user,
-                badge_type='reviews_50',
+                badge_type="reviews_50",
                 defaults={
-                    'name': '50 sharh',
-                    'description': '50 ta sharh yozdingiz',
-                    'icon': '✍️'
-                }
+                    "name": "50 sharh",
+                    "description": "50 ta sharh yozdingiz",
+                    "icon": "✍️",
+                },
             )
         elif gamification.total_reviews == 100:
             Badge.objects.get_or_create(
                 user=instance.user,
-                badge_type='reviews_100',
+                badge_type="reviews_100",
                 defaults={
-                    'name': '100 sharh',
-                    'description': '100 ta sharh yozdingiz!',
-                    'icon': '🏆'
-                }
+                    "name": "100 sharh",
+                    "description": "100 ta sharh yozdingiz!",
+                    "icon": "🏆",
+                },
             )
 
 
@@ -273,52 +304,51 @@ def update_gamification_on_helpful_vote(sender, instance, created, **kwargs):
     """Update review author's gamification when their review gets helpful votes"""
     if not created or kwargs.get("raw", False) or not instance.review.user:
         return
-    
+
     review = instance.review
     gamification, _ = UserGamification.objects.get_or_create(user=review.user)
-    
+
     # Update helpful votes count
     total_helpful = ReviewHelpfulVote.objects.filter(
-        review__user=review.user,
-        is_helpful=True
+        review__user=review.user, is_helpful=True
     ).count()
     gamification.helpful_votes_received = total_helpful
     gamification.save()
-    
+
     # Add XP for helpful vote
     if instance.is_helpful:
         gamification.add_xp(2, "Helpful vote received")
-    
+
     # Award helpful badges
     if total_helpful == 10:
         Badge.objects.get_or_create(
             user=review.user,
-            badge_type='helpful_10',
+            badge_type="helpful_10",
             defaults={
-                'name': '10 foydali ovoz',
-                'description': 'Sharhlaringiz 10 ta foydali ovoz oldi',
-                'icon': '👍'
-            }
+                "name": "10 foydali ovoz",
+                "description": "Sharhlaringiz 10 ta foydali ovoz oldi",
+                "icon": "👍",
+            },
         )
     elif total_helpful == 50:
         Badge.objects.get_or_create(
             user=review.user,
-            badge_type='helpful_50',
+            badge_type="helpful_50",
             defaults={
-                'name': '50 foydali ovoz',
-                'description': 'Sharhlaringiz 50 ta foydali ovoz oldi',
-                'icon': '🌟'
-            }
+                "name": "50 foydali ovoz",
+                "description": "Sharhlaringiz 50 ta foydali ovoz oldi",
+                "icon": "🌟",
+            },
         )
     elif total_helpful == 100:
         Badge.objects.get_or_create(
             user=review.user,
-            badge_type='helpful_100',
+            badge_type="helpful_100",
             defaults={
-                'name': '100 foydali ovoz',
-                'description': 'Sharhlaringiz 100 ta foydali ovoz oldi!',
-                'icon': '💎'
-            }
+                "name": "100 foydali ovoz",
+                "description": "Sharhlaringiz 100 ta foydali ovoz oldi!",
+                "icon": "💎",
+            },
         )
 
 
@@ -331,12 +361,18 @@ def optimize_review_image(sender, instance, **kwargs):
                 old_instance = ReviewImage.objects.get(pk=instance.pk)
                 if old_instance.image != instance.image:
                     from .image_optimization import optimize_image
-                    optimized = optimize_image(instance.image, max_width=1200, max_height=900, quality=85)
+
+                    optimized = optimize_image(
+                        instance.image, max_width=1200, max_height=900, quality=85
+                    )
                     if optimized:
                         instance.image = optimized
             else:
                 from .image_optimization import optimize_image
-                optimized = optimize_image(instance.image, max_width=1200, max_height=900, quality=85)
+
+                optimized = optimize_image(
+                    instance.image, max_width=1200, max_height=900, quality=85
+                )
                 if optimized:
                     instance.image = optimized
         except ReviewImage.DoesNotExist:

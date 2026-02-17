@@ -8,24 +8,71 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0010_activitylog'),
+        ("frontend", "0010_activitylog"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ReviewReport',
+            name="ReviewReport",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('reason', models.CharField(choices=[('spam', 'Spam yoki firibgarlik'), ('abuse', 'Qo‘pol so‘zlar / haqoratomuz'), ('false', 'Noto‘g‘ri maʼlumot'), ('pii', 'Shaxsiy maʼlumot oshkor etilgan'), ('other', 'Boshqa')], max_length=20)),
-                ('details', models.TextField(blank=True)),
-                ('status', models.CharField(choices=[('open', 'Kutilmoqda'), ('resolved', 'Hal qilindi'), ('rejected', 'Rad etildi')], db_index=True, default='open', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('reporter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reports', to='frontend.review')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "reason",
+                    models.CharField(
+                        choices=[
+                            ("spam", "Spam yoki firibgarlik"),
+                            ("abuse", "Qo‘pol so‘zlar / haqoratomuz"),
+                            ("false", "Noto‘g‘ri maʼlumot"),
+                            ("pii", "Shaxsiy maʼlumot oshkor etilgan"),
+                            ("other", "Boshqa"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("details", models.TextField(blank=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("open", "Kutilmoqda"),
+                            ("resolved", "Hal qilindi"),
+                            ("rejected", "Rad etildi"),
+                        ],
+                        db_index=True,
+                        default="open",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "reporter",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "review",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reports",
+                        to="frontend.review",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
     ]

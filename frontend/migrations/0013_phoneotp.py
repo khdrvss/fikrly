@@ -6,23 +6,36 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0012_review_owner_response_at_review_owner_response_text'),
+        ("frontend", "0012_review_owner_response_at_review_owner_response_text"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PhoneOTP',
+            name="PhoneOTP",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('phone', models.CharField(db_index=True, max_length=20)),
-                ('code', models.CharField(max_length=6)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('attempts', models.PositiveIntegerField(default=0)),
-                ('is_used', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("phone", models.CharField(db_index=True, max_length=20)),
+                ("code", models.CharField(max_length=6)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("attempts", models.PositiveIntegerField(default=0)),
+                ("is_used", models.BooleanField(default=False)),
             ],
             options={
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['phone', 'created_at'], name='frontend_ph_phone_b62f9c_idx')],
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["phone", "created_at"],
+                        name="frontend_ph_phone_b62f9c_idx",
+                    )
+                ],
             },
         ),
     ]

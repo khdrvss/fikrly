@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0008_company_library_image_path'),
+        ("frontend", "0008_company_library_image_path"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='review',
-            name='approval_requested',
+            model_name="review",
+            name="approval_requested",
             field=models.BooleanField(db_index=True, default=False),
         ),
     ]

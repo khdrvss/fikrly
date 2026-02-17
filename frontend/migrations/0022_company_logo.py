@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0021_alter_review_verified_purchase'),
+        ("frontend", "0021_alter_review_verified_purchase"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='logo',
-            field=models.ImageField(blank=True, help_text='Kompaniya logotipi (kvadrat shaklda tavsiya etiladi)', null=True, upload_to='company_logos/'),
+            model_name="company",
+            name="logo",
+            field=models.ImageField(
+                blank=True,
+                help_text="Kompaniya logotipi (kvadrat shaklda tavsiya etiladi)",
+                null=True,
+                upload_to="company_logos/",
+            ),
         ),
     ]

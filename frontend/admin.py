@@ -179,7 +179,13 @@ class CompanyAdmin(admin.ModelAdmin):
     list_filter = ("category_fk", "city", "is_verified", "is_active")
     search_fields = ("name", "city", "category_fk__name", "tax_id")
     readonly_fields = ("image_preview",)
-    actions = ["approve_verification", "reject_verification", "toggle_verified", "email_managers", "export_to_csv"]
+    actions = [
+        "approve_verification",
+        "reject_verification",
+        "toggle_verified",
+        "email_managers",
+        "export_to_csv",
+    ]
     fieldsets = (
         (
             "Asosiy ma'lumot",
@@ -244,7 +250,12 @@ class CompanyAdmin(admin.ModelAdmin):
         ),
     )
     inlines = [CompanyActivityLogInline]
-    actions = ["toggle_visibility", "toggle_verified", "approve_verification", "reject_verification"]
+    actions = [
+        "toggle_visibility",
+        "toggle_verified",
+        "approve_verification",
+        "reject_verification",
+    ]
 
     def toggle_visibility(self, request, queryset):
         for company in queryset:
@@ -261,29 +272,37 @@ class CompanyAdmin(admin.ModelAdmin):
     def approve_verification(self, request, queryset):
         """Bulk approve business verification"""
         from django.utils import timezone
+
         count = 0
         for company in queryset.filter(is_verified=False):
             if company.verification_document:
                 company.is_verified = True
-                company.verification_notes = f'Tasdiqlangan - {timezone.now().strftime("%Y-%m-%d %H:%M")}'
+                company.verification_notes = (
+                    f'Tasdiqlangan - {timezone.now().strftime("%Y-%m-%d %H:%M")}'
+                )
                 company.save()
                 count += 1
-        self.message_user(request, f'{count} ta biznes tasdiqlandi')
-    approve_verification.short_description = 'Biznes tasdiqlamasini tasdiqlash'
+        self.message_user(request, f"{count} ta biznes tasdiqlandi")
+
+    approve_verification.short_description = "Biznes tasdiqlamasini tasdiqlash"
 
     def reject_verification(self, request, queryset):
         """Bulk reject business verification"""
         from django.utils import timezone
+
         count = 0
         for company in queryset.filter(is_verified=False):
             if company.verification_requested_at:
                 company.verification_document = None
                 company.verification_requested_at = None
-                company.verification_notes = f'Rad etilgan - {timezone.now().strftime("%Y-%m-%d %H:%M")}'
+                company.verification_notes = (
+                    f'Rad etilgan - {timezone.now().strftime("%Y-%m-%d %H:%M")}'
+                )
                 company.save()
                 count += 1
-        self.message_user(request, f'{count} ta so\'rov rad etildi')
-    reject_verification.short_description = 'Biznes tasdiqlamasini rad etish'
+        self.message_user(request, f"{count} ta so'rov rad etildi")
+
+    reject_verification.short_description = "Biznes tasdiqlamasini rad etish"
 
     def toggle_verified(self, request, queryset):
         for company in queryset:
@@ -301,54 +320,77 @@ class CompanyAdmin(admin.ModelAdmin):
         """Bulk action to email all managers of selected companies"""
         from django.core.mail import send_mail
         from django.conf import settings
-        
-        managers = queryset.exclude(manager__isnull=True).values_list('manager__email', flat=True).distinct()
+
+        managers = (
+            queryset.exclude(manager__isnull=True)
+            .values_list("manager__email", flat=True)
+            .distinct()
+        )
         managers = [email for email in managers if email]
-        
+
         if not managers:
-            self.message_user(request, 'Tanlangan bizneslarda email manzili bo\'lgan menejerlar yo\'q', level='warning')
+            self.message_user(
+                request,
+                "Tanlangan bizneslarda email manzili bo'lgan menejerlar yo'q",
+                level="warning",
+            )
             return
-        
+
         try:
             send_mail(
-                subject='Fikrly - Muhim xabar',
-                message='Hurmatli biznes menedjer,\n\nBu Fikrly platformasi tomonidan yuborilgan xabar.\n\nHurmat bilan,\nFikrly jamoasi',
+                subject="Fikrly - Muhim xabar",
+                message="Hurmatli biznes menedjer,\n\nBu Fikrly platformasi tomonidan yuborilgan xabar.\n\nHurmat bilan,\nFikrly jamoasi",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=managers,
                 fail_silently=False,
             )
-            self.message_user(request, f'{len(managers)} ta menejerga email yuborildi')
+            self.message_user(request, f"{len(managers)} ta menejerga email yuborildi")
         except Exception as e:
-            self.message_user(request, f'Email yuborishda xatolik: {e}', level='error')
-    
-    email_managers.short_description = 'Tanlangan bizneslar menejerlariga email yuborish'
+            self.message_user(request, f"Email yuborishda xatolik: {e}", level="error")
+
+    email_managers.short_description = (
+        "Tanlangan bizneslar menejerlariga email yuborish"
+    )
 
     def export_to_csv(self, request, queryset):
         """Bulk action to export companies to CSV"""
         import csv
         from django.http import HttpResponse
-        
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="companies.csv"'
-        
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="companies.csv"'
+
         writer = csv.writer(response)
-        writer.writerow(['ID', 'Name', 'Category', 'City', 'Rating', 'Reviews', 'Verified', 'Active'])
-        
+        writer.writerow(
+            [
+                "ID",
+                "Name",
+                "Category",
+                "City",
+                "Rating",
+                "Reviews",
+                "Verified",
+                "Active",
+            ]
+        )
+
         for company in queryset:
-            writer.writerow([
-                company.id,
-                company.name,
-                company.category_fk.name if company.category_fk else '',
-                company.city,
-                company.rating or 0,
-                company.review_count or 0,
-                'Ha' if company.is_verified else 'Yo\'q',
-                'Faol' if company.is_active else 'Nofaol',
-            ])
-        
+            writer.writerow(
+                [
+                    company.id,
+                    company.name,
+                    company.category_fk.name if company.category_fk else "",
+                    company.city,
+                    company.rating or 0,
+                    company.review_count or 0,
+                    "Ha" if company.is_verified else "Yo'q",
+                    "Faol" if company.is_active else "Nofaol",
+                ]
+            )
+
         return response
-    
-    export_to_csv.short_description = 'Tanlangan bizneslarni CSV ga export qilish'
+
+    export_to_csv.short_description = "Tanlangan bizneslarni CSV ga export qilish"
 
     def image_preview(self, obj):
         from django.utils.html import format_html
@@ -391,7 +433,12 @@ class ReviewAdmin(admin.ModelAdmin):
     )
     list_filter = ("is_approved", "rating", "verified_purchase", "company")
     search_fields = ("company__name", "user_name", "text")
-    actions = ["approve_reviews", "toggle_verified_purchase", "bulk_reject_reviews", "export_reviews_csv"]
+    actions = [
+        "approve_reviews",
+        "toggle_verified_purchase",
+        "bulk_reject_reviews",
+        "export_reviews_csv",
+    ]
     inlines = [ReviewActivityLogInline]
     readonly_fields = ("receipt_preview",)
 
@@ -436,51 +483,68 @@ class ReviewAdmin(admin.ModelAdmin):
         self.message_user(request, f"{updated} ta sharh tasdiqlandi.")
 
     approve_reviews.short_description = "Tanlangan sharhlarni tasdiqlash"
+
     def bulk_reject_reviews(self, request, queryset):
         """Bulk reject/unapprove reviews"""
         company_ids = list(queryset.values_list("company_id", flat=True).distinct())
         updated = queryset.update(is_approved=False)
-        
+
         # Recalculate stats
         from .models import Company
         from django.db.models import Avg, Count
+
         for company_id in company_ids:
             company = Company.objects.get(pk=company_id)
             approved_reviews = Review.objects.filter(company=company, is_approved=True)
             company.rating = approved_reviews.aggregate(Avg("rating"))["rating__avg"]
             company.review_count = approved_reviews.count()
             company.save(update_fields=["rating", "review_count"])
-        
+
         self.message_user(request, f"{updated} sharh rad etildi (is_approved=False).")
-    
+
     bulk_reject_reviews.short_description = "Tanlangan sharhlarni rad etish"
 
     def export_reviews_csv(self, request, queryset):
         """Export reviews to CSV"""
         import csv
         from django.http import HttpResponse
-        
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="reviews.csv"'
-        
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="reviews.csv"'
+
         writer = csv.writer(response)
-        writer.writerow(['ID', 'Company', 'User', 'Rating', 'Text', 'Approved', 'Verified Purchase', 'Created'])
-        
+        writer.writerow(
+            [
+                "ID",
+                "Company",
+                "User",
+                "Rating",
+                "Text",
+                "Approved",
+                "Verified Purchase",
+                "Created",
+            ]
+        )
+
         for review in queryset:
-            writer.writerow([
-                review.id,
-                review.company.name,
-                review.user_name or (review.author.username if review.author else ''),
-                review.rating,
-                review.text[:100],  # Truncate long text
-                'Ha' if review.is_approved else 'Yo\'q',
-                'Ha' if review.verified_purchase else 'Yo\'q',
-                review.created_at.strftime('%Y-%m-%d %H:%M'),
-            ])
-        
+            writer.writerow(
+                [
+                    review.id,
+                    review.company.name,
+                    review.user_name
+                    or (review.author.username if review.author else ""),
+                    review.rating,
+                    review.text[:100],  # Truncate long text
+                    "Ha" if review.is_approved else "Yo'q",
+                    "Ha" if review.verified_purchase else "Yo'q",
+                    review.created_at.strftime("%Y-%m-%d %H:%M"),
+                ]
+            )
+
         return response
-    
-    export_reviews_csv.short_description = 'Tanlangan sharhlarni CSV ga export qilish'
+
+    export_reviews_csv.short_description = "Tanlangan sharhlarni CSV ga export qilish"
+
 
 # Ensure the built-in User model is visible/customized in the admin pane
 User = get_user_model()
@@ -746,79 +810,105 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(UserGamification)
 class UserGamificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'level', 'xp', 'total_reviews', 'helpful_votes_received', 'current_streak')
-    list_filter = ('level', 'current_streak')
-    search_fields = ('user__username', 'user__email')
-    readonly_fields = ('created_at', 'updated_at', 'next_level_xp', 'xp_progress')
-    
+    list_display = (
+        "user",
+        "level",
+        "xp",
+        "total_reviews",
+        "helpful_votes_received",
+        "current_streak",
+    )
+    list_filter = ("level", "current_streak")
+    search_fields = ("user__username", "user__email")
+    readonly_fields = ("created_at", "updated_at", "next_level_xp", "xp_progress")
+
     fieldsets = (
-        ('User', {'fields': ('user',)}),
-        ('Progress', {'fields': ('level', 'xp', 'next_level_xp', 'xp_progress')}),
-        ('Statistics', {'fields': ('total_reviews', 'helpful_votes_received', 'companies_reviewed')}),
-        ('Streak', {'fields': ('current_streak', 'longest_streak', 'last_activity_date')}),
-        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+        ("User", {"fields": ("user",)}),
+        ("Progress", {"fields": ("level", "xp", "next_level_xp", "xp_progress")}),
+        (
+            "Statistics",
+            {
+                "fields": (
+                    "total_reviews",
+                    "helpful_votes_received",
+                    "companies_reviewed",
+                )
+            },
+        ),
+        (
+            "Streak",
+            {"fields": ("current_streak", "longest_streak", "last_activity_date")},
+        ),
+        ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 
 
 @admin.register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'name', 'badge_type', 'icon', 'earned_at', 'is_new')
-    list_filter = ('badge_type', 'is_new', 'earned_at')
-    search_fields = ('user__username', 'name', 'description')
-    readonly_fields = ('earned_at',)
-    
+    list_display = ("user", "name", "badge_type", "icon", "earned_at", "is_new")
+    list_filter = ("badge_type", "is_new", "earned_at")
+    search_fields = ("user__username", "name", "description")
+    readonly_fields = ("earned_at",)
+
     fieldsets = (
-        ('Badge Info', {'fields': ('user', 'badge_type', 'name', 'description', 'icon')}),
-        ('Status', {'fields': ('is_new', 'earned_at')}),
+        (
+            "Badge Info",
+            {"fields": ("user", "badge_type", "name", "description", "icon")},
+        ),
+        ("Status", {"fields": ("is_new", "earned_at")}),
     )
 
 
 @admin.register(TwoFactorAuth)
 class TwoFactorAuthAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_enabled', 'last_used', 'created_at')
-    list_filter = ('is_enabled', 'last_used')
-    search_fields = ('user__username', 'user__email')
-    readonly_fields = ('created_at', 'secret_key')
-    
+    list_display = ("user", "is_enabled", "last_used", "created_at")
+    list_filter = ("is_enabled", "last_used")
+    search_fields = ("user__username", "user__email")
+    readonly_fields = ("created_at", "secret_key")
+
     fieldsets = (
-        ('User', {'fields': ('user',)}),
-        ('Settings', {'fields': ('is_enabled', 'secret_key')}),
-        ('Backup Codes', {'fields': ('backup_codes',)}),
-        ('Activity', {'fields': ('last_used', 'created_at')}),
+        ("User", {"fields": ("user",)}),
+        ("Settings", {"fields": ("is_enabled", "secret_key")}),
+        ("Backup Codes", {"fields": ("backup_codes",)}),
+        ("Activity", {"fields": ("last_used", "created_at")}),
     )
 
 
 @admin.register(ReviewImage)
 class ReviewImageAdmin(admin.ModelAdmin):
-    list_display = ('review', 'caption', 'order', 'uploaded_at')
-    list_filter = ('uploaded_at',)
-    search_fields = ('review__text', 'caption')
-    readonly_fields = ('uploaded_at',)
-    
+    list_display = ("review", "caption", "order", "uploaded_at")
+    list_filter = ("uploaded_at",)
+    search_fields = ("review__text", "caption")
+    readonly_fields = ("uploaded_at",)
+
     fieldsets = (
-        ('Review', {'fields': ('review',)}),
-        ('Image', {'fields': ('image', 'caption', 'order')}),
-        ('Timestamp', {'fields': ('uploaded_at',)}),
+        ("Review", {"fields": ("review",)}),
+        ("Image", {"fields": ("image", "caption", "order")}),
+        ("Timestamp", {"fields": ("uploaded_at",)}),
     )
 
 
 @admin.register(ReviewFlag)
 class ReviewFlagAdmin(admin.ModelAdmin):
-    list_display = ('review', 'flagged_by', 'reason', 'is_resolved', 'created_at')
-    list_filter = ('is_resolved', 'reason', 'created_at')
-    search_fields = ('review__text', 'flagged_by__username', 'description')
-    readonly_fields = ('created_at', 'resolved_at')
-    actions = ['resolve_as_approved', 'resolve_as_deleted', 'resolve_as_ignored']
-    
+    list_display = ("review", "flagged_by", "reason", "is_resolved", "created_at")
+    list_filter = ("is_resolved", "reason", "created_at")
+    search_fields = ("review__text", "flagged_by__username", "description")
+    readonly_fields = ("created_at", "resolved_at")
+    actions = ["resolve_as_approved", "resolve_as_deleted", "resolve_as_ignored"]
+
     fieldsets = (
-        ('Flag Info', {'fields': ('review', 'flagged_by', 'reason', 'description')}),
-        ('Resolution', {'fields': ('is_resolved', 'resolved_by', 'resolved_at', 'action_taken')}),
-        ('Timestamp', {'fields': ('created_at',)}),
+        ("Flag Info", {"fields": ("review", "flagged_by", "reason", "description")}),
+        (
+            "Resolution",
+            {"fields": ("is_resolved", "resolved_by", "resolved_at", "action_taken")},
+        ),
+        ("Timestamp", {"fields": ("created_at",)}),
     )
-    
+
     def resolve_as_approved(self, request, queryset):
         """Bulk action: Approve flagged reviews"""
         from django.utils import timezone
+
         count = 0
         for flag in queryset.filter(is_resolved=False):
             flag.review.is_approved = True
@@ -826,61 +916,68 @@ class ReviewFlagAdmin(admin.ModelAdmin):
             flag.is_resolved = True
             flag.resolved_by = request.user
             flag.resolved_at = timezone.now()
-            flag.action_taken = 'Review approved by admin'
+            flag.action_taken = "Review approved by admin"
             flag.save()
             count += 1
-        self.message_user(request, f'{count} ta sharh tasdiqlandi')
-    resolve_as_approved.short_description = 'Tanlangan sharhlarni tasdiqlash'
-    
+        self.message_user(request, f"{count} ta sharh tasdiqlandi")
+
+    resolve_as_approved.short_description = "Tanlangan sharhlarni tasdiqlash"
+
     def resolve_as_deleted(self, request, queryset):
         """Bulk action: Delete flagged reviews"""
         from django.utils import timezone
+
         count = 0
         for flag in queryset.filter(is_resolved=False):
             flag.review.delete()
             flag.is_resolved = True
             flag.resolved_by = request.user
             flag.resolved_at = timezone.now()
-            flag.action_taken = 'Review deleted by admin'
+            flag.action_taken = "Review deleted by admin"
             flag.save()
             count += 1
-        self.message_user(request, f'{count} ta sharh o\'chirildi')
-    resolve_as_deleted.short_description = 'Tanlangan sharhlarni o\'chirish'
-    
+        self.message_user(request, f"{count} ta sharh o'chirildi")
+
+    resolve_as_deleted.short_description = "Tanlangan sharhlarni o'chirish"
+
     def resolve_as_ignored(self, request, queryset):
         """Bulk action: Ignore flags"""
         from django.utils import timezone
+
         count = queryset.filter(is_resolved=False).update(
             is_resolved=True,
             resolved_by=request.user,
             resolved_at=timezone.now(),
-            action_taken='Flag ignored by admin'
+            action_taken="Flag ignored by admin",
         )
-        self.message_user(request, f'{count} ta flag e\'tiborsiz qoldirildi')
-    resolve_as_ignored.short_description = 'Flaglarni e\'tiborsiz qoldirish'
+        self.message_user(request, f"{count} ta flag e'tiborsiz qoldirildi")
+
+    resolve_as_ignored.short_description = "Flaglarni e'tiborsiz qoldirish"
 
 
 @admin.register(DataExport)
 class DataExportAdmin(admin.ModelAdmin):
-    list_display = ('user', 'export_type', 'status', 'created_at', 'expires_at')
-    list_filter = ('export_type', 'status', 'created_at')
-    search_fields = ('user__username', 'user__email')
-    readonly_fields = ('created_at', 'completed_at', 'expires_at')
-    actions = ['delete_expired_exports']
-    
+    list_display = ("user", "export_type", "status", "created_at", "expires_at")
+    list_filter = ("export_type", "status", "created_at")
+    search_fields = ("user__username", "user__email")
+    readonly_fields = ("created_at", "completed_at", "expires_at")
+    actions = ["delete_expired_exports"]
+
     fieldsets = (
-        ('User', {'fields': ('user',)}),
-        ('Export Details', {'fields': ('export_type', 'status', 'filters')}),
-        ('File', {'fields': ('file', 'error_message')}),
-        ('Timestamps', {'fields': ('created_at', 'completed_at', 'expires_at')}),
+        ("User", {"fields": ("user",)}),
+        ("Export Details", {"fields": ("export_type", "status", "filters")}),
+        ("File", {"fields": ("file", "error_message")}),
+        ("Timestamps", {"fields": ("created_at", "completed_at", "expires_at")}),
     )
-    
+
     def delete_expired_exports(self, request, queryset):
         """Bulk action: Delete expired exports"""
         from django.utils import timezone
+
         count = queryset.filter(expires_at__lt=timezone.now()).delete()[0]
-        self.message_user(request, f'{count} ta muddati o\'tgan export o\'chirildi')
-    delete_expired_exports.short_description = 'Muddati o\'tgan exportlarni o\'chirish'
+        self.message_user(request, f"{count} ta muddati o'tgan export o'chirildi")
+
+    delete_expired_exports.short_description = "Muddati o'tgan exportlarni o'chirish"
 
 
 # Override admin index with custom dashboard
@@ -889,5 +986,5 @@ from .admin_dashboard import admin_dashboard
 _original_index = admin.site.index
 admin.site.index = lambda request, extra_context=None: admin_dashboard(request)
 admin.site.site_header = "Fikrly Admin"
-admin.site.site_title = "Fikrly Admin"  
+admin.site.site_title = "Fikrly Admin"
 admin.site.index_title = "Boshqaruv paneli"

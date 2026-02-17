@@ -7,13 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0025_businesscategory'),
+        ("frontend", "0025_businesscategory"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='category_fk',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='companies', to='frontend.businesscategory'),
+            model_name="company",
+            name="category_fk",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="companies",
+                to="frontend.businesscategory",
+            ),
         ),
     ]

@@ -9,21 +9,23 @@ from django.db import migrations, models
 
 
 def populate_translations(apps, schema_editor):
-    BusinessCategory = apps.get_model('frontend', 'BusinessCategory')
-    Company = apps.get_model('frontend', 'Company')
+    BusinessCategory = apps.get_model("frontend", "BusinessCategory")
+    Company = apps.get_model("frontend", "Company")
     from django.db.models import F
 
     # Category name
-    BusinessCategory.objects.filter(name_ru='').update(name_ru=F('name'))
-    BusinessCategory.objects.filter(name_ru__isnull=True).update(name_ru=F('name'))
+    BusinessCategory.objects.filter(name_ru="").update(name_ru=F("name"))
+    BusinessCategory.objects.filter(name_ru__isnull=True).update(name_ru=F("name"))
 
     # Company name
-    Company.objects.filter(name_ru='').update(name_ru=F('name'))
-    Company.objects.filter(name_ru__isnull=True).update(name_ru=F('name'))
+    Company.objects.filter(name_ru="").update(name_ru=F("name"))
+    Company.objects.filter(name_ru__isnull=True).update(name_ru=F("name"))
 
     # Company description
-    Company.objects.filter(description_ru='').update(description_ru=F('description'))
-    Company.objects.filter(description_ru__isnull=True).update(description_ru=F('description'))
+    Company.objects.filter(description_ru="").update(description_ru=F("description"))
+    Company.objects.filter(description_ru__isnull=True).update(
+        description_ru=F("description")
+    )
 
 
 class Migration(migrations.Migration):

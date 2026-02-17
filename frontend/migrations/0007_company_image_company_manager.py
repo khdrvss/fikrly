@@ -8,19 +8,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0006_review_is_approved'),
+        ("frontend", "0006_review_is_approved"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='company_images/'),
+            model_name="company",
+            name="image",
+            field=models.ImageField(blank=True, null=True, upload_to="company_images/"),
         ),
         migrations.AddField(
-            model_name='company',
-            name='manager',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='managed_companies', to=settings.AUTH_USER_MODEL),
+            model_name="company",
+            name="manager",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="managed_companies",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

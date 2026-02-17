@@ -90,7 +90,11 @@ urlpatterns = [
     ),
     path("business/<int:pk>/like/", views.like_company, name="like_company"),
     path("reviews/<int:pk>/like/", views.like_review, name="like_review"),
-    path("api/reviews/<int:pk>/vote/", views.vote_review_helpful, name="vote_review_helpful"),
+    path(
+        "api/reviews/<int:pk>/vote/",
+        views.vote_review_helpful,
+        name="vote_review_helpful",
+    ),
     path("business/<int:pk>/claim/", claim_company, name="claim_company"),
     path("claim/verify/<str:token>/", verify_claim, name="verify_claim"),
     path("verification-badge/", verification_badge, name="verification_badge"),
@@ -102,36 +106,94 @@ urlpatterns = [
     path("guidelines/", community_guidelines, name="community_guidelines"),
     path("contact/", views.contact_us, name="contact_us"),
     # UI Demo (development only)
-    path("ui-demo/", lambda request: render(request, "pages/ui_demo.html"), name="ui_demo"),
+    path(
+        "ui-demo/",
+        lambda request: render(request, "pages/ui_demo.html"),
+        name="ui_demo",
+    ),
     # Phone OTP auth
     path("accounts/phone/", views.phone_signin, name="phone_signin"),
     path("accounts/phone/verify/", views.phone_verify, name="phone_verify"),
     # PWA offline page
-    path("offline/", lambda request: render(request, "frontend/offline.html"), name="offline"),
+    path(
+        "offline/",
+        lambda request: render(request, "frontend/offline.html"),
+        name="offline",
+    ),
     # Analytics dashboard
-    path("business/<int:company_id>/analytics/", advanced_views.analytics_dashboard, name="analytics_dashboard"),
+    path(
+        "business/<int:company_id>/analytics/",
+        advanced_views.analytics_dashboard,
+        name="analytics_dashboard",
+    ),
     # Gamification
-    path("gamification/profile/", advanced_views.user_gamification_profile, name="gamification_profile"),
+    path(
+        "gamification/profile/",
+        advanced_views.user_gamification_profile,
+        name="gamification_profile",
+    ),
     # Two-Factor Authentication
     path("security/2fa/setup/", advanced_views.setup_2fa, name="setup_2fa"),
     path("security/2fa/verify/", advanced_views.verify_2fa, name="verify_2fa"),
     # Advanced Search
     path("advanced-search/", advanced_views.advanced_search, name="advanced_search"),
     # Review Images
-    path("reviews/<int:review_id>/upload-images/", advanced_views.upload_review_images, name="upload_review_images"),
+    path(
+        "reviews/<int:review_id>/upload-images/",
+        advanced_views.upload_review_images,
+        name="upload_review_images",
+    ),
     # Moderation Dashboard
-    path("admin/moderation/", moderation_views.moderation_dashboard, name="moderation_dashboard"),
-    path("admin/moderation/bulk/", moderation_views.bulk_moderate_reviews, name="bulk_moderate_reviews"),
-    path("reviews/<int:review_id>/flag/", moderation_views.flag_review, name="flag_review"),
-    path("admin/flags/<int:flag_id>/resolve/", moderation_views.resolve_flag, name="resolve_flag"),
+    path(
+        "admin/moderation/",
+        moderation_views.moderation_dashboard,
+        name="moderation_dashboard",
+    ),
+    path(
+        "admin/moderation/bulk/",
+        moderation_views.bulk_moderate_reviews,
+        name="bulk_moderate_reviews",
+    ),
+    path(
+        "reviews/<int:review_id>/flag/",
+        moderation_views.flag_review,
+        name="flag_review",
+    ),
+    path(
+        "admin/flags/<int:flag_id>/resolve/",
+        moderation_views.resolve_flag,
+        name="resolve_flag",
+    ),
     # Business Verification
-    path("business/<int:company_id>/request-verification/", moderation_views.request_verification, name="request_verification"),
-    path("admin/business/<int:company_id>/verify/", moderation_views.approve_verification, name="approve_verification"),
+    path(
+        "business/<int:company_id>/request-verification/",
+        moderation_views.request_verification,
+        name="request_verification",
+    ),
+    path(
+        "admin/business/<int:company_id>/verify/",
+        moderation_views.approve_verification,
+        name="approve_verification",
+    ),
     # Data Export
-    path("export/reviews-pdf/<int:company_id>/", moderation_views.export_reviews_pdf, name="export_reviews_pdf"),
-    path("export/reviews-excel/<int:company_id>/", moderation_views.export_reviews_excel, name="export_reviews_excel"),
-    path("export/user-data/", moderation_views.export_user_data, name="export_user_data"),
-    path("export/request/", moderation_views.request_data_export, name="request_data_export"),
+    path(
+        "export/reviews-pdf/<int:company_id>/",
+        moderation_views.export_reviews_pdf,
+        name="export_reviews_pdf",
+    ),
+    path(
+        "export/reviews-excel/<int:company_id>/",
+        moderation_views.export_reviews_excel,
+        name="export_reviews_excel",
+    ),
+    path(
+        "export/user-data/", moderation_views.export_user_data, name="export_user_data"
+    ),
+    path(
+        "export/request/",
+        moderation_views.request_data_export,
+        name="request_data_export",
+    ),
     # Utility
     path("health/", views.health_check, name="health_check"),
 ]

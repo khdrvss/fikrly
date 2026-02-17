@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from a .env file at project root (if present)
 load_dotenv(BASE_DIR / ".env")
 
+
 def _env_bool(key: str, default: bool = False) -> bool:
     val = os.environ.get(key)
     if val is None:
@@ -51,7 +52,7 @@ if DEBUG:
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://localhost",
-        "http://127.0.0.1"
+        "http://127.0.0.1",
     ]
 
 INTERNAL_IPS = [
@@ -78,31 +79,35 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = USE_HTTPS
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
-    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
 
     # Additional Security Headers
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = "DENY"
-    
+
 # Error Reporting via Email
 ADMINS = [
-    ('Admin', os.environ.get('ADMINS', 'admin@fikrly.uz')),
+    ("Admin", os.environ.get("ADMINS", "admin@fikrly.uz")),
 ]
 MANAGERS = ADMINS
 
 # Email Configuration
 EMAIL_BACKEND = os.environ.get(
-    'EMAIL_BACKEND',
-    'django.core.mail.backends.smtp.EmailBackend' if not DEBUG else 'django.core.mail.backends.console.EmailBackend'
+    "EMAIL_BACKEND",
+    (
+        "django.core.mail.backends.smtp.EmailBackend"
+        if not DEBUG
+        else "django.core.mail.backends.console.EmailBackend"
+    ),
 )
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@fikrly.uz')
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true", "1", "t")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@fikrly.uz")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 
@@ -130,7 +135,7 @@ INSTALLED_APPS = [
 ]
 
 # Only enable Silk in development or when explicitly enabled
-SILK_ENABLED = os.environ.get('SILK_ENABLED', str(DEBUG)).lower() in ('true', '1', 't')
+SILK_ENABLED = os.environ.get("SILK_ENABLED", str(DEBUG)).lower() in ("true", "1", "t")
 if SILK_ENABLED:
     INSTALLED_APPS.insert(INSTALLED_APPS.index("django_extensions"), "silk")
 
@@ -211,7 +216,7 @@ DB_PORT = os.environ.get("DB_PORT", "5432")
 
 if DB_ENGINE.endswith("sqlite3") or DB_ENGINE.endswith("sqlite"):
     # SQLite expects a file path for NAME
-    if DB_NAME and DB_NAME.endswith('.sqlite3'):
+    if DB_NAME and DB_NAME.endswith(".sqlite3"):
         sqlite_path = Path(DB_NAME)
         if not sqlite_path.is_absolute():
             sqlite_path = BASE_DIR / DB_NAME
@@ -236,7 +241,11 @@ else:
             "USER": DB_USER,
             "PASSWORD": DB_PASSWORD,
             "HOST": DB_HOST,
-            "PORT": int(DB_PORT) if DB_PORT is not None and str(DB_PORT).isdigit() else DB_PORT,
+            "PORT": (
+                int(DB_PORT)
+                if DB_PORT is not None and str(DB_PORT).isdigit()
+                else DB_PORT
+            ),
             "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
         }
     }
@@ -435,80 +444,81 @@ ESKIZ_FROM = os.environ.get("ESKIZ_FROM", "4546")
 # LOGGING CONFIGURATION
 # ============================================
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         },
-        'file': {
-            'level': 'WARNING',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'errors.log',
-            'maxBytes': 1024 * 1024 * 10,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-            'filters': ['require_debug_false'],
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
         },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'django.request': {
-            'handlers': ['error_file', 'console'],
-            'level': 'ERROR',
-            'propagate': False,
+        "file": {
+            "level": "WARNING",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10MB
+            "backupCount": 5,
+            "formatter": "verbose",
         },
-        'frontend': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": BASE_DIR / "logs" / "errors.log",
+            "maxBytes": 1024 * 1024 * 10,  # 10MB
+            "backupCount": 5,
+            "formatter": "verbose",
+            "filters": ["require_debug_false"],
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["error_file", "console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "frontend": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
 
 # Create logs directory
 import os
-os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+os.makedirs(BASE_DIR / "logs", exist_ok=True)
 
 
 # ============================================
 # RATE LIMITING
 # ============================================
 RATELIMIT_ENABLE = not DEBUG  # Disable in development
-RATELIMIT_USE_CACHE = 'default'
-RATELIMIT_VIEW = 'frontend.views.ratelimit_error'
+RATELIMIT_USE_CACHE = "default"
+RATELIMIT_VIEW = "frontend.views.ratelimit_error"
 
 
 # ============================================
@@ -518,7 +528,7 @@ if not DEBUG:
     # Content Security Policy
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
-    X_FRAME_OPTIONS = 'DENY'
-    
+    X_FRAME_OPTIONS = "DENY"
+
     # Additional security
-    SECURE_REFERRER_POLICY = 'same-origin'
+    SECURE_REFERRER_POLICY = "same-origin"

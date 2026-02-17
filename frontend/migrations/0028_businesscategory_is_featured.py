@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0027_businesscategory_color'),
+        ("frontend", "0027_businesscategory_color"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='businesscategory',
-            name='is_featured',
-            field=models.BooleanField(default=False, help_text="Bosh sahifada ko'rsatish"),
+            model_name="businesscategory",
+            name="is_featured",
+            field=models.BooleanField(
+                default=False, help_text="Bosh sahifada ko'rsatish"
+            ),
         ),
     ]

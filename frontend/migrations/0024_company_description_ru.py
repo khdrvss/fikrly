@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0023_alter_company_logo'),
+        ("frontend", "0023_alter_company_logo"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='description_ru',
-            field=models.TextField(blank=True, verbose_name='Tavsif (Rus tilida)'),
+            model_name="company",
+            name="description_ru",
+            field=models.TextField(blank=True, verbose_name="Tavsif (Rus tilida)"),
         ),
     ]

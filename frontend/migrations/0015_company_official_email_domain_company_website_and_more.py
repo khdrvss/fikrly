@@ -8,43 +8,94 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('frontend', '0014_delete_reviewattachment'),
+        ("frontend", "0014_delete_reviewattachment"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='company',
-            name='official_email_domain',
-            field=models.CharField(blank=True, help_text='Masalan: example.com (ixtiyoriy)', max_length=100),
+            model_name="company",
+            name="official_email_domain",
+            field=models.CharField(
+                blank=True, help_text="Masalan: example.com (ixtiyoriy)", max_length=100
+            ),
         ),
         migrations.AddField(
-            model_name='company',
-            name='website',
-            field=models.URLField(blank=True, help_text='Rasmiy veb-sayt, masalan: https://example.com'),
+            model_name="company",
+            name="website",
+            field=models.URLField(
+                blank=True, help_text="Rasmiy veb-sayt, masalan: https://example.com"
+            ),
         ),
         migrations.AlterField(
-            model_name='activitylog',
-            name='action',
-            field=models.CharField(choices=[('company_edit', 'Company Edited'), ('approval_requested', 'Review Approval Requested'), ('review_approved', 'Review Approved'), ('owner_responded', 'Owner Responded'), ('review_created', 'Review Created'), ('review_reported', 'Review Reported'), ('company_claim_requested', 'Company Claim Requested'), ('company_claim_verified', 'Company Claim Verified')], max_length=50),
+            model_name="activitylog",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("company_edit", "Company Edited"),
+                    ("approval_requested", "Review Approval Requested"),
+                    ("review_approved", "Review Approved"),
+                    ("owner_responded", "Owner Responded"),
+                    ("review_created", "Review Created"),
+                    ("review_reported", "Review Reported"),
+                    ("company_claim_requested", "Company Claim Requested"),
+                    ("company_claim_verified", "Company Claim Verified"),
+                ],
+                max_length=50,
+            ),
         ),
         migrations.CreateModel(
-            name='CompanyClaim',
+            name="CompanyClaim",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('email', models.EmailField(max_length=254)),
-                ('token', models.CharField(db_index=True, max_length=64, unique=True)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('verified', 'Verified'), ('rejected', 'Rejected'), ('expired', 'Expired')], db_index=True, default='pending', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('verified_at', models.DateTimeField(blank=True, null=True)),
-                ('expires_at', models.DateTimeField()),
-                ('request_ip', models.GenericIPAddressField(blank=True, null=True)),
-                ('user_agent', models.TextField(blank=True)),
-                ('claimant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='company_claims', to=settings.AUTH_USER_MODEL)),
-                ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='claims', to='frontend.company')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("email", models.EmailField(max_length=254)),
+                ("token", models.CharField(db_index=True, max_length=64, unique=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("verified", "Verified"),
+                            ("rejected", "Rejected"),
+                            ("expired", "Expired"),
+                        ],
+                        db_index=True,
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("verified_at", models.DateTimeField(blank=True, null=True)),
+                ("expires_at", models.DateTimeField()),
+                ("request_ip", models.GenericIPAddressField(blank=True, null=True)),
+                ("user_agent", models.TextField(blank=True)),
+                (
+                    "claimant",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="company_claims",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "company",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="claims",
+                        to="frontend.company",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
+                "ordering": ["-created_at"],
             },
         ),
     ]
