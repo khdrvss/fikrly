@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count, Q, Sum
 from django.utils import translation
+from django.utils.translation import gettext as _
 from .models import Company, Review, UserProfile, BusinessCategory
 from .utils import compute_assessment, send_telegram_message, diff_instance_fields
 import json
@@ -26,7 +27,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.cache import cache_page
 from .models import PhoneOTP
 from .sms import send_otp_via_eskiz
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail, EmailMessage
 from django_ratelimit.decorators import ratelimit
 import logging
@@ -193,7 +194,7 @@ def manager_company_edit(request, pk: int):
                 company=obj,
                 details=diff_instance_fields(obj, changed),
             )
-            messages.success(request, "Kompaniya maʼlumotlari yangilandi.")
+            messages.success(request, _("Company information updated."))
             return redirect("business_dashboard")
     else:
         form = CompanyManagerEditForm(instance=company)
@@ -211,9 +212,7 @@ def manager_company_edit(request, pk: int):
 @login_required
 def manager_request_approval(request, pk: int):
     try:
-        review = Review.objects.select_related("company").get(
-            pk=pk, company__manager=request.user
-        )
+        review = Review.objects.select_related("company").get(pk=pk, company__manager=request.user)
     except Review.DoesNotExist:
         raise Http404
 
@@ -328,13 +327,37 @@ def search_suggestions_api(request):
 def business_list(request, category_slug=None):
     """View that lists all businesses as clickable cards with enhanced search"""
     companies = Company.objects.filter(is_active=True).select_related("category_fk")
-    query = request.GET.get("q", "").strip()
 
+    # Per-language page-level caching for anonymous GET requests (HTML only).
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    is_get = request.method.upper() == 'GET'
+    use_cache = is_get and (not request.user.is_authenticated) and (not is_ajax)
+    cache_key = None
+    if use_cache:
+        from django.core.cache import cache
+        from django.utils.translation import get_language
+        # include full path (querystring) and language to keep separate caches
+        cache_key = f"business_list:{get_language()}:{request.get_full_path()}"
+        cached_html = cache.get(cache_key)
+        if cached_html:
+            from django.http import HttpResponse
+            return HttpResponse(cached_html)
+
+    # Query params
+    query = request.GET.get("q", "").strip()
+    city = request.GET.get("city", "").strip()
+    categories_param = request.GET.get("categories", "").strip()
+    min_rating = request.GET.get("min_rating")
+    verified = request.GET.get("verified")
+    sort = request.GET.get("sort", "top")
+
+    # category can come from the URL or querystring (backwards-compat)
     if category_slug:
         category_filter = category_slug
     else:
         category_filter = request.GET.get("category", "").strip()
 
+    # apply text search
     if query:
         # Use PostgreSQL full-text search if available, otherwise fallback to icontains
         db_vendor = companies.db if hasattr(companies, 'db') else 'default'
@@ -388,9 +411,60 @@ def business_list(request, category_slug=None):
             companies = companies.filter(category__icontains=category_filter)
 
     # Default ordering when no search query
-    if not query:
-        companies = companies.order_by("-review_count", "-rating", "name")
+    # Apply filters coming from query params
+    # categories (comma-separated ids or slugs)
+    if categories_param:
+        cat_vals = [v.strip() for v in categories_param.split(",") if v.strip()]
+        if cat_vals:
+            # support numeric ids and slugs
+            id_vals = [v for v in cat_vals if v.isdigit()]
+            slug_vals = [v for v in cat_vals if not v.isdigit()]
+            qcats = Q()
+            if id_vals:
+                qcats |= Q(category_fk__id__in=[int(x) for x in id_vals])
+            if slug_vals:
+                qcats |= Q(category_fk__slug__in=slug_vals) | Q(category__in=slug_vals)
+            companies = companies.filter(qcats)
 
+    # city filter (matches exact or icontains)
+    if city:
+        companies = companies.filter(Q(city__iexact=city) | Q(city__icontains=city))
+
+    # verified filter
+    if verified is not None and verified != "":
+        try:
+            if int(verified) == 1:
+                companies = companies.filter(is_verified=True)
+            else:
+                companies = companies.filter(is_verified=False)
+        except Exception:
+            pass
+
+    # min_rating filter
+    if min_rating:
+        try:
+            mr = float(min_rating)
+            companies = companies.filter(rating__gte=mr)
+        except Exception:
+            pass
+
+    # Apply ordering based on `sort` param
+    if sort == "top":
+        companies = companies.order_by("-rating", "-review_count", "name")
+    elif sort == "new":
+        companies = companies.order_by("-created_at")
+    elif sort == "most_reviews":
+        companies = companies.order_by("-review_count")
+    elif sort == "az":
+        companies = companies.order_by("name")
+    else:
+        # fallback default
+        companies = companies.order_by("-rating", "-review_count", "name")
+
+    # If no explicit search and category filter applied by previous code, keep it ordered by defaults
+    if not query and not categories_param and not city and not min_rating and (verified is None or verified == ""):
+        companies = companies.order_by("-review_count", "-rating", "name")
+    
     # Get search suggestions if no results found
     search_suggestions = []
     if (query or category_filter) and not companies.exists():
@@ -422,46 +496,57 @@ def business_list(request, category_slug=None):
         else f"Kategoriya: {category_display_name}" if category_filter else ""
     )
 
-    # Pagination
-    paginator = Paginator(companies, 12)  # 12 companies per page
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+    # Pagination - show 20 companies per page as required
+    paginator = Paginator(companies, 20)
+    page_number = request.GET.get("page", 1)
+    logger.debug(f"business_list requested page: {page_number}; total_companies={companies.count()}")
 
-    # Handle JSON requests for infinite scroll
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        from django.http import JsonResponse
-        companies_data = []
-        for c in page_obj:
-            companies_data.append({
-                'name': c.name,
-                'slug': c.slug,
-                'rating': float(c.rating),
-                'review_count': c.review_count,
-                'category': c.category_fk.display_name if c.category_fk else c.category,
-                'city': c.city,
-                'image_url': c.display_image_url or c.image_url or 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-                'logo_url': c.display_logo or f"https://api.dicebear.com/7.x/shapes/svg?seed={c.name}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear",
-                'logo_scale': c.logo_scale or 100,
-            })
-        return JsonResponse({
-            'companies': companies_data,
-            'has_next': page_obj.has_next(),
-            'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-        })
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        logger.debug(f"PageNotAnInteger for page={page_number}; defaulting to page 1")
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        logger.debug(f"EmptyPage requested: page={page_number}")
+        # Show the last available page for any request
+        page_obj = paginator.page(paginator.num_pages)
 
-    return render(
-        request,
-        "pages/business_list.html",
-        {
-            "companies": page_obj,
-            "search_query": search_context,
-            "search_results_count": companies.count(),
-            "category_filter": category_display_name,
-            "search_display": search_display,
-            "search_suggestions": search_suggestions,
-            "canonical_url": request.build_absolute_uri(),
+    # Note: We intentionally removed the AJAX/JSON endpoint for infinite-scroll
+    # to enforce strict pagination. The view always returns full HTML pages.
+
+    ctx = {
+        "companies": page_obj,
+        "page_obj": page_obj,
+        "search_query": search_context,
+        "search_results_count": companies.count(),
+        "category_filter": category_display_name,
+        "search_display": search_display,
+        "search_suggestions": search_suggestions,
+        "canonical_url": request.build_absolute_uri(),
+        "all_categories": BusinessCategory.objects.annotate(company_count=Count('companies', filter=Q(companies__is_active=True))).order_by('name'),
+        "all_cities": Company.objects.filter(is_active=True).values_list('city', flat=True).distinct().order_by('city'),
+        "selected_filters": {
+            "q": query,
+            "city": city,
+            "categories": categories_param,
+            "min_rating": min_rating,
+            "verified": verified,
+            "sort": sort,
         },
-    )
+    }
+
+    if use_cache and cache_key:
+        from django.template.loader import render_to_string
+        from django.core.cache import cache
+        rendered = render_to_string("pages/business_list.html", ctx, request=request)
+        # cache for 5 minutes
+        cache.set(cache_key, rendered, 60 * 5)
+        from django.http import HttpResponse
+
+        return HttpResponse(rendered)
+
+    return render(request, "pages/business_list.html", ctx)
+
 
 
 def category_browse(request):
@@ -624,7 +709,7 @@ def verify_claim(request, token: str):
         details=f"Claim verified for {company.name} by {claim.claimant.username}",
     )
 
-    messages.success(request, "Kompaniya tasdiqlandi va profilingizga biriktirildi.")
+    messages.success(request, _("Company verified and linked to your profile."))
     return redirect("company_detail", pk=company.pk)
 
 
@@ -743,7 +828,7 @@ def phone_verify(request):
                         UserProfile.objects.get_or_create(user=user)
                         login(request, user)
                         request.session.pop("phone_pending", None)
-                        messages.success(request, "Tizimga kirdingiz.")
+                        messages.success(request, _("You are now signed in."))
                         return redirect("user_profile")
     else:
         form = VerifyForm()
@@ -765,10 +850,8 @@ def community_guidelines(request):
 
 
 def contact_us(request):
-    # Force Uzbek if on the default path (workaround for potential middleware issues)
-    if request.path == "/contact/" and translation.get_language() != "uz":
-        translation.activate("uz")
-        request.LANGUAGE_CODE = "uz"
+    # Language selection should be handled by LocaleMiddleware and URL prefixes.
+    # Do not force Uzbek here — avoid overriding user-selected language.
 
     if request.method == "POST":
         form = ContactForm(request.POST)
@@ -1080,6 +1163,21 @@ def favicon_file(request):
     source_path = settings.BASE_DIR / "frontend" / "static" / "favicons" / "favicon.ico"
     if source_path.exists():
         return FileResponse(open(source_path, "rb"), content_type="image/x-icon")
+
+    return HttpResponse(status=404)
+
+
+def service_worker(request):
+    """Serve the service worker file for PWA"""
+    # Try serving from STATIC_ROOT (production collected files)
+    static_path = settings.STATIC_ROOT / "service-worker.js"
+    if static_path.exists():
+        return FileResponse(open(static_path, "rb"), content_type="application/javascript")
+
+    # Fallback to source (development)
+    source_path = settings.BASE_DIR / "frontend" / "static" / "service-worker.js"
+    if source_path.exists():
+        return FileResponse(open(source_path, "rb"), content_type="application/javascript")
 
     return HttpResponse(status=404)
 

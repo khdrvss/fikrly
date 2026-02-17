@@ -26,10 +26,10 @@
 
 {% block content %}
     <!-- Hero / Search Section -->
-    <section class="bg-white border-b border-gray-200 py-12">
+    <section class="bg-[var(--surface)] border-b border-[var(--border)] py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">{% trans "Kategoriyalar" %}</h1>
-            <p class="text-gray-600 mb-8">{% trans "O'zingizga kerakli xizmat yoki mahsulot turini toping" %}</p>
+            <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-4">{% trans "Kategoriyalar" %}</h1>
+            <p class="text-[var(--text-secondary)] mb-8">{% trans "O'zingizga kerakli xizmat yoki mahsulot turini toping" %}</p>
 
             <div class="relative max-w-xl mx-auto">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -38,10 +38,10 @@
                     </svg>
                 </div>
                 <input type="text" id="categorySearch"
-                    class="block w-full pl-11 pr-4 py-4 border border-gray-200 rounded-2xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm text-gray-900 placeholder-gray-400"
+                    class="block w-full pl-11 pr-4 py-4 border border-[var(--border)] rounded-2xl bg-[var(--bg)] focus:bg-[var(--surface)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all shadow-sm text-[var(--text-primary)] placeholder-gray-400"
                     placeholder="{% trans 'Kategoriyalarni qidiring...' %}" autocomplete="off">
             </div>
-            <p class="mt-3 text-sm text-gray-500" id="searchResults">{% blocktrans with count=categories|length %}{{ count }} ta kategoriya mavjud{% endblocktrans %}</p>
+            <p class="mt-3 text-sm text-[var(--text-secondary)]" id="searchResults">{% blocktrans with count=categories|length %}{{ count }} ta kategoriya mavjud{% endblocktrans %}</p>
         </div>
     </section>
 
@@ -49,23 +49,23 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="categoryGrid">
             {% for cat in categories %}
-            <a href="{% url 'business_list' %}?category={{ cat.category }}" class="category-card group bg-white rounded-2xl p-5 border border-green-200 shadow-sm hover:shadow-md hover:border-primary-200 transition-all duration-200 flex items-center justify-between">
+            <a href="{% url 'business_list' %}?category={{ cat.category }}" class="category-card group bg-[var(--surface)] rounded-2xl p-5 border border-green-200 shadow-sm hover:shadow-md hover:border-primary-200 transition-all duration-200 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors
                         {% if cat.color == 'red' %}bg-red-50 text-red-600 group-hover:bg-red-100
                         {% elif cat.color == 'orange' %}bg-orange-50 text-orange-600 group-hover:bg-orange-100
                         {% elif cat.color == 'yellow' %}bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100
                         {% elif cat.color == 'green' %}bg-green-50 text-green-600 group-hover:bg-green-100
-                        {% elif cat.color == 'blue' %}bg-primary-50 text-primary-600 group-hover:bg-primary-100
+                        {% elif cat.color == 'blue' %}bg-primary-50 text-[var(--accent)] group-hover:bg-primary-100
                         {% elif cat.color == 'purple' %}bg-purple-50 text-purple-600 group-hover:bg-purple-100
                         {% elif cat.color == 'pink' %}bg-pink-50 text-pink-600 group-hover:bg-pink-100
-                        {% else %}bg-gray-50 text-gray-600 group-hover:bg-gray-100{% endif %}">
+                        {% else %}bg-[var(--bg)] text-[var(--text-secondary)] group-hover:bg-[var(--surface)]{% endif %}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {{ cat.icon|safe }}
                         </svg>
                     </div>
                     <div>
-                        <h3 class="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">{{ cat.label }}</h3>
+                        <h3 class="font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{{ cat.label }}</h3>
                         <!-- Optional: Add count if available in context, otherwise leave blank or add placeholder text -->
                     </div>
                 </div>
@@ -75,26 +75,26 @@
             </a>
             {% empty %}
             <div class="col-span-full text-center py-12">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div class="w-16 h-16 bg-[var(--surface)] rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7l2 2m0 0l2 2m-2-2v6m-2-2L5 20" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900">{% trans "Kategoriyalar topilmadi" %}</h3>
-                <p class="text-gray-500 mt-1">{% trans "Hozircha hech qanday kategoriya mavjud emas." %}</p>
+                <h3 class="text-lg font-medium text-[var(--text-primary)]">{% trans "Kategoriyalar topilmadi" %}</h3>
+                <p class="text-[var(--text-secondary)] mt-1">{% trans "Hozircha hech qanday kategoriya mavjud emas." %}</p>
             </div>
             {% endfor %}
         </div>
 
         <!-- Empty Search State (Hidden by default) -->
         <div id="emptySearchState" class="hidden text-center py-12">
-            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-[var(--surface)] rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900">{% trans "Natija topilmadi" %}</h3>
-            <p class="text-gray-500 mt-1">{% trans "Boshqa so'z bilan qidirib ko'ring" %}</p>
+            <h3 class="text-lg font-medium text-[var(--text-primary)]">{% trans "Natija topilmadi" %}</h3>
+            <p class="text-[var(--text-secondary)] mt-1">{% trans "Boshqa so'z bilan qidirib ko'ring" %}</p>
         </div>
     </section>
 {% endblock %}

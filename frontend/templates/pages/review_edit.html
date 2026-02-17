@@ -5,11 +5,11 @@
 {% block title %}{% trans "Sharhni tahrirlash | Fikrly" %}{% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen py-12">
+<div class="bg-primary min-h-screen py-12">
     <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div class="bg-elevated rounded-2xl shadow-sm border border-borderPrimary p-8">
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">{% trans "Sharhni tahrirlash" %}</h1>
+                <h1 class="text-2xl font-bold text-textPrimary">{% trans "Sharhni tahrirlash" %}</h1>
             </div>
 
             <form method="post" class="space-y-6">
@@ -22,7 +22,7 @@
                 {% endif %}
 
                 <div>
-                    <label for="{{ form.rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Baho" %}</label>
+                    <label for="{{ form.rating.id_for_label }}" class="block text-sm font-medium text-textSecondary mb-1">{% trans "Baho" %}</label>
                     {{ form.rating }}
                     {% if form.rating.errors %}
                         <p class="mt-1 text-sm text-red-600">{{ form.rating.errors.0 }}</p>
@@ -30,18 +30,18 @@
                 </div>
 
                 <div>
-                    <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Matn" %}</label>
+                    <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-textSecondary mb-1">{% trans "Matn" %}</label>
                     {{ form.text }}
                     {% if form.text.errors %}
                         <p class="mt-1 text-sm text-red-600">{{ form.text.errors.0 }}</p>
                     {% endif %}
                 </div>
 
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                    <a href="{% url 'user_profile' %}" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-borderPrimary">
+                    <a href="{% url 'user_profile' %}" class="px-4 py-2 border border-borderPrimary shadow-sm text-sm font-medium rounded-lg text-textSecondary bg-elevated hover:bg-secondary transition-colors">
                         {% trans "Bekor qilish" %}
                     </a>
-                    <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                    <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-[var(--accent)] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
                         {% trans "Saqlash" %}
                     </button>
                 </div>

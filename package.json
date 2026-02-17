@@ -5,9 +5,10 @@
   "main": "index.html",
   "dependencies": {},
   "scripts": {
-    "build:css":  "npx tailwindcss -i ./frontend/static/tailwind.css -o ./frontend/static/bundle.css",
-    "watch:css": "npx tailwindcss -i ./frontend/static/tailwind.css -o ./frontend/static/bundle.css --watch",
-    "dev": "npm run watch:css"
+    "build:css": "NODE_ENV=production npx tailwindcss -i ./frontend/static/tailwind.css -o ./frontend/static/dist/bundle.css --minify",
+    "watch:css": "npx tailwindcss -i ./frontend/static/tailwind.css -o ./frontend/static/dist/bundle.css --watch",
+    "dev": "npm run watch:css",
+    "lighthouse": "lighthouse http://localhost --view"
   },
   "author": "",
   "license": "MIT",

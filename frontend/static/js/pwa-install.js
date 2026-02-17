@@ -64,7 +64,7 @@
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0">
-          <button id="pwa-install-btn" class="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+          <button id="pwa-install-btn" class="bg-elevated text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-secondary transition-colors">
             O'rnatish
           </button>
           <button id="pwa-dismiss-btn" class="text-white opacity-75 hover:opacity-100 p-2">

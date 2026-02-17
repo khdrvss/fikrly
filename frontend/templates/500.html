@@ -1,10 +1,11 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="uz">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>500 - Server xatosi | Fikrly.uz</title>
+    <title>{% trans "500 - Server xatosi | Fikrly.uz" %}</title>
     <link rel="stylesheet" href="{% static 'tailwind.css' %}">
     <style>
         .pulse-error {
@@ -16,7 +17,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body class="bg-bg-light text-[var(--text-primary)] dark:bg-bg-dark dark:text-slate-100">
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="max-w-2xl w-full text-center">
             <!-- Error Icon -->
@@ -30,12 +31,12 @@
             <h1 class="text-9xl font-bold text-red-600 mb-4">500</h1>
             
             <!-- Message -->
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Server xatosi
+            <h2 class="text-3xl font-bold text-[var(--text-primary)] dark:text-slate-100 mb-4">
+                {% trans "Server xatosi" %}
             </h2>
-            <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
-                Kechirasiz, serverda vaqtinchalik muammo yuz berdi. <br>
-                Iltimos, bir necha daqiqadan so'ng qayta urinib ko'ring.
+            <p class="text-xl text-muted-light dark:text-muted-dark mb-8">
+                {% trans "Kechirasiz, serverda vaqtinchalik muammo yuz berdi." %} <br>
+                {% trans "Iltimos, bir necha daqiqadan so'ng qayta urinib ko'ring." %}
             </p>
 
             <!-- Technical Details (only in debug mode) -->
@@ -51,28 +52,28 @@
             <!-- Actions -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <button onclick="location.reload()" 
-                        class="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition duration-200">
+                        class="inline-flex items-center justify-center px-6 py-3 bg-[var(--accent)] text-white font-semibold rounded-lg hover:opacity-90 transition duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    Qayta yuklash
+                    {% trans "Qayta yuklash" %}
                 </button>
                 
                 <a href="/" 
-                   class="inline-flex items-center justify-center px-6 py-3 border-2 border-primary-600 text-primary-600 font-semibold rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition duration-200">
+                   class="inline-flex items-center justify-center px-6 py-3 border-2 border-primary-600 text-[var(--accent)] font-semibold rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    Bosh sahifaga qaytish
+                    {% trans "Bosh sahifaga qaytish" %}
                 </a>
             </div>
 
             <!-- Support -->
-            <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+                <div class="mt-12 pt-8 border-t border-border-light dark:border-border-dark">
+                <p class="text-sm text-muted-light dark:text-muted-dark">
                     Muammo davom etsa, 
-                    <a href="/contact/" class="text-primary-600 hover:underline font-semibold">
-                        qo'llab-quvvatlash xizmatiga murojaat qiling
+                    <a href="/contact/" class="text-[var(--accent)] hover:underline font-semibold">
+                        {% trans "qo'llab-quvvatlash xizmatiga murojaat qiling" %}
                     </a>
                 </p>
             </div>

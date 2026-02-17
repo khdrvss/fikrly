@@ -8,9 +8,9 @@
     <h1 class="text-3xl font-bold mb-8">Mening ma'lumotlarimni yuklash</h1>
 
     <!-- Request New Export -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8 p-6">
+    <div class="bg-[var(--surface)] dark:bg-gray-800 rounded-lg shadow mb-8 p-6">
         <h2 class="text-xl font-bold mb-4">Yangi yuklash so'rovi</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
+        <p class="text-[var(--text-secondary)] dark:text-gray-400 mb-6">
             Barcha ma'lumotlaringizni JSON yoki PDF formatida yuklang. 
             Yuklash tayyor bo'lgach, sizga email orqali xabar yuboriladi.
         </p>
@@ -23,36 +23,36 @@
             </select>
             
             <button type="submit" 
-                    class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-semibold">
+                    class="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 font-semibold">
                 Yuklashni boshlash
             </button>
         </form>
     </div>
 
     <!-- Export History -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div class="bg-[var(--surface)] dark:bg-gray-800 rounded-lg shadow">
         <div class="p-6 border-b">
             <h2 class="text-xl font-bold">Yuklash tarixi</h2>
         </div>
         
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-gray-50 dark:bg-gray-700">
+                <thead class="bg-[var(--bg)] dark:bg-gray-700">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Format</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Holat</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">So'ralgan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tugallangan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amallar</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase">Format</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase">Holat</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase">So'ralgan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase">Tugallangan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-[var(--text-secondary)] uppercase">Amallar</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
                     {% for export in exports %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr class="hover:bg-[var(--bg)] dark:hover:bg-gray-700">
                         <td class="px-6 py-4 text-sm">#{{ export.id }}</td>
                         <td class="px-6 py-4 text-sm">
-                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded text-xs font-mono">
+                            <span class="px-2 py-1 bg-[var(--surface)] dark:bg-gray-600 rounded text-xs font-mono">
                                 {{ export.format|upper }}
                             </span>
                         </td>
@@ -75,10 +75,10 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
+                        <td class="px-6 py-4 text-sm text-[var(--text-secondary)]">
                             {{ export.requested_at|date:"Y-m-d H:i" }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">
+                        <td class="px-6 py-4 text-sm text-[var(--text-secondary)]">
                             {% if export.completed_at %}
                                 {{ export.completed_at|date:"Y-m-d H:i" }}
                             {% else %}
@@ -89,7 +89,7 @@
                             {% if export.status == 'completed' and export.file %}
                                 <a href="{{ export.file.url }}" 
                                    download
-                                   class="inline-flex items-center gap-2 text-primary-600 hover:underline font-semibold">
+                                   class="inline-flex items-center gap-2 text-[var(--accent)] hover:underline font-semibold">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                     </svg>
@@ -104,7 +104,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        <td colspan="6" class="px-6 py-12 text-center text-[var(--text-secondary)]">
                             Hozircha yuklashlar yo'q. Yuqorida yangi so'rov yarating.
                         </td>
                     </tr>
@@ -117,18 +117,18 @@
         <div class="p-6 border-t flex justify-center gap-2">
             {% if exports.has_previous %}
                 <a href="?page={{ exports.previous_page_number }}" 
-                   class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                   class="px-4 py-2 border rounded-lg hover:bg-[var(--bg)]">
                     ← Oldingi
                 </a>
             {% endif %}
             
-            <span class="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <span class="px-4 py-2 bg-[var(--surface)] dark:bg-gray-700 rounded-lg">
                 {{ exports.number }} / {{ exports.paginator.num_pages }}
             </span>
             
             {% if exports.has_next %}
                 <a href="?page={{ exports.next_page_number }}" 
-                   class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                   class="px-4 py-2 border rounded-lg hover:bg-[var(--bg)]">
                     Keyingi →
                 </a>
             {% endif %}
@@ -139,7 +139,7 @@
     <!-- Info Box -->
     <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
         <h3 class="text-lg font-bold mb-2">ℹ Ma'lumot</h3>
-        <ul class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+        <ul class="space-y-2 text-sm text-[var(--text-primary)] dark:text-gray-300">
             <li>• Yuklangan ma'lumotlar 7 kun davomida saqlanadi</li>
             <li>• JSON format: Kod orqali ishlov berish uchun qulay</li>
             <li>• PDF format: O'qish va chop etish uchun qulay</li>

@@ -1,0 +1,34 @@
+{% extends "admin/index.html" %}
+{% load static admin_stats %}
+
+{% block content %}
+<div class="dashboard-cards" style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px;">
+  <a href="{% url 'admin:auth_user_changelist' %}" class="dashboard-card card-users" aria-label="Jami foydalanuvchilar">
+    <div class="card-label">JAMI FOYDALANUVCHILAR</div>
+    <div class="card-number">{% admin_count_users %}</div>
+    <div class="card-subtext">{% admin_users_recent_subtext 7 %}</div>
+  </a>
+
+  <a href="{% url 'admin:frontend_company_changelist' %}" class="dashboard-card card-business" aria-label="Jami bizneslar">
+    <div class="card-label">JAMI BIZNESLAR</div>
+    <div class="card-number">{% admin_count_companies %}</div>
+    <div class="card-subtext">{% admin_companies_verified_subtext %}</div>
+  </a>
+
+  <a href="{% url 'admin:frontend_review_changelist' %}" class="dashboard-card card-reviews" aria-label="Jami sharhlar">
+    <div class="card-label">JAMI SHARHLAR</div>
+    <div class="card-number">{% admin_count_reviews %}</div>
+    <div class="card-subtext">{% admin_reviews_approved_subtext %}</div>
+  </a>
+
+  <a href="{% url 'admin:frontend_review_changelist' %}?is_approved__exact=0" class="dashboard-card card-pending" aria-label="Kutilmoqda - pending reviews">
+    <div class="card-label">KUTILMOQDA</div>
+    <div class="card-number">{% admin_count_pending_reviews %}</div>
+    <div class="card-subtext">{% admin_pending_subtext %}</div>
+  </a>
+</div>
+
+<div id="admin-filter-banner-container"></div>
+
+{{ block.super }}
+{% endblock %}

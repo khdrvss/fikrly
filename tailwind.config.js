@@ -1,4 +1,5 @@
 module.exports = {
+  darkMode: 'class',
   content: [
     "./frontend/templates/**/*.html",
     "./frontend/static/**/*.js",
@@ -18,7 +19,24 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary Colors
+        // Semantic color tokens (light / dark)
+        bg: {
+          light: '#f8fafc',
+          dark: '#0f172a',
+        },
+        surface: {
+          light: '#ffffff',
+          dark: '#0f172a',
+        },
+        muted: {
+          light: '#64748b',
+          dark: '#94a3b8',
+        },
+        border: {
+          light: '#e2e8f0',
+          dark: '#334155',
+        },
+        // Primary color palette
         primary: {
           DEFAULT: '#008f5d',
           50: '#f0fdf9',
@@ -32,82 +50,94 @@ module.exports = {
           800: '#006d47',
           900: '#004d32',
         },
-        // Secondary Colors
         secondary: {
-          DEFAULT: "#F59E0B", // amber-500
-          50: "#FFFBEB", // amber-50
-          100: "#FEF3C7", // amber-100
-          200: "#FDE68A", // amber-200
-          300: "#FCD34D", // amber-300
-          400: "#FBBF24", // amber-400
-          500: "#F59E0B", // amber-500
-          600: "#D97706", // amber-600
-          700: "#B45309", // amber-700
-          800: "#92400E", // amber-800
-          900: "#78350F", // amber-900
+          DEFAULT: '#F59E0B',
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#F59E0B',
+          600: '#D97706',
+          700: '#B45309',
+          800: '#92400E',
+          900: '#78350F',
         },
-        // Accent Colors
         accent: {
-          DEFAULT: "#DC2626", // red-600
-          50: "#FEF2F2", // red-50
-          100: "#FEE2E2", // red-100
-          200: "#FECACA", // red-200
-          300: "#FCA5A5", // red-300
-          400: "#F87171", // red-400
-          500: "#EF4444", // red-500
-          600: "#DC2626", // red-600
-          700: "#B91C1C", // red-700
-          800: "#991B1B", // red-800
-          900: "#7F1D1D", // red-900
+          DEFAULT: '#DC2626',
+          50: '#FEF2F2',
+          100: '#FEE2E2',
+          200: '#FECACA',
+          300: '#FCA5A5',
+          400: '#F87171',
+          500: '#EF4444',
+          600: '#DC2626',
+          700: '#B91C1C',
+          800: '#991B1B',
+          900: '#7F1D1D',
         },
-        // Background Colors
-        background: "#FAFAFA", // gray-50
-        surface: "#FFFFFF", // white
-        // Text Colors
-        text: {
-          primary: "#1F2937", // gray-800
-          secondary: "#6B7280", // gray-500
-        },
-        // Status Colors
+        // Status colors
         success: {
-          DEFAULT: "#059669", // emerald-600
-          50: "#ECFDF5", // emerald-50
-          100: "#D1FAE5", // emerald-100
-          200: "#A7F3D0", // emerald-200
-          300: "#6EE7B7", // emerald-300
-          400: "#34D399", // emerald-400
-          500: "#10B981", // emerald-500
-          600: "#059669", // emerald-600
-          700: "#047857", // emerald-700
-          800: "#065F46", // emerald-800
-          900: "#064E3B", // emerald-900
+          DEFAULT: '#059669',
+          50: '#ECFDF5',
+          100: '#D1FAE5',
+          200: '#A7F3D0',
+          300: '#6EE7B7',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065F46',
+          900: '#064E3B',
         },
         warning: {
-          DEFAULT: "#D97706", // amber-600
-          50: "#FFFBEB", // amber-50
-          100: "#FEF3C7", // amber-100
-          200: "#FDE68A", // amber-200
-          300: "#FCD34D", // amber-300
-          400: "#FBBF24", // amber-400
-          500: "#F59E0B", // amber-500
-          600: "#D97706", // amber-600
-          700: "#B45309", // amber-700
-          800: "#92400E", // amber-800
-          900: "#78350F", // amber-900
+          DEFAULT: '#D97706',
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#F59E0B',
+          600: '#D97706',
+          700: '#B45309',
+          800: '#92400E',
+          900: '#78350F',
         },
         error: {
-          DEFAULT: "#DC2626", // red-600
-          50: "#FEF2F2", // red-50
-          100: "#FEE2E2", // red-100
-          200: "#FECACA", // red-200
-          300: "#FCA5A5", // red-300
-          400: "#F87171", // red-400
-          500: "#EF4444", // red-500
-          600: "#DC2626", // red-600
-          700: "#B91C1C", // red-700
-          800: "#991B1B", // red-800
-          900: "#7F1D1D", // red-900
+          DEFAULT: '#DC2626',
+          50: '#FEF2F2',
+          100: '#FEE2E2',
+          200: '#FECACA',
+          300: '#FCA5A5',
+          400: '#F87171',
+          500: '#EF4444',
+          600: '#DC2626',
+          700: '#B91C1C',
+          800: '#991B1B',
+          900: '#7F1D1D',
         },
+        // CSS variable-backed semantic tokens (use in templates as text-textPrimary, bg-bgPrimary etc)
+          // Backwards-compatible variable tokens
+          bgPrimary: 'var(--bg-primary)',
+          bgSecondary: 'var(--bg-secondary)',
+          textPrimary: 'var(--text-primary)',
+          textSecondary: 'var(--text-secondary)',
+          cardBg: 'var(--card-bg)',
+          borderColor: 'var(--border-color)',
+          accentVar: 'var(--accent)',
+          // Canonical semantic tokens mapped to CSS variables for templates
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          elevated: 'var(--bg-elevated)',
+
+          textPrimary: 'var(--text-primary)',
+          textSecondary: 'var(--text-secondary)',
+          textMuted: 'var(--text-muted)',
+
+          borderPrimary: 'var(--border-primary)',
+
+          brand: 'var(--brand)',
+          brandHover: 'var(--brand-hover)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

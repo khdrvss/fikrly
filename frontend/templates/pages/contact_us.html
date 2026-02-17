@@ -5,12 +5,12 @@
 {% block title %}{% trans "Biz bilan bog'lanish - Fikrly" %}{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-12">
+<div class="min-h-screen bg-[var(--bg)] py-12">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12">
+        <div class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8 md:p-12">
             <div class="text-center mb-10">
-                <h1 class="text-3xl font-bold text-gray-900 mb-4">{% trans "Biz bilan bog'lanish" %}</h1>
-                <p class="text-gray-600 text-lg">
+                <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-4">{% trans "Biz bilan bog'lanish" %}</h1>
+                <p class="text-[var(--text-secondary)] text-lg">
                     {% trans "Savollaringiz bormi? Taklif yoki shikoyatlaringizni yuboring. Biz har doim yordam berishga tayyormiz." %}
                 </p>
             </div>
@@ -26,7 +26,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">
                             {{ form.name.label }}
                         </label>
                         {{ form.name }}
@@ -36,7 +36,7 @@
                     </div>
 
                     <div>
-                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">
                             {{ form.email.label }}
                         </label>
                         {{ form.email }}
@@ -47,7 +47,7 @@
                 </div>
 
                 <div>
-                    <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">
                         {{ form.subject.label }}
                     </label>
                     {{ form.subject }}
@@ -57,7 +57,7 @@
                 </div>
 
                 <div>
-                    <label for="{{ form.message.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="{{ form.message.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">
                         {{ form.message.label }}
                     </label>
                     {{ form.message }}
@@ -66,47 +66,47 @@
                     {% endif %}
                 </div>
 
-                <button type="submit" class="w-full bg-primary-600 text-white py-3 px-6 rounded-xl font-medium hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <button type="submit" class="w-full bg-[var(--accent)] text-white py-3 px-6 rounded-xl font-medium hover:opacity-90 transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                     {% trans "Xabarni yuborish" %}
                 </button>
             </form>
 
-            <div class="mt-12 pt-8 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
+            <div class="mt-12 pt-8 border-t border-[var(--border)] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 text-center">
                 <div>
-                    <div class="w-12 h-12 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-12 h-12 bg-primary-50 text-[var(--accent)] rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     </div>
-                    <h3 class="font-medium text-gray-900">Email</h3>
-                    <a href="mailto:fikrlyuzb@gmail.com" class="text-gray-500 hover:text-primary-600">fikrlyuzb@gmail.com</a>
+                    <h3 class="font-medium text-[var(--text-primary)]">Email</h3>
+                    <a href="mailto:fikrlyuzb@gmail.com" class="text-[var(--text-secondary)] hover:text-[var(--accent)]">fikrlyuzb@gmail.com</a>
                 </div>
                 <div>
-                    <div class="w-12 h-12 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-12 h-12 bg-primary-50 text-[var(--accent)] rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                     </div>
-                    <h3 class="font-medium text-gray-900">Telefon</h3>
-                    <a href="tel:+998936895105" class="text-gray-500 hover:text-primary-600">+998 93 689 51 05</a>
+                    <h3 class="font-medium text-[var(--text-primary)]">Telefon</h3>
+                    <a href="tel:+998936895105" class="text-[var(--text-secondary)] hover:text-[var(--accent)]">+998 93 689 51 05</a>
                 </div>
                 <div>
-                    <div class="w-12 h-12 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-12 h-12 bg-primary-50 text-[var(--accent)] rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                     </div>
-                    <h3 class="font-medium text-gray-900">Telegram</h3>
-                    <a href="https://t.me/fikrly_support" class="text-gray-500 hover:text-primary-600">@fikrly_support</a>
+                    <h3 class="font-medium text-[var(--text-primary)]">Telegram</h3>
+                    <a href="https://t.me/fikrly_support" class="text-[var(--text-secondary)] hover:text-[var(--accent)]">@fikrly_support</a>
                 </div>
                 <div>
-                    <div class="w-12 h-12 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-12 h-12 bg-primary-50 text-[var(--accent)] rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M7.8 21h8.4a5.5 5.5 0 005.5-5.5V8.5a5.5 5.5 0 00-5.5-5.5H7.8A5.5 5.5 0 002.3 8.5v7.05A5.5 5.5 0 007.8 21z"></path></svg>
                     </div>
-                    <h3 class="font-medium text-gray-900">Instagram</h3>
-                    <a href="https://www.instagram.com/fikrlyuz/" class="text-gray-500 hover:text-primary-600">@fikrlyuz</a>
+                    <h3 class="font-medium text-[var(--text-primary)]">Instagram</h3>
+                    <a href="https://www.instagram.com/fikrlyuz/" class="text-[var(--text-secondary)] hover:text-[var(--accent)]">@fikrlyuz</a>
                 </div>
                 <div>
-                    <div class="w-12 h-12 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-12 h-12 bg-primary-50 text-[var(--accent)] rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </div>
-                    <h3 class="font-medium text-gray-900">Manzil</h3>
-                    <span class="text-gray-500">Toshkent sh., O'zbekiston</span>
+                    <h3 class="font-medium text-[var(--text-primary)]">Manzil</h3>
+                    <span class="text-[var(--text-secondary)]">Toshkent sh., O'zbekiston</span>
                 </div>
             </div>
         </div>

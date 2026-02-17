@@ -20,10 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create working directory
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python dependencies (copy only requirements to leverage cache)
 COPY requirements.txt requirements-prod.txt ./
-RUN pip install -r requirements.txt \
-    && pip install -r requirements-prod.txt
+# Use explicit --no-cache-dir for deterministic installs and smaller layers
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -r requirements-prod.txt
 
 
 # Stage 2: Runtime stage

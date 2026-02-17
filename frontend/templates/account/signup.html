@@ -39,7 +39,7 @@
     </script>
     {% load socialaccount %}
 </head>
-<body class="bg-background">
+<body class="bg-bg-light text-[var(--text-primary)] dark:bg-bg-dark dark:text-slate-100">
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
         <!-- Left brand panel for desktop -->
@@ -47,8 +47,8 @@
             <a href="/" class="inline-flex items-center space-x-3 mb-4">
                 <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-12 h-12 rounded-xl shadow-lg">
                 <div>
-                    <div class="text-3xl font-bold text-gray-900">Fikrly</div>
-                    <p class="text-gray-500">{% trans "Ishonchli sharhlar platformasi" %}</p>
+                    <div class="text-3xl font-bold text-[var(--text-primary)] dark:text-slate-100">Fikrly</div>
+                    <p class="text-muted-light dark:text-muted-dark">{% trans "Ishonchli sharhlar platformasi" %}</p>
                 </div>
             </a>
         </div>
@@ -60,13 +60,13 @@
                 <div class="text-center mb-6 md:hidden">
                     <a href="/" class="inline-flex items-center space-x-2">
                         <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-10 h-10 rounded-lg shadow-md">
-                        <span class="text-2xl font-bold text-gray-900">Fikrly</span>
+                        <span class="text-2xl font-bold text-[var(--text-primary)] dark:text-slate-100">Fikrly</span>
                     </a>
-                    <h1 class="mt-4 text-2xl font-bold text-gray-900">{% trans "Ro'yxatdan o'tish" %}</h1>
-                    <p class="text-gray-500">{% trans "Hisob yarating yoki ijtimoiy tarmoq orqali davom eting" %}</p>
+                    <h1 class="mt-4 text-2xl font-bold text-[var(--text-primary)] dark:text-slate-100">{% trans "Ro'yxatdan o'tish" %}</h1>
+                    <p class="text-muted-light dark:text-muted-dark">{% trans "Hisob yarating yoki ijtimoiy tarmoq orqali davom eting" %}</p>
                 </div>
 
-                <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-primary-200">
+                <div class="bg-surface-light dark:bg-surface-dark p-8 rounded-2xl shadow-lg border-2 border-primary-200">
                 <form method="post" action="{% url 'account_signup' %}" class="space-y-4">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
@@ -111,10 +111,10 @@
                 <div class="mt-6">
                     <div class="relative">
                         <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
+                            <div class="w-full border-t border-border-light dark:border-border-dark"></div>
                         </div>
                         <div class="relative flex justify-center text-sm">
-                            <span class="px-2 bg-white text-gray-500">{% trans "Yoki" %}</span>
+                            <span class="px-2 bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark">{% trans "Yoki" %}</span>
                         </div>
                     </div>
 
@@ -122,7 +122,7 @@
                         {% get_providers as socialaccount_providers %}
                         {% for provider in socialaccount_providers %}
                             {% if provider.id == "google" %}
-                            <a href="{% provider_login_url provider.id process='login' %}" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            <a href="{% provider_login_url provider.id process='login' %}" class="w-full flex items-center justify-center px-4 py-2 border border-border-light dark:border-border-dark rounded-xl shadow-sm bg-surface-light dark:bg-surface-dark text-sm font-medium text-[var(--text-primary)] dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                 <svg class="h-5 w-5 mr-2" viewBox="0 0 24 24">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -137,7 +137,7 @@
                 </div>
                 </div>
 
-                <p class="text-center text-sm text-text-secondary mt-4">
+                <p class="text-center text-sm text-muted-light dark:text-muted-dark mt-4">
                 Hisobingiz bormi?
                 <a class="text-primary font-semibold" href="{% url 'account_login' %}">Kirish</a>
                 <!-- Phone sign-up temporarily hidden -->

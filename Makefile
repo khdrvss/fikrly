@@ -1,3 +1,27 @@
+## Makefile: safe docker operations for Fikrly
+
+.PHONY: restart rebuild build logs ps prune
+
+restart:
+	docker-compose down
+	docker-compose up -d --build
+
+rebuild:
+	docker-compose build --no-cache
+	docker-compose up -d
+
+build:
+	docker-compose build
+
+logs:
+	docker-compose logs -f
+
+ps:
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+prune:
+	# Remove unused images; does NOT remove volumes
+	docker image prune -f
 # Makefile for Fikrly Docker operations
 
 .PHONY: help build up down restart logs shell test migrate makemigrations collectstatic superuser backup restore clean

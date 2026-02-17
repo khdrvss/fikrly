@@ -1,454 +1,366 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load i18n %}
-
+{% load static i18n render_stars url_params query_helpers %}
 
 {% block title %}
 {% if category_filter %}
-{{ category_filter }} — Fikrly.uz sharhlari va reytinglari
+{% blocktrans %}{{ category_filter }} — Fikrly.uz sharhlari va reytinglari{% endblocktrans %}
 {% else %}
-Bizneslar ro‘yxati — Fikrly.uz
+{% trans "Kompaniyalar ro'yxati — Fikrly.uz" %}
 {% endif %}
 {% endblock %}
 
 {% block meta_description %}
 {% if category_filter %}
-{{ category_filter }} bo‘yicha O‘zbekistondagi kompaniyalar haqida sharhlar, baholar va foydalanuvchi fikrlari.
-Fikrly.uz orqali qaysi kompaniya yaxshiroq ekanini bilib oling.
+{% blocktrans %}{{ category_filter }} bo'yicha O'zbekistondagi kompaniyalar haqida sharhlar, baholar va foydalanuvchi fikrlari.{% endblocktrans %}
 {% else %}
-Fikrly.uz — O‘zbekistondagi barcha bizneslar va xizmatlar ro‘yxati. Sharhlar o‘qing va qoldiring.
+{% trans "Fikrly.uz — O'zbekistondagi barcha bizneslar va xizmatlar ro'yxati. Sharhlar o'qing va qoldiring." %}
 {% endif %}
 {% endblock %}
 
 {% block content %}
-{% load url_params %}
-<div class="min-h-screen py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Breadcrumbs -->
-        <nav class="flex mb-8" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{% url 'index' %}"
-                        class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
-                            </path>
+<div class="bg-gray-50 min-h-screen">
+    <!-- Secondary Search/Sort Row -->
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between gap-4">
+                <!-- Mobile search (hidden on desktop) -->
+                <form method="get" action="{% url 'business_list' %}" class="flex-1 lg:hidden">
+                    <div class="relative">
+                        <input type="search" name="q" value="{{ request.GET.q }}"
+                               placeholder="{% trans 'Qidiring...' %}"
+                               class="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        {% trans "Bosh sahifa" %}
-                    </a>
-                </li>
-                {% if category_filter %}
-                <li>
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        <a href="{% url 'category_browse' %}"
-                            class="ml-1 text-sm font-medium text-gray-500 hover:text-primary-600 md:ml-2">{% trans
-                            "Kategoriyalar" %}</a>
                     </div>
-                </li>
-                <li aria-current="page">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-900 md:ml-2">{{ category_filter }}</span>
-                    </div>
-                </li>
-                {% else %}
-                <li aria-current="page">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        <span class="ml-1 text-sm font-medium text-gray-900 md:ml-2">{% trans "Bizneslar" %}</span>
-                    </div>
-                </li>
-                {% endif %}
-            </ol>
-        </nav>
+                </form>
 
-        <!-- Header & Search -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                    {% if search_query %}
-                    {% if category_filter %}
-                    {{ category_filter }}
-                    {% else %}
-                    {% trans "Qidiruv natijalari" %}
-                    {% endif %}
-                    {% else %}
-                    {% trans "Barcha bizneslar" %}
-                    {% endif %}
-                </h1>
-                {% if search_query %}
-                <p class="text-gray-500 mt-2 text-lg">
-                    "{{ search_query }}" bo'yicha {{ search_results_count }} ta natija
+                <!-- Results count (desktop) -->
+                <p class="hidden lg:block text-sm text-gray-600">
+                    <span class="font-semibold text-gray-900">{{ search_results_count }}</span> {% trans "kompaniya topildi" %}
                 </p>
-                {% else %}
-                <p class="text-gray-500 mt-2 text-lg">{% trans "Eng yaxshi kompaniyalar va xizmatlarni toping" %}</p>
-                {% endif %}
+
+                <!-- Sort dropdown -->
+                <div class="flex items-center gap-2">
+                    <form method="get" action="" class="inline-block" id="sortForm">
+                        {% for key, value in request.GET.items %}
+                            {% if key != 'sort' and key != 'page' %}
+                                <input type="hidden" name="{{ key }}" value="{{ value }}">
+                            {% endif %}
+                        {% endfor %}
+                        <select name="sort" onchange="this.form.submit()" 
+                                class="h-10 pl-3 pr-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white cursor-pointer">
+                            <option value="top" {% if selected_filters.sort == 'top' %}selected{% endif %}>{% trans "Eng mos" %}</option>
+                            <option value="most_reviews" {% if selected_filters.sort == 'most_reviews' %}selected{% endif %}>{% trans "Eng ko'p sharhlar" %}</option>
+                            <option value="new" {% if selected_filters.sort == 'new' %}selected{% endif %}>{% trans "Yangi" %}</option>
+                            <option value="az" {% if selected_filters.sort == 'az' %}selected{% endif %}>{% trans "A-Z" %}</option>
+                        </select>
+                    </form>
+                </div>
             </div>
 
-            <form method="get" class="flex w-full md:w-auto gap-2 relative" id="searchForm">
-                <div class="relative flex-1 md:w-80">
-                    <input type="text" name="q" id="searchInput" aria-label="{% trans 'Kompaniya nomini qidiring' %}"
-                        value="{{ search_query }}" placeholder="{% trans 'Kompaniya nomini qidiring...' %}"
-                        data-search-autocomplete
-                        class="w-full pl-10 pr-4 py-3 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
-                        autocomplete="off">
-                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" aria-hidden="true" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-
-                    <!-- Search Suggestions Dropdown -->
-                    <div id="searchSuggestions"
-                        class="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 hidden">
-                        <!-- Content will be injected via JS -->
-                    </div>
-                </div>
-                <button type="submit"
-                    class="bg-primary-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg">
-                    {% trans "Qidirish" %}
-                </button>
-                {% if search_query %}
-                <a href="{% url 'business_list' %}"
-                    class="px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </a>
-                {% endif %}
-            </form>
+            <!-- Mobile results count -->
+            <p class="lg:hidden text-sm text-gray-600 mt-3">
+                <span class="font-semibold text-gray-900">{{ search_results_count }}</span> {% trans "kompaniya topildi" %}
+            </p>
         </div>
+    </div>
 
-        <!-- Grid with Infinite Scroll -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="businessGrid" data-infinite-scroll {% if
-            companies.has_next %}data-next-page="{{ companies.next_page_number }}" {% endif %}
-            data-url-template="?{% url_replace request 'page' 'PAGE_NUM' %}">
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- Sidebar Filters -->
+            <aside class="col-span-12 lg:col-span-3">
+                <div class="bg-white rounded-xl border border-slate-200 p-6 lg:sticky lg:top-24">
+                    <h2 class="text-lg font-bold text-gray-900 mb-6">{% trans "Filtrlar" %}</h2>
+                    
+                    <form id="filtersForm" method="get" action="{% url 'business_list' %}" class="space-y-6">
+                        <input type="hidden" name="q" value="{{ selected_filters.q }}">
+                        <input type="hidden" name="sort" value="{{ selected_filters.sort }}">
+                        <input type="hidden" name="page" value="1">
 
-            {% for c in companies %}
-            <div
-                class="group bg-white rounded-2xl border border-green-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden relative">
-                <div class="relative h-48 overflow-hidden">
-                    <!-- TODO: Change default company image here. Recommended size: 800x400px -->
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect fill='%23f3f4f6' width='800' height='400'/%3E%3C/svg%3E"
-                        data-src="{{ c.display_image_url|default:c.image_url|default:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80' }}"
-                        alt="{{ c.name }}"
-                        class="lazy-image w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                        onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                        <!-- City Dropdown -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-2">{% trans "Barcha shaharlar" %}</label>
+                            <select name="city" onchange="this.form.submit()"
+                                    class="w-full h-10 px-3 pr-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+                                <option value="">{% trans "Barcha shaharlar" %}</option>
+                                {% for ct in all_cities %}
+                                    {% if ct %}
+                                    <option value="{{ ct }}" {% if selected_filters.city == ct %}selected{% endif %}>{{ ct }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                    <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                        <div class="bg-white p-1 rounded-lg shadow-lg overflow-hidden">
-                            <div class="w-10 h-10 rounded-md overflow-hidden relative">
-                                {% if c.display_logo %}
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%23f3f4f6' width='40' height='40'/%3E%3C/svg%3E"
-                                    data-src="{{ c.display_logo }}" alt="{{ c.name }} logo"
-                                    class="lazy-image w-full h-full object-cover absolute inset-0"
-                                    style="transform: scale(calc({{ c.logo_scale|default:100 }} / 100));"
-                                    onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear';">
-                                {% else %}
-                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%23f3f4f6' width='40' height='40'/%3E%3C/svg%3E"
-                                    data-src="https://api.dicebear.com/7.x/shapes/svg?seed={{ c.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear"
-                                    alt="Logo" class="lazy-image w-full h-full object-cover">
+                        <!-- Categories Checkboxes -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-3">{% trans "Barcha kategoriyalar" %}</label>
+                            <div class="space-y-2 max-h-64 overflow-y-auto pr-2">
+                                {% for cat in all_categories %}
+                                <label class="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer group">
+                                    <div class="flex items-center gap-2 flex-1">
+                                        <input type="checkbox" name="cat_{{ cat.id }}" value="{{ cat.id }}" 
+                                               class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 category-checkbox"
+                                               {% if cat.id|stringformat:"s" in selected_filters.categories %}checked{% endif %}
+                                               onchange="handleCategoryChange(this)">
+                                        <span class="text-sm text-gray-700 group-hover:text-gray-900">{{ cat.display_name }}</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400 ml-2">({{ cat.company_count }})</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Minimal Rating -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-900 mb-3">{% trans "Minimal baho" %}</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="min_rating" value="4" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                                           {% if selected_filters.min_rating == '4' %}checked{% endif %} onchange="this.form.submit()">
+                                    <span class="text-sm text-gray-700 flex items-center gap-1">
+                                        <span class="text-yellow-400">★★★★</span><span class="text-gray-300">☆</span>
+                                        <span class="text-gray-600">& up</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="min_rating" value="3" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                                           {% if selected_filters.min_rating == '3' %}checked{% endif %} onchange="this.form.submit()">
+                                    <span class="text-sm text-gray-700 flex items-center gap-1">
+                                        <span class="text-yellow-400">★★★</span><span class="text-gray-300">☆☆</span>
+                                        <span class="text-gray-600">& up</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="min_rating" value="2" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
+                                           {% if selected_filters.min_rating == '2' %}checked{% endif %} onchange="this.form.submit()">
+                                    <span class="text-sm text-gray-700 flex items-center gap-1">
+                                        <span class="text-yellow-400">★★</span><span class="text-gray-300">☆☆☆</span>
+                                        <span class="text-gray-600">& up</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Verified Only Toggle -->
+                        <div>
+                            <label class="flex items-center justify-between py-2 cursor-pointer">
+                                <span class="text-sm font-semibold text-gray-900">{% trans "Faqat tasdiqlangan" %}</span>
+                                <div class="relative">
+                                    <input type="checkbox" name="verified" value="1" class="sr-only peer" id="verifiedToggle"
+                                           {% if selected_filters.verified == '1' %}checked{% endif %} onchange="this.form.submit()">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Reset Button -->
+                        <div class="pt-4 border-t border-slate-200">
+                            <a href="{% url 'business_list' %}" 
+                               class="block w-full px-4 py-2.5 text-center text-sm font-medium text-gray-700 border border-slate-300 rounded-lg hover:bg-gray-50 transition">
+                                {% trans "Filtrlarni tozalash" %}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Business Cards Grid -->
+            <div class="col-span-12 lg:col-span-9">
+                <!-- Active Filters Pills (if any) -->
+                {% if selected_filters.city or selected_filters.categories or selected_filters.min_rating or selected_filters.verified == '1' %}
+                <div class="flex flex-wrap gap-2 mb-6">
+                    {% if selected_filters.city %}
+                    <a href="?{% querystring_without 'city' %}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                        {{ selected_filters.city }}
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if selected_filters.min_rating %}
+                    <a href="?{% querystring_without 'min_rating' %}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                        {{ selected_filters.min_rating }}★ & up
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if selected_filters.verified == '1' %}
+                    <a href="?{% querystring_without 'verified' %}" 
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                        {% trans "Tasdiqlangan" %}
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {% for company in companies %}
+                    <a href="{% url 'company_detail' company.pk %}" 
+                       class="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+                        <!-- Company Image -->
+                        <div class="relative aspect-[2/1] bg-gray-100 overflow-hidden">
+                            <img src="{{ company.image_800_url|default:company.display_image_url|default:company.image_url }}"
+                                 srcset="{{ company.image_400_url }} 400w, {{ company.image_800_url }} 800w"
+                                 alt="{{ company.name }}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                 onerror="this.src='{% static 'img/placeholder-2x1.svg' %}'">
+                            
+                            <!-- Logo Overlay -->
+                            {% if company.logo_url %}
+                            <div class="absolute bottom-3 left-3 w-14 h-14 bg-white rounded-lg border-2 border-white shadow-lg overflow-hidden">
+                                <img src="{{ company.logo_url }}" 
+                                     alt="{{ company.name }} logo"
+                                     class="w-full h-full object-contain p-1"
+                                     style="transform: scale({{ company.logo_scale|default:100 }}%);">
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4">
+                            <!-- Title Row -->
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <h3 class="font-bold text-gray-900 text-base line-clamp-1 flex-1">{{ company.name }}</h3>
+                                {% if company.is_verified %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium shrink-0">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {% trans "Tasdiqlangan" %}
+                                </span>
                                 {% endif %}
                             </div>
-                        </div>
-                        <div
-                            class="flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-sm font-bold text-gray-900 shadow-sm">
-                            <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            {{ c.rating }}
-                        </div>
-                    </div>
-                </div>
 
-                <div class="p-6 flex-1 flex flex-col">
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-1">
-                            {% with cat=c.category_fk %}
-                            <span class="text-xs font-semibold uppercase tracking-wider
-                                    {% if cat.color == 'red' %}text-red-600
-                                    {% elif cat.color == 'orange' %}text-orange-600
-                                    {% elif cat.color == 'yellow' %}text-yellow-600
-                                    {% elif cat.color == 'green' %}text-green-600
-                                    {% elif cat.color == 'blue' %}text-primary-600
-                                    {% elif cat.color == 'purple' %}text-purple-600
-                                    {% elif cat.color == 'pink' %}text-pink-600
-                                    {% else %}text-gray-600{% endif %}">
-                                {{ cat.display_name|default:c.category }}
-                            </span>
-                            {% endwith %}
-                            <span class="text-xs text-gray-400">{% blocktrans with count=c.review_count %}{{ count }}
-                                sharh{% endblocktrans %}</span>
+                            <!-- Stars & Reviews -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="flex items-center text-yellow-400">
+                                    {% with rating=company.rating %}
+                                        {% if rating >= 1 %}★{% else %}☆{% endif %}{% if rating >= 2 %}★{% else %}☆{% endif %}{% if rating >= 3 %}★{% else %}☆{% endif %}{% if rating >= 4 %}★{% else %}☆{% endif %}{% if rating >= 5 %}★{% else %}☆{% endif %}
+                                    {% endwith %}
+                                </div>
+                                <span class="text-sm text-gray-600">({{ company.review_count }})</span>
+                            </div>
 
-                        </div>
-                        <h3
-                            class="text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1 flex items-center gap-1 relative z-10 pointer-events-none">
-                            {{ c.name }}
-                            {% if c.is_verified %}
-                            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                            <!-- Description -->
+                            {% if company.display_description %}
+                            <p class="text-sm text-gray-600 line-clamp-2 mb-4">{{ company.display_description }}</p>
+                            {% else %}
+                            <div class="mb-4"></div>
                             {% endif %}
-                        </h3>
-                        {% if c.city %}
-                        <div class="flex items-center gap-1 text-sm text-gray-500 mt-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            {{ c.city }}
+
+                            <!-- Divider -->
+                            <div class="border-t border-slate-200 mb-3"></div>
+
+                            <!-- Footer Meta -->
+                            <div class="flex items-center justify-between text-sm text-gray-500">
+                                {% if company.city %}
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    <span class="truncate">{{ company.city }}</span>
+                                </div>
+                                {% endif %}
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                                    </svg>
+                                    <span>{{ company.review_count }} {% trans "sharhlar" %}</span>
+                                </div>
+                            </div>
                         </div>
-                        {% endif %}
-                    </div>
-
-                    {% if c.display_description %}
-                    <p class="text-gray-600 text-sm line-clamp-2 mb-4 flex-1">{{ c.display_description }}</p>
-                    {% else %}
-                    <div class="flex-1"></div>
-                    {% endif %}
-
-                    <a href="{% url 'review_submission' %}?company={{ c.pk }}"
-                        class="w-full py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium hover:border-primary-600 hover:text-primary-600 transition-colors flex items-center justify-center gap-2 group-hover:bg-primary-50/50 relative z-20">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                            </path>
-                        </svg>
-                        {% trans "Sharh yozish" %}
                     </a>
-                </div>
-                <a href="{% url 'company_detail' c.pk %}" class="absolute inset-0 z-10"></a>
-            </div>
-            {% empty %}
-            <div class="col-span-full py-16 text-center">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-6">
-                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">{% trans "Hech narsa topilmadi" %}</h3>
-                <p class="text-gray-500 max-w-md mx-auto mb-8">{% trans "So'rovingiz bo'yicha hech qanday biznes
-                    topilmadi. Iltimos, boshqa kalit so'zlarni sinab ko'ring yoki kategoriyalarni ko'zdan kechiring." %}
-                </p>
-
-
-                {% if search_suggestions %}
-                <div class="max-w-2xl mx-auto bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-left">
-                    <h4 class="font-bold text-gray-900 mb-4">{% trans "Qidiruv takliflari:" %}</h4>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        {% if search_suggestions.categories %}
-                        <div>
-                            <h5 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{% trans
-                                "Kategoriyalar" %}</h5>
-                            <div class="flex flex-wrap gap-2">
-                                {% for category in search_suggestions.categories %}
-                                <a href="{% url 'business_list' %}?category={{ category }}"
-                                    class="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors">{{
-                                    category }}</a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% if search_suggestions.cities %}
-                        <div>
-                            <h5 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">{% trans
-                                "Shaharlar" %}</h5>
-                            <div class="flex flex-wrap gap-2">
-                                {% for city in search_suggestions.cities %}
-                                <a href="{% url 'business_list' %}?q={{ city }}"
-                                    class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">{{
-                                    city }}</a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endif %}
+                    {% empty %}
+                    <!-- No Results -->
+                    <div class="col-span-full py-16 text-center">
+                        <div class="text-6xl mb-4">🔍</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">{% trans "Hech qanday natija topilmadi" %}</h3>
+                        <p class="text-gray-600 mb-6">{% trans "Filtrlarni o'zgartiring yoki boshqa kategoriya sinab ko'ring." %}</p>
+                        <a href="{% url 'business_list' %}" 
+                           class="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition">
+                            {% trans "Filtrlarni tozalash" %}
+                        </a>
                     </div>
-                </div>
-                {% endif %}
-
-                <div class="mt-8">
-                    <a href="{% url 'business_list' %}" class="text-primary-600 font-medium hover:underline">{% trans
-                        "Barcha bizneslarni ko'rish" %} &rarr;</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- Pagination -->
-        {% if companies.has_other_pages %}
-        <div class="mt-12 flex justify-center">
-
-            <nav class="flex items-center space-x-2" aria-label="Pagination">
-                {% if companies.has_previous %}
-                <a href="?{% url_replace request 'page' companies.previous_page_number %}"
-                    class="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                    <span class="sr-only">{% trans "Oldingi" %}</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                        </path>
-                    </svg>
-                </a>
-                {% else %}
-                <span class="p-2 rounded-lg border border-gray-100 text-gray-300 cursor-not-allowed">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-                        </path>
-                    </svg>
-                </span>
-                {% endif %}
-
-                {% for i in companies.paginator.page_range %}
-                {% if companies.number == i %}
-                <span class="px-4 py-2 rounded-lg bg-primary-600 text-white font-medium shadow-sm">{{ i }}</span>
-                {% elif i > companies.number|add:'-3' and i < companies.number|add:'3' %} <a
-                    href="?{% url_replace request 'page' i %}"
-                    class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                    {{ i }}</a>
-                    {% endif %}
-
                     {% endfor %}
+                </div>
 
-                    {% if companies.has_next %}
-                    <a href="?{% url_replace request 'page' companies.next_page_number %}"
-                        class="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                        <span class="sr-only">{% trans "Keyingi" %}</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </a>
-                    {% else %}
-                    <span class="p-2 rounded-lg border border-gray-100 text-gray-300 cursor-not-allowed">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </span>
-                    {% endif %}
-            </nav>
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="mt-10 flex justify-center">
+                    <nav class="flex items-center gap-2" aria-label="Pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% url_replace request 'page' page_obj.previous_page_number %}"
+                           class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                            ←
+                        </a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if num == page_obj.number %}
+                            <span class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium">{{ num }}</span>
+                            {% else %}
+                            <a href="?{% url_replace request 'page' num %}"
+                               class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                                {{ num }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <a href="?{% url_replace request 'page' page_obj.next_page_number %}"
+                           class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                            →
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchForm = document.getElementById('searchForm');
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsBox = document.getElementById('searchSuggestions');
-        let debounceTimer;
+// Handle category checkbox changes
+function handleCategoryChange(checkbox) {
+    const form = document.getElementById('filtersForm');
+    const checkedBoxes = form.querySelectorAll('.category-checkbox:checked');
+    const categories = Array.from(checkedBoxes).map(cb => cb.value).join(',');
+    
+    // Update or remove hidden categories input
+    let categoriesInput = form.querySelector('input[name="categories"]');
+    if (!categoriesInput) {
+        categoriesInput = document.createElement('input');
+        categoriesInput.type = 'hidden';
+        categoriesInput.name = 'categories';
+        form.appendChild(categoriesInput);
+    }
+    categoriesInput.value = categories;
+    
+    // Submit form
+    form.submit();
+}
 
-        if (searchInput) {
-            // Live Search Logic
-            searchInput.addEventListener('input', function () {
-                const query = this.value.trim();
-
-                clearTimeout(debounceTimer);
-
-                if (query.length < 2) {
-                    suggestionsBox.classList.add('hidden');
-                    suggestionsBox.innerHTML = '';
-                    return;
-                }
-
-                debounceTimer = setTimeout(() => {
-                    fetch(`{% url 'search_suggestions_api' %}?q=${encodeURIComponent(query)}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.results && data.results.length > 0) {
-                                renderSuggestions(data.results);
-                            } else {
-                                suggestionsBox.classList.add('hidden');
-                            }
-                        })
-                        .catch(err => console.error('Search error:', err));
-                }, 300);
-            });
-
-            // Close suggestions when clicking outside
-            document.addEventListener('click', function (e) {
-                if (!searchForm.contains(e.target)) {
-                    suggestionsBox.classList.add('hidden');
-                }
-            });
-        }
-
-        function renderSuggestions(results) {
-            let html = '<ul class="py-2">';
-
-            results.forEach(item => {
-                if (item.type === 'category') {
-                    html += `
-                            <li>
-                                <a href="${item.url}" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center mr-3">
-                                        ${item.icon ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>` :
-                            `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>`}
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-gray-900">${item.name}</div>
-                                        <div class="text-xs text-gray-500">{% trans "Kategoriya" %}</div>
-                                    </div>
-                                </a>
-                            </li>
-                        `;
-                } else {
-                    // Company
-                    const logoUrl = item.logo || item.image || "{% static 'images/placeholder.png' %}";
-                    const scale = item.logo_scale || 100;
-
-                    const imgHtml = `
-                            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 mr-3 relative overflow-hidden">
-                                <img src="${logoUrl}"
-                                     class="absolute inset-0 w-full h-full object-cover"
-                                     alt="${item.name}"
-                                     style="transform: scale(${scale / 100});"
-                                     onerror="this.src='{% static 'images/placeholder.png' %}'">
-                            </div>`;
-
-                    html += `
-                            <li>
-                                <a href="${item.url}" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                                    ${imgHtml}
-                                    <div>
-                                        <div class="font-medium text-gray-900">${item.name}</div>
-                                        <div class="text-xs text-gray-500">${item.category || '{% trans "Biznes" %}'}</div>
-                                    </div>
-                                </a>
-                            </li>
-                        `;
-                }
-            });
-
-            html += '</ul>';
-            suggestionsBox.innerHTML = html;
-            suggestionsBox.classList.remove('hidden');
-        }
-    });
+// Mobile menu toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    
+    if (menuBtn && menu) {
+        menuBtn.addEventListener('click', function() {
+            menu.classList.toggle('hidden');
+        });
+    }
+});
 </script>
 {% endblock %}

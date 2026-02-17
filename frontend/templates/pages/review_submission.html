@@ -26,18 +26,18 @@
 {% block content %}
 <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{% trans "Tajribangizni baholang" %}</h1>
-        <p class="text-gray-600">{% trans "Sizning fikringiz bizneslarga o'sishga va boshqalarga to'g'ri tanlov qilishga yordam beradi." %}</p>
+        <h1 class="text-3xl font-bold text-[var(--text-primary)] mb-2">{% trans "Tajribangizni baholang" %}</h1>
+        <p class="text-[var(--text-secondary)]">{% trans "Sizning fikringiz bizneslarga o'sishga va boshqalarga to'g'ri tanlov qilishga yordam beradi." %}</p>
     </div>
 
     <form id="reviewForm" method="post" action="" class="space-y-6" enctype="multipart/form-data" data-validate>
         {% csrf_token %}
 
         <!-- Step 1: Select Company -->
-        <div class="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
+        <div class="bg-[var(--surface)] rounded-2xl shadow-sm border border-green-200 overflow-hidden">
             <div class="p-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">{% trans "1. Biznesni tanlang" %}</h2>
+                    <h2 class="text-lg font-semibold text-[var(--text-primary)]">{% trans "1. Biznesni tanlang" %}</h2>
                     <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700">{% trans "Majburiy" %}</span>
                 </div>
 
@@ -50,7 +50,7 @@
                             </svg>
                         </div>
                         <input type="text" id="companySearchInput"
-                            class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all sm:text-sm"
+                            class="block w-full pl-10 pr-3 py-3 border border-[var(--border)] rounded-xl leading-5 bg-[var(--bg)] placeholder-gray-400 focus:outline-none focus:bg-[var(--surface)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all sm:text-sm"
                             placeholder="{% trans 'Biznes nomi yoki manzilini qidiring...' %}" autocomplete="off">
                     </div>
 
@@ -59,12 +59,12 @@
                         {% static 'images/placeholder.png' as default_placeholder %}
                         {% trans "Kategoriya yo'q" as no_category %}
                         {% for c in suggested_companies %}
-                        <div class="company-card cursor-pointer group relative flex items-center p-3 rounded-xl border border-gray-200 hover:border-primary-400 hover:shadow-md transition-all bg-white"
+                        <div class="company-card cursor-pointer group relative flex items-center p-3 rounded-xl border border-[var(--border)] hover:border-primary-400 hover:shadow-md transition-all bg-[var(--surface)]"
                                 data-id="{{ c.pk }}"
                                 data-name="{{ c.name }}"
                                 data-image="{{ c.display_logo|default:c.display_image_url|default:default_placeholder }}"
                                 data-scale="{{ c.logo_scale|default:100 }}">
-                            <div class="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-gray-100 mr-3 relative">
+                            <div class="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-[var(--surface)] mr-3 relative">
                                 <img src="{{ c.display_logo|default:c.display_image_url|default:default_placeholder }}"
                                         alt="{{ c.name }}"
                                         class="h-full w-full object-cover absolute inset-0"
@@ -72,11 +72,11 @@
                                         onerror="this.onerror=null;this.src='{{ default_placeholder }}'">
                             </div>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600 transition-colors">{{ c.name }}</p>
-                                <p class="text-xs text-gray-500 truncate">{{ c.category_fk.display_name|default:c.category|default:no_category }}</p>
+                                <p class="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent)] transition-colors">{{ c.name }}</p>
+                                <p class="text-xs text-[var(--text-secondary)] truncate">{{ c.category_fk.display_name|default:c.category|default:no_category }}</p>
                             </div>
                             <div class="md:hidden ml-2">
-                                <span class="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
+                                <span class="text-xs font-medium text-[var(--accent)] bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
                             </div>
                             <div class="absolute inset-0 border-2 border-primary-500 rounded-xl opacity-0 scale-95 transition-all pointer-events-none selection-ring"></div>
                         </div>
@@ -93,15 +93,15 @@
                 <div id="selectedCompanyView" class="hidden">
                     <div class="flex items-center justify-between p-4 bg-primary-50 border border-primary-100 rounded-xl">
                         <div class="flex items-center">
-                            <div class="h-12 w-12 rounded-lg overflow-hidden bg-white border border-primary-100 mr-3">
+                            <div class="h-12 w-12 rounded-lg overflow-hidden bg-[var(--surface)] border border-primary-100 mr-3">
                                 <img id="selectedCompanyImg" src="" alt="" class="h-full w-full object-cover">
                             </div>
                             <div>
-                                <p class="text-sm text-primary-600 font-medium mb-0.5">{% trans "Tanlangan biznes" %}</p>
-                                <h3 id="selectedCompanyName" class="text-base font-bold text-gray-900"></h3>
+                                <p class="text-sm text-[var(--accent)] font-medium mb-0.5">{% trans "Tanlangan biznes" %}</p>
+                                <h3 id="selectedCompanyName" class="text-base font-bold text-[var(--text-primary)]"></h3>
                             </div>
                         </div>
-                        <button type="button" id="changeCompanyBtn" class="text-sm text-gray-500 hover:text-primary-600 font-medium underline decoration-dotted underline-offset-2">
+                        <button type="button" id="changeCompanyBtn" class="text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] font-medium underline decoration-dotted underline-offset-2">
                             {% trans "O'zgartirish" %}
                         </button>
                     </div>
@@ -110,9 +110,9 @@
         </div>
 
         <!-- Step 2: Rating -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-gray-900">{% trans "2. Baholang" %}</h2>
+                <h2 class="text-lg font-semibold text-[var(--text-primary)]">{% trans "2. Baholang" %}</h2>
                 <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700">{% trans "Majburiy" %}</span>
             </div>
 
@@ -130,17 +130,17 @@
         </div>
 
         <!-- Step 3: Review Details -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-6">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-semibold text-gray-900">{% trans "3. Batafsil fikringiz" %}</h2>
+                <h2 class="text-lg font-semibold text-[var(--text-primary)]">{% trans "3. Batafsil fikringiz" %}</h2>
             </div>
 
             <div class="space-y-6">
                 <!-- Name Field -->
                 <div>
-                    <label for="{{ form.user_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Ismingiz" %}</label>
+                    <label for="{{ form.user_name.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">{% trans "Ismingiz" %}</label>
                     <input type="text" name="{{ form.user_name.name }}" id="{{ form.user_name.id_for_label }}"
-                            class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm"
+                            class="block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--bg)] focus:bg-[var(--surface)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm"
                             placeholder="{% trans 'Ismingizni kiriting' %}"
                             value="{{ form.user_name.value|default:'' }}">
                     {% if form.user_name.errors %}
@@ -151,19 +151,19 @@
                 <!-- Review Text -->
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-gray-700">{% trans "Sharh matni" %}</label>
+                        <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)]">{% trans "Sharh matni" %}</label>
                     </div>
                     <textarea name="{{ form.text.name }}" 
                               id="{{ form.text.id_for_label }}" 
                               rows="5"
                               maxlength="2000"
                               data-character-counter
-                              class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm resize-y"
+                              class="block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--bg)] focus:bg-[var(--surface)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors sm:text-sm resize-y"
                               placeholder="{% trans "Nima sizga yoqdi yoki yoqmadi? Boshqalarga foydali bo'ladigan tafsilotlarni yozing..." %}">{{ form.text.value|default:'' }}</textarea>
                     {% if form.text.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.text.errors.0 }}</p>
                     {% endif %}
-                    <p class="mt-2 text-xs text-gray-500 flex items-center gap-1">
+                    <p class="mt-2 text-xs text-[var(--text-secondary)] flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         {% trans "Haqoratli so'zlar va shaxsiy ma'lumotlardan saqlaning." %}
                     </p>
@@ -171,20 +171,20 @@
 
                 <!-- Receipt Upload -->
                 <div>
-                    <label for="{{ form.receipt.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Xarid cheki (ixtiyoriy)" %}</label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-primary-400 transition-colors bg-gray-50 hover:bg-white">
+                    <label for="{{ form.receipt.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">{% trans "Xarid cheki (ixtiyoriy)" %}</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-primary-400 transition-colors bg-[var(--bg)] hover:bg-[var(--surface)]">
                         <div class="space-y-1 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            <div class="flex text-sm text-gray-600 justify-center">
-                                <label for="{{ form.receipt.id_for_label }}" class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                            <div class="flex text-sm text-[var(--text-secondary)] justify-center">
+                                <label for="{{ form.receipt.id_for_label }}" class="relative cursor-pointer bg-[var(--surface)] rounded-md font-medium text-[var(--accent)] hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
                                     <span>{% trans "Fayl yuklash" %}</span>
                                     <input id="{{ form.receipt.id_for_label }}" name="{{ form.receipt.name }}" type="file" class="sr-only" accept="image/*">
                                 </label>
                                 <p class="pl-1">{% trans "yoki bu yerga tashlang" %}</p>
                             </div>
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs text-[var(--text-secondary)]">
                                 PNG, JPG, GIF ({% trans "maks." %} 5MB)
                             </p>
                         </div>
@@ -192,27 +192,27 @@
                     {% if form.receipt.errors %}
                     <p class="mt-1 text-sm text-red-600">{{ form.receipt.errors.0 }}</p>
                     {% endif %}
-                    <p class="mt-2 text-xs text-gray-500">
+                    <p class="mt-2 text-xs text-[var(--text-secondary)]">
                         {% trans "Chek yuklash orqali siz 'Tasdiqlangan xarid' belgisini olishingiz mumkin." %}
                     </p>
                 </div>
 
                 <!-- Privacy Toggles -->
-                <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-                    <h3 class="text-sm font-semibold text-gray-900">{% trans "Maxfiylik sozlamalari" %}</h3>
+                <div class="bg-[var(--bg)] rounded-xl p-4 space-y-3">
+                    <h3 class="text-sm font-semibold text-[var(--text-primary)]">{% trans "Maxfiylik sozlamalari" %}</h3>
 
                     <label class="flex items-center cursor-pointer group">
                         <div class="relative flex items-center">
-                            <input type="checkbox" class="peer h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 transition-all cursor-pointer" checked>
+                            <input type="checkbox" class="peer h-5 w-5 text-[var(--accent)] border-gray-300 rounded focus:ring-primary-500 transition-all cursor-pointer" checked>
                         </div>
-                        <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">{% trans "Ismimni ko'rsatish" %}</span>
+                        <span class="ml-3 text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{% trans "Ismimni ko'rsatish" %}</span>
                     </label>
 
                     <label class="flex items-center cursor-pointer group">
                         <div class="relative flex items-center">
-                            <input type="checkbox" class="peer h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 transition-all cursor-pointer" checked>
+                            <input type="checkbox" class="peer h-5 w-5 text-[var(--accent)] border-gray-300 rounded focus:ring-primary-500 transition-all cursor-pointer" checked>
                         </div>
-                        <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">{% trans "Biznesga javob berish imkoniyatini berish" %}</span>
+                        <span class="ml-3 text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{% trans "Biznesga javob berish imkoniyatini berish" %}</span>
                     </label>
                 </div>
 
@@ -222,14 +222,14 @@
 
         <!-- Submit Actions -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
-            <p class="text-xs text-gray-500 text-center sm:text-left max-w-md">
-                {% trans "Yuborish tugmasini bosish orqali siz" %} <a href="{% url 'terms_of_service' %}" class="text-primary-600 hover:underline">{% trans "Foydalanish shartlari" %}</a> {% trans "va" %} <a href="{% url 'community_guidelines' %}" class="text-primary-600 hover:underline">{% trans "Hamjamiyat qoidalari" %}</a>{% trans "ga rozilik bildirasiz." %}
+            <p class="text-xs text-[var(--text-secondary)] text-center sm:text-left max-w-md">
+                {% trans "Yuborish tugmasini bosish orqali siz" %} <a href="{% url 'terms_of_service' %}" class="text-[var(--accent)] hover:underline">{% trans "Foydalanish shartlari" %}</a> {% trans "va" %} <a href="{% url 'community_guidelines' %}" class="text-[var(--accent)] hover:underline">{% trans "Hamjamiyat qoidalari" %}</a>{% trans "ga rozilik bildirasiz." %}
             </p>
             <div class="flex gap-3 w-full sm:w-auto">
-                <button type="reset" class="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+                <button type="reset" class="flex-1 sm:flex-none px-6 py-3 border border-gray-300 text-[var(--text-primary)] font-medium rounded-xl hover:bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
                     {% trans "Tozalash" %}
                 </button>
-                <button type="submit" class="flex-1 sm:flex-none px-8 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-200 transition-all transform hover:-translate-y-0.5">
+                <button type="submit" class="flex-1 sm:flex-none px-8 py-3 bg-[var(--accent)] text-white font-bold rounded-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-200 transition-all transform hover:-translate-y-0.5">
                     {% trans "Yuborish" %}
                 </button>
             </div>
@@ -303,7 +303,7 @@
                     .then(data => {
                         companyContainer.innerHTML = '';
                         if (data.results.length === 0) {
-                            companyContainer.innerHTML = `<div class="col-span-full text-center py-4 text-gray-500">{% trans "Hech narsa topilmadi" %}</div>`;
+                            companyContainer.innerHTML = `<div class="col-span-full text-center py-4 text-[var(--text-secondary)]">{% trans "Hech narsa topilmadi" %}</div>`;
                             return;
                         }
 
@@ -312,12 +312,12 @@
                                 const logoUrl = c.logo || c.image || "{% static 'images/placeholder.png' %}";
                                 const scale = c.logo_scale || 100;
                                 const html = `
-                                <div class="company-card cursor-pointer group relative flex items-center p-3 rounded-xl border border-gray-200 hover:border-primary-400 hover:shadow-md transition-all bg-white"
+                                <div class="company-card cursor-pointer group relative flex items-center p-3 rounded-xl border border-[var(--border)] hover:border-primary-400 hover:shadow-md transition-all bg-[var(--surface)]"
                                         data-id="${c.id}"
                                         data-name="${c.name}"
                                         data-image="${logoUrl}"
                                         data-scale="${scale}">
-                                    <div class="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-gray-100 mr-3 relative">
+                                    <div class="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-[var(--surface)] mr-3 relative">
                                         <img src="${logoUrl}"
                                              alt="${c.name}"
                                              class="h-full w-full object-cover absolute inset-0"
@@ -325,11 +325,11 @@
                                              onerror="this.src='{% static 'images/placeholder.png' %}'">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600 transition-colors">${c.name}</p>
-                                        <p class="text-xs text-gray-500 truncate">${c.category || "{% trans "Kategoriya yo'q" %}"}</p>
+                                        <p class="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent)] transition-colors">${c.name}</p>
+                                        <p class="text-xs text-[var(--text-secondary)] truncate">${c.category || "{% trans "Kategoriya yo'q" %}"}</p>
                                     </div>
                                     <div class="md:hidden ml-2">
-                                        <span class="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
+                                        <span class="text-xs font-medium text-[var(--accent)] bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
                                     </div>
                                     <div class="absolute inset-0 border-2 border-primary-500 rounded-xl opacity-0 scale-95 transition-all pointer-events-none selection-ring"></div>
                                 </div>`;

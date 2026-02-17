@@ -1,0 +1,171 @@
+/* Custom Fikrly Admin Styles - Modern SaaS look */
+:root{
+  --bg-main: #0F1115;
+  --bg-card: #161A20;
+  --border-soft: #252B33;
+
+  --text-primary: #E6E8EB;
+  --text-muted: #9AA4B2;
+
+  --blue: #4C8DFF;
+  --green: #0F9D7A;
+  --yellow: #F5B942;
+  --red: #FF6B6B;
+
+  --blue-soft: rgba(76,141,255,0.15);
+  --green-soft: rgba(15,157,122,0.15);
+  --yellow-soft: rgba(245,185,66,0.15);
+  --red-soft: rgba(255,107,107,0.15);
+
+  /* Backwards-compatible vars used elsewhere */
+  --card-bg-light: #ffffff;
+  --card-text: #0F1724;
+  --bg-hover: #1E232B;
+  --border-soft: #E6EAF0;
+  --header-bg: #2F7F8A;
+}
+
+/* Base body */
+html, body {
+  background: var(--bg-main) !important;
+  color: var(--text-primary) !important;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Wrap content in a centered container */
+#content-main, .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px;
+}
+
+/* Admin header adjustments */
+#header, #branding {
+  background: linear-gradient(90deg, var(--header-bg), #2C6E77);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+#header { padding: 12px 32px; }
+#branding { padding: 8px 0; }
+#site-name { color: var(--card-bg-light); font-weight:700; font-size:18px; }
+
+/* Left sidebar tweaks */
+#nav-global, .app-list, .model-list {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  width: 260px;
+  padding: 18px;
+  border-right: 1px solid var(--border-soft);
+  border-radius: 12px;
+}
+
+/* Make sidebar fixed and main content flow next to it */
+#container { display: flex; gap: 24px; }
+#nav-sidebar { flex: 0 0 260px; position: sticky; top: 20px; align-self: start; }
+#content { flex: 1 1 auto; }
+
+/* Sidebar links */
+.app-list a, .model-list a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; margin-bottom: 6px;
+  border-radius: 10px; color: var(--text-muted); text-decoration: none;
+}
+.app-list a:hover, .model-list a:hover { background: var(--bg-hover); color: var(--text-primary); }
+.app-list .selected a, .model-list .selected a { background: var(--green-soft); color: var(--green-primary); }
+
+/* Dashboard cards */
+.dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.stat-card { background: var(--card-bg-light); color: var(--card-text); border-radius: 16px; padding: 24px; border: 1px solid rgba(15,23,36,0.06); transition: transform .18s ease, box-shadow .18s ease; }
+.stat-card:hover{ transform: translateY(-3px); box-shadow: 0 10px 30px rgba(2,6,23,0.45); }
+.stat-card h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing:0.04em; margin-bottom:8px; }
+.stat-card .value { font-size: 36px; font-weight:700; color:var(--card-text); }
+.stat-card .subtext { font-size:12px; color:var(--text-muted); margin-top:8px; }
+
+/* Dashboard clickable card system per design spec */
+.dashboard-card {
+  display: block;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 16px;
+  padding: 24px;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.15s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.dashboard-card:hover{ transform: translateY(-3px); }
+.dashboard-card .card-label{ font-size:12px; text-transform:uppercase; color:var(--text-muted); margin-bottom:8px; }
+.dashboard-card .card-number{ font-size:32px; font-weight:700; color:var(--text-primary); }
+.dashboard-card .card-subtext{ font-size:12px; color:var(--text-muted); margin-top:8px; }
+
+.card-users{ border-left: 4px solid var(--blue); }
+.card-users:hover{ background: var(--blue-soft); color: var(--card-text); }
+.card-business{ border-left: 4px solid var(--green); }
+.card-business:hover{ background: var(--green-soft); color: var(--card-text); }
+.card-reviews{ border-left: 4px solid var(--yellow); }
+.card-reviews:hover{ background: var(--yellow-soft); color: var(--card-text); }
+.card-pending{ border-left: 4px solid var(--red); }
+.card-pending:hover{ background: var(--red-soft); color: var(--card-text); }
+
+/* Left indicator bar */
+.stat-card.indicator-users{ border-left: 6px solid var(--blue-soft); }
+.stat-card.indicator-businesses{ border-left: 6px solid var(--green-primary); }
+.stat-card.indicator-reviews{ border-left: 6px solid var(--yellow-soft); }
+.stat-card.indicator-pending{ border-left: 6px solid var(--red-soft); }
+
+/* Sections spacing */
+.section { background: transparent; margin-top: 40px; }
+.section > h2 { color: var(--text-primary); font-size: 18px; margin-bottom: 16px; }
+
+/* Quick action buttons */
+.quick-actions a{ display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:#F3F4F6; color:var(--card-text); border-radius:10px; text-decoration:none; transition: background .18s ease; }
+.quick-actions a:hover{ background:var(--green-soft); color:var(--green-primary); }
+.quick-actions a svg{ opacity:0.9 }
+
+/* Table styles */
+.activity-table, table.results { width:100%; border-collapse: separate; border-spacing: 0; }
+.activity-table thead th { background: transparent; color: var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:0.05em; padding:12px 16px; position: sticky; top: 64px; z-index: 5; }
+.activity-table tbody tr { background: var(--bg-card); border-bottom: 1px solid rgba(255,255,255,0.02); }
+.activity-table tbody tr:nth-child(even) { background: #1A1F26; }
+.activity-table tbody tr:hover { background: #222831; cursor: pointer; }
+.activity-table td { padding: 14px 16px; color: var(--text-primary); }
+
+/* Make sections use card background where appropriate (table containers etc) */
+.section .card, .section .module, .card-container { background: var(--card-bg-light); color: var(--card-text); border-radius: 12px; padding: 16px; border: 1px solid rgba(15,23,36,0.06); }
+
+/* Badge pills */
+.badge { display:inline-block; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600; }
+.badge.success { background: var(--green-soft); color: var(--green-primary); }
+.badge.warning { background: rgba(245,185,66,0.15); color: var(--yellow-soft); }
+.badge.danger { background: rgba(255,107,107,0.15); color: var(--red-soft); }
+
+/* Buttons and focus */
+button, .button, a.button { border-radius:10px; padding:8px 12px; background:var(--bg-hover); color:var(--text-primary); border:none; }
+:focus-visible { outline: 2px solid var(--green-primary); outline-offset: 2px; }
+
+/* Collapsible system info */
+.system-collapsible { background: var(--bg-card); border-radius: 12px; padding: 12px; }
+.system-collapsible .toggle { cursor:pointer; color:var(--text-muted); }
+.system-collapsible .content{ display:none; margin-top:12px; }
+.system-collapsible.open .content{ display:block; }
+
+/* Small screens */
+@media (max-width: 1024px){
+  #container{ flex-direction: column; }
+  #nav-sidebar{ position:relative; width:100%; }
+  .dashboard-grid{ grid-template-columns: repeat(2,1fr); }
+  .dashboard-cards { grid-template-columns: 1fr !important; }
+  #content-main, .container { padding: 16px; }
+}
+
+/* Accessibility and micro-ux */
+.fade-in { animation: fadeIn .35s ease both; }
+@keyframes fadeIn { from{ opacity:0; transform: translateY(6px);} to{opacity:1; transform:none;} }
+
+/* Ensure minimum clickable area for links in tables */
+.activity-table a{ display:inline-block; padding:6px 8px; border-radius:6px; }
+
+/* Make sure admin login and forms are legible */
+#content-main .module, .module { background: transparent; }
+

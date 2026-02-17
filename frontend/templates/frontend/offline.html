@@ -1,7 +1,7 @@
-{% extends 'frontend/base.html' %}
-{% load static %}
+{% extends 'base.html' %}
+{% load static i18n %}
 
-{% block title %}Oflayn - Fikrly{% endblock %}
+{% block title %}{% trans "Oflayn - Fikrly" %}{% endblock %}
 
 {% block content %}
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-purple-50">
@@ -14,58 +14,58 @@
     </div>
     
     <!-- Message -->
-    <h1 class="text-4xl font-bold text-gray-900 mb-4">Internet aloqasi yo'q</h1>
-    <p class="text-lg text-gray-600 mb-8">
-      Hozirda internet aloqasi mavjud emas. Iltimos, ulanishni tekshiring va qayta urinib ko'ring.
+    <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-4">{% trans "Internet aloqasi yo'q" %}</h1>
+    <p class="text-lg text-[var(--text-secondary)] mb-8">
+      {% trans "Hozirda internet aloqasi mavjud emas. Iltimos, ulanishni tekshiring va qayta urinib ko'ring." %}
     </p>
     
     <!-- Connection status -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <div class="bg-[var(--surface)] rounded-lg shadow-lg p-6 mb-6">
       <div class="flex items-center justify-between">
-        <span class="text-gray-700 font-medium">Aloqa holati</span>
+        <span class="text-[var(--text-primary)] font-medium">{% trans "Aloqa holati" %}</span>
         <span id="connection-status" class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">
-          Oflayn
+          {% trans "Oflayn" %}
         </span>
       </div>
     </div>
     
     <!-- Actions -->
     <div class="space-y-3">
-      <button onclick="location.reload()" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-        Qayta urinish
+      <button onclick="location.reload()" class="w-full bg-[var(--accent)] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+        {% trans "Qayta urinish" %}
       </button>
       
-      <a href="/" class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-        Bosh sahifaga qaytish
+      <a href="/" class="block w-full bg-[var(--surface)] hover:bg-gray-200 text-[var(--text-primary)] font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+        {% trans "Bosh sahifaga qaytish" %}
         </a>
     </div>
     
     <!-- Helpful tips -->
     <div class="mt-12 text-left bg-blue-50 rounded-lg p-6">
-      <h3 class="font-semibold text-gray-900 mb-3 flex items-center">
+        <h3 class="font-semibold text-[var(--text-primary)] mb-3 flex items-center">
         <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
         </svg>
-        Foydali maslahatlar
+        {% trans "Foydali maslahatlar" %}
       </h3>
-      <ul class="space-y-2 text-sm text-gray-700">
+      <ul class="space-y-2 text-sm text-[var(--text-primary)]">
         <li class="flex items-start">
           <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
-          Wi-Fi yoki mobil internetni yoqilganligini tekshiring
+          {% trans "Wi-Fi yoki mobil internetni yoqilganligini tekshiring" %}
         </li>
         <li class="flex items-start">
           <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
-          Parvoz rejimini o'chirilganligini tasdiqlang
+          {% trans "Parvoz rejimini o'chirilganligini tasdiqlang" %}
         </li>
         <li class="flex items-start">
           <svg class="w-5 h-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
           </svg>
-          Router yoki modemni qayta ishga tushiring
+          {% trans "Router yoki modemni qayta ishga tushiring" %}
         </li>
       </ul>
     </div>

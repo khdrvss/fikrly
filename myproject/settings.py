@@ -46,6 +46,13 @@ CSRF_TRUSTED_ORIGINS = ["https://fikrly.uz", "https://www.fikrly.uz"]
 if DEBUG:
     # Allow Cloudflare Quick Tunnel random subdomains and local binds during development
     ALLOWED_HOSTS = list({*ALLOWED_HOSTS, ".trycloudflare.com", "0.0.0.0"})
+    # Add localhost to CSRF trusted origins for development
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost",
+        "http://127.0.0.1"
+    ]
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -116,6 +123,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     # Performance monitoring (conditionally loaded)
     "django_extensions",
+    # Model translation for multilingual DB fields
+    "modeltranslation",
     # 'debug_toolbar',
     "frontend.apps.FrontendConfig",
 ]
@@ -193,16 +202,44 @@ else:
 
 # ... existing code ...
 
-DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.environ.get("DB_NAME", "fikrly_db"),
-        "USER": os.environ.get("DB_USER", "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "fikrly_uz"),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.postgresql")
+DB_NAME = os.environ.get("DB_NAME", "fikrly_db")
+DB_USER = os.environ.get("DB_USER", "fikrly_user")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "fikrly_uz")
+DB_HOST = os.environ.get("DB_HOST", "db")  # docker compose service name default
+DB_PORT = os.environ.get("DB_PORT", "5432")
+
+if DB_ENGINE.endswith("sqlite3") or DB_ENGINE.endswith("sqlite"):
+    # SQLite expects a file path for NAME
+    if DB_NAME and DB_NAME.endswith('.sqlite3'):
+        sqlite_path = Path(DB_NAME)
+        if not sqlite_path.is_absolute():
+            sqlite_path = BASE_DIR / DB_NAME
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": str(sqlite_path),
+            }
+        }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": str(BASE_DIR / "db.sqlite3"),
+            }
+        }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": int(DB_PORT) if DB_PORT is not None and str(DB_PORT).isdigit() else DB_PORT,
+            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+        }
     }
-}
 
 
 # Password validation
@@ -236,6 +273,9 @@ LANGUAGES = [
     ("ru", _("Русский")),
 ]
 
+# Default language used by django-modeltranslation when creating translated fields
+MODELTRANSLATION_DEFAULT_LANGUAGE = "uz"
+
 LOCALE_PATHS = [
     BASE_DIR / "locale",
 ]
@@ -245,6 +285,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)

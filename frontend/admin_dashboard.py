@@ -28,7 +28,8 @@ def admin_dashboard(request):
     total_users = User.objects.count()
     active_users_7d = User.objects.filter(last_login__gte=last_7_days).count()
     new_users_30d = User.objects.filter(date_joined__gte=last_30_days).count()
-    verified_users = UserProfile.objects.filter(email_verified=True).count()
+    # Note: UserProfile does not have `email_verified` field; use admin approval flag instead
+    verified_users = UserProfile.objects.filter(is_approved=True).count()
     
     # Company statistics
     total_companies = Company.objects.count()
@@ -47,7 +48,8 @@ def admin_dashboard(request):
     avg_rating = Review.objects.filter(is_approved=True).aggregate(Avg('rating'))['rating__avg'] or 0
     
     # Recent activity
-    recent_reviews = Review.objects.select_related('company', 'author').order_by('-created_at')[:10]
+    # Use 'user' FK (Review.user) - 'author' does not exist on Review model
+    recent_reviews = Review.objects.select_related('company', 'user').order_by('-created_at')[:10]
     recent_companies = Company.objects.select_related('manager').order_by('-id')[:10]
     recent_users = User.objects.order_by('-date_joined')[:10]
     

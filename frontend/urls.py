@@ -49,6 +49,7 @@ urlpatterns = [
     path("business-profile/", business_profile, name="business_profile"),
     # New SEO-friendly paths
     path("bizneslar/", business_list, name="business_list"),
+    path("businesses/", business_list, name="business_list_en"),
     path("kategoriyalar/", category_browse, name="category_browse"),
     path(
         "kategoriyalar/<slug:category_slug>/",

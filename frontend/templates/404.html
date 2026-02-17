@@ -1,10 +1,11 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="uz">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Sahifa topilmadi | Fikrly.uz</title>
+    <title>{% trans "404 - Sahifa topilmadi | Fikrly.uz" %}</title>
     <link rel="stylesheet" href="{% static 'tailwind.css' %}">
     <style>
         .error-animation {
@@ -16,59 +17,59 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body class="bg-bg-light text-[var(--text-primary)] dark:bg-bg-dark dark:text-slate-100">
     <div class="min-h-screen flex items-center justify-center px-4">
         <div class="max-w-2xl w-full text-center">
             <!-- 404 Illustration -->
             <div class="error-animation mb-8">
-                <svg class="w-64 h-64 mx-auto text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-64 h-64 mx-auto text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
 
             <!-- Error Code -->
-            <h1 class="text-9xl font-bold text-primary-600 mb-4">404</h1>
+            <h1 class="text-9xl font-bold text-[var(--accent)] mb-4">404</h1>
             
             <!-- Message -->
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Sahifa topilmadi
+            <h2 class="text-3xl font-bold text-[var(--text-primary)] dark:text-slate-100 mb-4">
+                {% trans "Sahifa topilmadi" %}
             </h2>
-            <p class="text-xl text-gray-600 dark:text-gray-400 mb-8">
-                Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki o'chirilgan.
+            <p class="text-xl text-muted-light dark:text-muted-dark mb-8">
+                {% trans "Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki o'chirilgan." %}
             </p>
 
             <!-- Actions -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="/" 
-                   class="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-semibold rounded-lg hover:bg-primary-700 transition duration-200">
+                   class="inline-flex items-center justify-center px-6 py-3 bg-[var(--accent)] text-white font-semibold rounded-lg hover:opacity-90 transition duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    Bosh sahifaga qaytish
+                    {% trans "Bosh sahifaga qaytish" %}
                 </a>
                 
                 <a href="/bizneslar/" 
-                   class="inline-flex items-center justify-center px-6 py-3 border-2 border-primary-600 text-primary-600 font-semibold rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition duration-200">
+                   class="inline-flex items-center justify-center px-6 py-3 border-2 border-primary-600 text-[var(--accent)] font-semibold rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition duration-200">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    Bizneslarni ko'rish
+                    {% trans "Bizneslarni ko'rish" %}
                 </a>
             </div>
 
             <!-- Popular Links -->
-            <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Mashhur sahifalar:
+            <div class="mt-12 pt-8 border-t border-border-light dark:border-border-dark">
+                <p class="text-sm text-muted-light dark:text-muted-dark mb-4">
+                    {% trans "Mashhur sahifalar:" %}
                 </p>
                 <div class="flex flex-wrap gap-3 justify-center">
-                    <a href="/kategoriyalar/" class="text-sm text-primary-600 hover:underline">Kategoriyalar</a>
-                    <span class="text-gray-400">•</span>
-                    <a href="/sharh-yozish/" class="text-sm text-primary-600 hover:underline">Sharh yozish</a>
-                    <span class="text-gray-400">•</span>
-                    <a href="/profile/" class="text-sm text-primary-600 hover:underline">Profilim</a>
-                    <span class="text-gray-400">•</span>
-                    <a href="/contact/" class="text-sm text-primary-600 hover:underline">Bog'lanish</a>
+                    <a href="/kategoriyalar/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Kategoriyalar" %}</a>
+                    <span class="text-muted-light dark:text-muted-dark">•</span>
+                    <a href="/sharh-yozish/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Sharh yozish" %}</a>
+                    <span class="text-muted-light dark:text-muted-dark">•</span>
+                    <a href="/profile/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Profilim" %}</a>
+                    <span class="text-muted-light dark:text-muted-dark">•</span>
+                    <a href="/contact/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Bog'lanish" %}</a>
                 </div>
             </div>
         </div>

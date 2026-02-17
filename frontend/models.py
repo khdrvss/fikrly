@@ -23,9 +23,6 @@ class BusinessCategory(models.Model):
         ("gray", "Gray"),
     ]
     name = models.CharField(max_length=100, unique=True)
-    name_ru = models.CharField(
-        max_length=100, blank=True, verbose_name=_("Nom (Rus tilida)")
-    )
     slug = models.SlugField(max_length=100, unique=True)
     icon_svg = models.TextField(blank=True, help_text=_("SVG path content"))
     color = models.CharField(
@@ -70,9 +67,13 @@ class Company(models.Model):
     )
     city = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
-    description_ru = models.TextField(blank=True, verbose_name=_("Tavsif (Rus tilida)"))
+    description = models.TextField(blank=True)
     image_url = models.URLField(blank=True)
     image = models.ImageField(upload_to="company_images/", blank=True, null=True)
+    # Generated optimized images (WEBP) in multiple sizes
+    image_400 = models.ImageField(upload_to="company_images/variants/", blank=True, null=True)
+    image_800 = models.ImageField(upload_to="company_images/variants/", blank=True, null=True)
+    image_1200 = models.ImageField(upload_to="company_images/variants/", blank=True, null=True)
     logo = models.ImageField(
         upload_to=company_logo_path,
         blank=True,
@@ -160,6 +161,65 @@ class Company(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def image_url_for_size(self, size: int):
+        if size == 400 and self.image_400:
+            return getattr(self.image_400, 'url', '')
+        if size == 800 and self.image_800:
+            return getattr(self.image_800, 'url', '')
+        if size == 1200 and self.image_1200:
+            return getattr(self.image_1200, 'url', '')
+        # fallback to uploaded image or external URL
+        return self.display_image_url
+
+    @property
+    def image_400_url(self):
+        return self.image_url_for_size(400)
+
+    @property
+    def image_800_url(self):
+        return self.image_url_for_size(800)
+
+    @property
+    def image_1200_url(self):
+        return self.image_url_for_size(1200)
+
+    def save(self, *args, **kwargs):
+        # If a new image file was uploaded, generate WEBP variants.
+        try:
+            # detect new upload by checking if `image` has a file-like object
+            new_image = getattr(self, 'image') and hasattr(self.image, 'file') and getattr(self.image.file, 'closed', False) is False
+        except Exception:
+            new_image = False
+
+        super().save(*args, **kwargs)
+
+        # Post-save: generate variants only when an image exists
+        if self.image and new_image:
+            try:
+                from .utils.images import generate_webp_versions
+
+                files = generate_webp_versions(self.image)
+                changed = False
+                if 400 in files:
+                    fname = f"{self.pk}_400.webp"
+                    self.image_400.save(fname, files[400], save=False)
+                    changed = True
+                if 800 in files:
+                    fname = f"{self.pk}_800.webp"
+                    self.image_800.save(fname, files[800], save=False)
+                    changed = True
+                if 1200 in files:
+                    fname = f"{self.pk}_1200.webp"
+                    self.image_1200.save(fname, files[1200], save=False)
+                    changed = True
+
+                if changed:
+                    # Avoid recursion by using update_fields on file fields
+                    super(Company, self).save(update_fields=['image_400', 'image_800', 'image_1200'])
+            except Exception:
+                # Fail silently — preserve original upload if generation fails
+                pass
 
     @property
     def display_description(self):

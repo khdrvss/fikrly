@@ -46,251 +46,19 @@ const Toast = {
     setTimeout(() => toast.classList.remove('translate-x-full'), 10);
     
     setTimeout(() => {
-      toast.classList.add('translate-x-full');
-      setTimeout(() => toast.remove(), 300);
-    }, duration);
-  },
-
-  success(message, duration) {
-    this.show(message, 'success', duration);
-  },
-
-  error(message, duration) {
-    this.show(message, 'error', duration);
-  },
-
-  warning(message, duration) {
-    this.show(message, 'warning', duration);
-  },
-
-  info(message, duration) {
-    this.show(message, 'info', duration);
-  }
-};
-
-// Make Toast globally available
-window.Toast = Toast;
-
-
-// ============================================
-// 2. SKELETON LOADERS
-// ============================================
-const Skeleton = {
-  card() {
-    return `
-      <div class="animate-pulse bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div class="h-48 bg-gray-200 rounded-xl mb-4"></div>
-        <div class="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
-        <div class="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
-        <div class="flex items-center space-x-2">
-          <div class="h-3 bg-gray-200 rounded w-20"></div>
-          <div class="h-3 bg-gray-200 rounded w-16"></div>
-        </div>
-      </div>
-    `;
-  },
-
-  list() {
-    return `
-      <div class="animate-pulse flex space-x-4 p-4 bg-white rounded-lg shadow-sm">
-        <div class="rounded-full bg-gray-200 h-12 w-12 flex-shrink-0"></div>
-        <div class="flex-1 space-y-3 py-1">
-          <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-    `;
-  },
-
-  text(lines = 3) {
-    let html = '<div class="animate-pulse space-y-3">';
-    for (let i = 0; i < lines; i++) {
-      const width = i === lines - 1 ? 'w-2/3' : 'w-full';
-      html += `<div class="h-4 bg-gray-200 rounded ${width}"></div>`;
-    }
-    html += '</div>';
-    return html;
-  },
-
-  showInContainer(containerId, type = 'card', count = 3) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    container.innerHTML = '';
-    for (let i = 0; i < count; i++) {
-      const skeleton = document.createElement('div');
-      skeleton.innerHTML = this[type] ? this[type]() : this.card();
-      container.appendChild(skeleton.firstElementChild);
-    }
-  },
-
-  hide(containerId) {
-    const container = document.getElementById(containerId);
-    if (container) {
-      const skeletons = container.querySelectorAll('.animate-pulse');
-      skeletons.forEach(s => s.remove());
-    }
-  }
-};
-
-window.Skeleton = Skeleton;
-
-
-// ============================================
-// 3. FORM VALIDATION
-// ============================================
-class FormValidator {
-  constructor(form, options = {}) {
-    this.form = typeof form === 'string' ? document.querySelector(form) : form;
-    if (!this.form) return;
-
-    this.options = {
-      validateOnBlur: true,
-      validateOnInput: true,
-      showSuccessState: false,
-      ...options
-    };
-
-    this.init();
-  }
-
-  init() {
-    const inputs = this.form.querySelectorAll('input:not([type="hidden"]), textarea, select');
-    
-    inputs.forEach(input => {
-      if (this.options.validateOnBlur) {
-        input.addEventListener('blur', () => this.validateField(input));
+      // ============================================
+      // 6. INFINITE SCROLL (DISABLED)
+      // ============================================
+      // Infinite scroll feature intentionally disabled to enforce strict pagination.
+      // The class is replaced with a no-op stub to avoid runtime errors in pages
+      // that might reference it. No client-side auto-loading will occur.
+      class InfiniteScroll {
+        constructor() {
+          console.info('InfiniteScroll disabled');
+        }
       }
-      
-      if (this.options.validateOnInput) {
-        input.addEventListener('input', () => {
-          if (input.classList.contains('border-red-500')) {
-            this.validateField(input);
-          }
-        });
-      }
-    });
 
-    this.form.addEventListener('submit', (e) => {
-      if (!this.validateForm()) {
-        e.preventDefault();
-        this.focusFirstError();
-      }
-    });
-  }
-
-  validateField(field) {
-    const value = field.value.trim();
-    const type = field.type;
-    let isValid = true;
-    let message = '';
-
-    // Required validation
-    if (field.hasAttribute('required') && !value) {
-      isValid = false;
-      message = field.dataset.requiredMsg || "Bu maydon to'ldirilishi shart";
-    }
-    // Email validation
-    else if (type === 'email' && value && !this.isValidEmail(value)) {
-      isValid = false;
-      message = field.dataset.emailMsg || "Noto'g'ri email formati";
-    }
-    // Phone validation
-    else if (type === 'tel' && value && !this.isValidPhone(value)) {
-      isValid = false;
-      message = field.dataset.phoneMsg || "Noto'g'ri telefon raqami";
-    }
-    // Min length validation
-    else if (field.hasAttribute('minlength')) {
-      const minLength = parseInt(field.getAttribute('minlength'));
-      if (value.length > 0 && value.length < minLength) {
-        isValid = false;
-        message = field.dataset.minlengthMsg || `Kamida ${minLength} ta belgi bo'lishi kerak`;
-      }
-    }
-    // Max length validation
-    else if (field.hasAttribute('maxlength')) {
-      const maxLength = parseInt(field.getAttribute('maxlength'));
-      if (value.length > maxLength) {
-        isValid = false;
-        message = field.dataset.maxlengthMsg || `Ko'pi bilan ${maxLength} ta belgi bo'lishi kerak`;
-      }
-    }
-    // Pattern validation
-    else if (field.hasAttribute('pattern') && value) {
-      const pattern = new RegExp(field.getAttribute('pattern'));
-      if (!pattern.test(value)) {
-        isValid = false;
-        message = field.dataset.patternMsg || "Noto'g'ri format";
-      }
-    }
-
-    if (!isValid) {
-      this.showError(field, message);
-    } else {
-      this.clearError(field);
-      if (this.options.showSuccessState && value) {
-        this.showSuccess(field);
-      }
-    }
-
-    return isValid;
-  }
-
-  showError(field, message) {
-    this.clearError(field);
-    
-    const wrapper = field.closest('.form-group') || field.parentElement;
-    wrapper.classList.add('has-error');
-
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message text-red-500 text-sm mt-1 flex items-center space-x-1';
-    errorDiv.innerHTML = `
-      <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-      </svg>
-      <span>${message}</span>
-    `;
-    wrapper.appendChild(errorDiv);
-
-    field.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
-    field.classList.remove('border-gray-300', 'focus:ring-primary-500', 'focus:border-primary-500', 'border-green-500');
-    field.setAttribute('aria-invalid', 'true');
-  }
-
-  showSuccess(field) {
-    this.clearError(field);
-    field.classList.add('border-green-500', 'focus:ring-green-500');
-    field.classList.remove('border-red-500', 'focus:ring-red-500', 'border-gray-300');
-  }
-
-  clearError(field) {
-    const wrapper = field.closest('.form-group') || field.parentElement;
-    wrapper.classList.remove('has-error');
-    wrapper.querySelector('.error-message')?.remove();
-
-    field.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500', 'border-green-500', 'focus:ring-green-500');
-    field.classList.add('border-gray-300');
-    field.removeAttribute('aria-invalid');
-  }
-
-  validateForm() {
-    const fields = this.form.querySelectorAll('input:not([type="hidden"]), textarea, select');
-    let isValid = true;
-
-    fields.forEach(field => {
-      if (!this.validateField(field)) {
-        isValid = false;
-      }
-    });
-
-    return isValid;
-  }
-
-  focusFirstError() {
-    const firstError = this.form.querySelector('.has-error input, .has-error textarea, .has-error select');
-    if (firstError) {
-      firstError.focus();
+      window.InfiniteScroll = InfiniteScroll;
       firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
@@ -590,7 +358,9 @@ class InfiniteScroll {
       let url;
       if (urlTemplate && currentNextPage) {
         // Use template-based URL (for business list with filters)
-        url = new URL(urlTemplate.replace('PAGE_NUM', currentNextPage), window.location.origin);
+        // Use current path as base so query-only templates resolve to the current view
+        const basePath = `${window.location.origin}${window.location.pathname}`;
+        url = new URL(urlTemplate.replace('PAGE_NUM', currentNextPage), basePath);
       } else {
         // Use standard pagination
         url = new URL(this.options.loadMoreUrl, window.location.origin);
@@ -602,6 +372,18 @@ class InfiniteScroll {
           'X-Requested-With': 'XMLHttpRequest'
         }
       });
+
+      if (!response.ok) {
+        // HTTP error statuses
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      // Ensure JSON content-type before parsing
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('Invalid response content-type');
+      }
+
       const data = await response.json();
       
       this.hideLoader();
@@ -640,11 +422,27 @@ class InfiniteScroll {
     } catch (error) {
       console.error('InfiniteScroll error:', error);
       this.hideLoader();
-      
+
+      let userMessage = 'Server bilan bog‘lanishda muammo yuz berdi.';
+      if (error.message && error.message.includes('HTTP error')) {
+        const status = parseInt(error.message.replace(/[^0-9]/g, ''), 10) || 0;
+        if (status >= 500) {
+          userMessage = 'Ichki server xatosi. Keyinroq urinib ko‘ring.';
+        } else if (status === 404) {
+          userMessage = 'Bu sahifada bizneslar topilmadi.';
+        } else if (status === 400) {
+          userMessage = 'So‘rov noto‘g‘ri yuborildi.';
+        } else {
+          userMessage = `Server javobi: ${status}`;
+        }
+      } else if (error.message && error.message.includes('Invalid response content-type')) {
+        userMessage = 'Server noto‘g‘ri javob qaytardi.';
+      }
+
       if (this.options.onError) {
-        this.options.onError(error);
+        this.options.onError(error, userMessage);
       } else {
-        Toast.error('Ma\'lumotlarni yuklashda xatolik');
+        Toast.error(userMessage);
       }
     } finally {
       this.loading = false;
@@ -765,7 +563,7 @@ class InfiniteScroll {
         
         <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
           <span class="text-sm text-gray-500">${company.review_count} ta sharh</span>
-          <a href="/company/${company.slug}/" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
+          <a href="${company.detail_url}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
             Ko'rish
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </a>
@@ -3609,9 +3407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.starRating = new StarRating();
   }
   
-  if (document.querySelector('[data-infinite-scroll]')) {
-    window.infiniteScroll = new InfiniteScroll();
-  }
+  // Infinite scroll disabled: do not auto-initialize even if data attributes remain.
   
   if (document.querySelector('[data-lazy-src]')) {
     window.lazyImageLoader = new LazyImageLoader();

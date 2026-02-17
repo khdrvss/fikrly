@@ -10,7 +10,7 @@
 
   /* Button Primary */
   .btn-primary {
-    @apply bg-primary-500 text-white px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-lg font-semibold;
+    @apply bg-primary text-white px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-lg font-semibold;
     @apply inline-flex items-center justify-center;
     transition: all 300ms ease-in-out;
     @apply min-h-[40px] md:min-h-[48px];
@@ -18,16 +18,16 @@
   }
 
   .btn-primary:hover {
-    @apply bg-primary-600;
+    @apply opacity-90;
   }
 
   .btn-primary:focus {
-    @apply outline-none ring-2 ring-primary-400;
+    @apply outline-none ring-2 ring-primary;
   }
 
   /* Button Secondary */
   .btn-secondary {
-    @apply bg-[#F59E0B] text-white px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-lg font-semibold;
+    @apply border border-border-light dark:border-border-dark text-slate-700 dark:text-slate-200 px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-lg font-semibold bg-transparent;
     @apply inline-flex items-center justify-center;
     transition: all 300ms ease-in-out;
     @apply min-h-[40px] md:min-h-[48px];
@@ -35,16 +35,16 @@
   }
 
   .btn-secondary:hover {
-    @apply bg-[#D97706];
+    @apply bg-slate-100 dark:bg-slate-800;
   }
 
   .btn-secondary:focus {
-    @apply outline-none ring-2 ring-[#F59E0B];
+    @apply outline-none ring-2 ring-border-light dark:ring-border-dark;
   }
 
   /* Button Outline */
   .btn-outline {
-    @apply border-2 border-primary-500 text-primary-500 bg-transparent px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-lg font-semibold;
+    @apply border-2 border-primary text-primary bg-transparent px-4 py-2.5 text-sm md:px-6 md:py-3 md:text-base rounded-lg font-semibold;
     @apply inline-flex items-center justify-center;
     transition: all 300ms ease-in-out;
     @apply min-h-[40px] md:min-h-[48px];
@@ -61,8 +61,7 @@
 
   /* Card */
   .card {
-    @apply bg-white rounded-lg border border-gray-200 p-6;
-    transition: all 300ms ease-in-out;
+    @apply bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark p-6 shadow-sm hover:shadow-md transition-all duration-300;
   }
 
   .card-hover:hover {
@@ -71,17 +70,17 @@
 
   /* Input Field */
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-lg;
+    @apply w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-slate-100 placeholder-muted-light dark:placeholder-muted-dark;
     transition: all 300ms ease-in-out;
   }
 
   .input-field:focus {
-    @apply outline-none ring-2 ring-primary-400 border-transparent;
+    @apply outline-none ring-2 ring-primary border-transparent;
   }
 
   /* Text Gradient */
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-[#F59E0B] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-primary-700 bg-clip-text text-transparent;
   }
 }
 

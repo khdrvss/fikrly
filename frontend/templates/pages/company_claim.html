@@ -8,16 +8,16 @@
 {% block title %}{% trans "Kompaniyani tasdiqlash" %} - Fikrly{% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen py-12">
+<div class="bg-[var(--bg)] min-h-screen py-12">
     <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
             <div class="text-center mb-8">
-                <div class="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 text-primary-600">
+                <div class="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--accent)]">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans "Kompaniyani tasdiqlash" %}</h1>
-                <p class="text-gray-600">
-                    {% blocktrans with name=company.name %}<span class="font-semibold text-gray-900">{{ name }}</span> kompaniyasi uchun ishchi emailingizni kiriting. Tasdiqlash havolasi yuboriladi.{% endblocktrans %}
+                <h1 class="text-2xl font-bold text-[var(--text-primary)] mb-2">{% trans "Kompaniyani tasdiqlash" %}</h1>
+                <p class="text-[var(--text-secondary)]">
+                    {% blocktrans with name=company.name %}<span class="font-semibold text-[var(--text-primary)]">{{ name }}</span> kompaniyasi uchun ishchi emailingizni kiriting. Tasdiqlash havolasi yuboriladi.{% endblocktrans %}
                 </p>
             </div>
 
@@ -31,7 +31,7 @@
                 {% endif %}
 
                 <div>
-                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{% trans "Email manzil" %}</label>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-[var(--text-primary)] mb-1">{% trans "Email manzil" %}</label>
                     {{ form.email }}
                     {% if form.email.errors %}
                         <p class="mt-1 text-sm text-red-600">{{ form.email.errors.0 }}</p>
@@ -39,10 +39,10 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-4">
-                    <a href="{% url 'company_detail' company.pk %}" class="text-sm font-medium text-gray-600 hover:text-gray-900">
+                    <a href="{% url 'company_detail' company.pk %}" class="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                         {% trans "Ortga qaytish" %}
                     </a>
-                    <button type="submit" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg shadow-sm shadow-primary-200 transition-colors">
+                    <button type="submit" class="px-6 py-2.5 bg-[var(--accent)] hover:opacity-90 text-white font-medium rounded-lg shadow-sm shadow-primary-200 transition-colors">
                         {% trans "Yuborish" %}
                     </button>
                 </div>

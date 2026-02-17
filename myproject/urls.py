@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from frontend.sitemaps import CompanySitemap, StaticSitemap, CategorySitemap
-from frontend.views import robots_txt, bing_site_auth, favicon_file
+from frontend.views import robots_txt, bing_site_auth, favicon_file, service_worker
 from django.conf.urls.i18n import i18n_patterns
 from django.views.generic import TemplateView
 
@@ -43,14 +43,7 @@ urlpatterns = [
     ),
     path("favicon.ico", favicon_file, name="favicon"),
     # Service Worker for PWA
-    path(
-        "service-worker.js",
-        TemplateView.as_view(
-            template_name="service-worker.js",
-            content_type="application/javascript"
-        ),
-        name="service_worker"
-    ),
+    path("service-worker.js", service_worker, name="service_worker"),
 ]
 
 urlpatterns += i18n_patterns(

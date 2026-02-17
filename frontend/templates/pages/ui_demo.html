@@ -7,15 +7,15 @@
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="mb-12 text-center">
-        <h1 class="text-4xl font-bold text-gray-900 mb-4">UI Components Demo</h1>
-        <p class="text-gray-600">Test all 14 UI enhancement features with live examples</p>
+        <h1 class="text-4xl font-bold text-[var(--text-primary)] mb-4">UI Components Demo</h1>
+        <p class="text-[var(--text-secondary)]">Test all 14 UI enhancement features with live examples</p>
     </div>
 
     <div class="space-y-12">
         <!-- Toast Notifications Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">1. Toast Notifications</h2>
-            <p class="text-gray-600 mb-6">Click buttons to see different toast types:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">1. Toast Notifications</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Click buttons to see different toast types:</p>
             
             <div class="flex flex-wrap gap-4">
                 <button onclick="Toast.success('Muvaffaqiyatli bajarildi!')" 
@@ -31,7 +31,7 @@
                     Warning Toast
                 </button>
                 <button onclick="Toast.info('Ma\'lumot uchun.')" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                     Info Toast
                 </button>
                 <button onclick="Toast.show('Custom toast with long duration', 'info', 5000)" 
@@ -42,25 +42,25 @@
         </section>
 
         <!-- Skeleton Loaders Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">2. Skeleton Loaders</h2>
-            <p class="text-gray-600 mb-6">Click to show/hide different skeleton types:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">2. Skeleton Loaders</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Click to show/hide different skeleton types:</p>
             
             <div class="space-y-4">
                 <button onclick="toggleSkeleton('cardSkeleton', 'card')" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                     Toggle Card Skeleton
                 </button>
                 <div id="cardSkeleton" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
 
                 <button onclick="toggleSkeleton('listSkeleton', 'list')" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                     Toggle List Skeleton
                 </button>
                 <div id="listSkeleton" class="space-y-4"></div>
 
                 <button onclick="toggleSkeleton('textSkeleton', 'text')" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                     Toggle Text Skeleton
                 </button>
                 <div id="textSkeleton"></div>
@@ -68,13 +68,13 @@
         </section>
 
         <!-- Form Validation Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">3. Form Validation</h2>
-            <p class="text-gray-600 mb-6">Try submitting or leaving fields to see validation:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">3. Form Validation</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Try submitting or leaving fields to see validation:</p>
             
             <form data-validate class="space-y-6 max-w-2xl" onsubmit="event.preventDefault(); Toast.success('Form muvaffaqiyatli yuborildi!');">
                 <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Ism <span class="text-red-500">*</span>
                     </label>
                     <input type="text" 
@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Email <span class="text-red-500">*</span>
                     </label>
                     <input type="email" 
@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Telefon <span class="text-red-500">*</span>
                     </label>
                     <input type="tel" 
@@ -111,7 +111,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Xabar <span class="text-red-500">*</span>
                     </label>
                     <textarea required
@@ -126,12 +126,12 @@
 
                 <div class="flex items-center space-x-4">
                     <button type="submit" 
-                            class="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
+                            class="px-8 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors font-medium">
                         Yuborish
                     </button>
                     <button type="button" 
                             onclick="this.form.reset(); Array.from(this.form.querySelectorAll('input, textarea')).forEach(f => { const validator = this.form.__validator; if(validator) validator.clearError(f); });"
-                            class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                            class="px-8 py-3 bg-gray-200 text-[var(--text-primary)] rounded-lg hover:bg-gray-300 transition-colors font-medium">
                         Tozalash
                     </button>
                 </div>
@@ -139,12 +139,12 @@
         </section>
 
         <!-- Combined Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">4. Combined Features Demo</h2>
-            <p class="text-gray-600 mb-6">Simulate loading data with skeleton and success toast:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">4. Combined Features Demo</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Simulate loading data with skeleton and success toast:</p>
             
             <button onclick="simulateDataLoad()" 
-                    class="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
+                    class="px-8 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors font-medium">
                 Simulate Data Loading
             </button>
             
@@ -152,37 +152,37 @@
         </section>
 
         <!-- Lazy Image Loading Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">5. Progressive Image Loading</h2>
-            <p class="text-gray-600 mb-6">Images load with blur effect as you scroll (lazy loading):</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">5. Progressive Image Loading</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Images load with blur effect as you scroll (lazy loading):</p>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <div class="aspect-square bg-[var(--surface)] rounded-lg overflow-hidden">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E"
                          data-src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&fit=crop"
                          alt="Demo 1"
                          class="w-full h-full object-cover lazy-image">
                 </div>
-                <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <div class="aspect-square bg-[var(--surface)] rounded-lg overflow-hidden">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E"
                          data-src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=400&h=400&fit=crop"
                          alt="Demo 2"
                          class="w-full h-full object-cover lazy-image">
                 </div>
-                <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <div class="aspect-square bg-[var(--surface)] rounded-lg overflow-hidden">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E"
                          data-src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?w=400&h=400&fit=crop"
                          alt="Demo 3"
                          class="w-full h-full object-cover lazy-image">
                 </div>
-                <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <div class="aspect-square bg-[var(--surface)] rounded-lg overflow-hidden">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3C/svg%3E"
                          data-src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=400&fit=crop"
                          alt="Demo 4"
                          class="w-full h-full object-cover lazy-image">
                 </div>
             </div>
-            <p class="mt-4 text-sm text-gray-500">
+            <p class="mt-4 text-sm text-[var(--text-secondary)]">
                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -191,40 +191,40 @@
         </section>
 
         <!-- Star Rating Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">6. Interactive Star Rating</h2>
-            <p class="text-gray-600 mb-6">Hover over stars to preview, click to select:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">6. Interactive Star Rating</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Hover over stars to preview, click to select:</p>
             
             <div class="space-y-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Editable Rating</label>
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-3">Editable Rating</label>
                     <div data-star-rating="0" data-size="large" data-show-count></div>
-                    <p class="mt-2 text-sm text-gray-500">Click stars to rate, hover to preview</p>
+                    <p class="mt-2 text-sm text-[var(--text-secondary)]">Click stars to rate, hover to preview</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Medium Size (Default)</label>
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-3">Medium Size (Default)</label>
                     <div data-star-rating="3" data-size="medium"></div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Readonly Rating</label>
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-3">Readonly Rating</label>
                     <div data-star-rating="4.5" data-readonly data-size="medium"></div>
-                    <p class="mt-2 text-sm text-gray-500">Display only (read-only)</p>
+                    <p class="mt-2 text-sm text-[var(--text-secondary)]">Display only (read-only)</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Small Size</label>
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-3">Small Size</label>
                     <div data-star-rating="2" data-size="small"></div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">In a Form</label>
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-3">In a Form</label>
                     <form onsubmit="event.preventDefault(); const rating = this.querySelector('input[name=rating]').value; Toast.success('Baholandi: ' + rating + ' yulduz!');" class="space-y-4">
                         <div data-star-rating="0" data-size="medium" data-show-count>
                             <input type="hidden" name="rating" value="0">
                         </div>
-                        <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        <button type="submit" class="px-6 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                             Submit Rating
                         </button>
                     </form>
@@ -233,12 +233,12 @@
         </section>
 
         <!-- Infinite Scroll Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">7. Infinite Scroll</h2>
-            <p class="text-gray-600 mb-6">Scroll down to automatically load more items:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">7. Infinite Scroll</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Scroll down to automatically load more items:</p>
             
             <button onclick="initInfiniteScrollDemo()" 
-                    class="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium mb-6">
+                    class="px-8 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors font-medium mb-6">
                 Start Infinite Scroll Demo
             </button>
             
@@ -246,13 +246,13 @@
         </section>
 
         <!-- Loading Progress Bar Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">8. Loading Progress Bar</h2>
-            <p class="text-gray-600 mb-6">Watch the thin blue bar at the top of the page:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">8. Loading Progress Bar</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Watch the thin blue bar at the top of the page:</p>
             
             <div class="flex flex-wrap gap-4">
                 <button onclick="LoadingBar.start()" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                     Start Loading
                 </button>
                 <button onclick="LoadingBar.complete()" 
@@ -269,7 +269,7 @@
                 </button>
             </div>
             
-            <p class="mt-4 text-sm text-gray-500">
+            <p class="mt-4 text-sm text-[var(--text-secondary)]">
                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -278,13 +278,13 @@
         </section>
 
         <!-- Character Counter Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">9. Character Counter</h2>
-            <p class="text-gray-600 mb-6">Type in the fields to see live character counts with color warnings:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">9. Character Counter</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Type in the fields to see live character counts with color warnings:</p>
             
             <div class="space-y-6 max-w-2xl">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Short Text (Max 50 characters)
                     </label>
                     <input type="text" 
@@ -292,11 +292,11 @@
                            data-character-counter
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                            placeholder="Type something...">
-                    <p class="mt-1 text-xs text-gray-500">Counter turns amber at 90%, red at 100%</p>
+                    <p class="mt-1 text-xs text-[var(--text-secondary)]">Counter turns amber at 90%, red at 100%</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Review Text (Max 500 characters)
                     </label>
                     <textarea rows="5"
@@ -307,7 +307,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Long Text (Max 2000 characters)
                     </label>
                     <textarea rows="8"
@@ -324,9 +324,9 @@
         </section>
 
         <!-- Modal System Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">10. Modal/Dialog System</h2>
-            <p class="text-gray-600 mb-6">Professional popup dialogs and confirmations:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">10. Modal/Dialog System</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Professional popup dialogs and confirmations:</p>
             
             <div class="flex flex-wrap gap-4">
                 <button onclick="Modal.alert({ title: 'Success!', message: 'Amaling muvaffaqiyatli bajarildi!', buttonText: 'Yaxshi' })" 
@@ -340,7 +340,7 @@
                 </button>
                 
                 <button onclick="showCustomModal()" 
-                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                        class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors">
                     Custom Modal
                 </button>
                 
@@ -352,9 +352,9 @@
         </section>
 
         <!-- Image Lightbox Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">11. Image Lightbox</h2>
-            <p class="text-gray-600 mb-6">Click images to view fullscreen with zoom and navigation:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">11. Image Lightbox</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Click images to view fullscreen with zoom and navigation:</p>
             
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&fit=crop"
@@ -382,7 +382,7 @@
                      class="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity">
             </div>
             
-            <p class="mt-4 text-sm text-gray-500">
+            <p class="mt-4 text-sm text-[var(--text-secondary)]">
                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -391,19 +391,19 @@
         </section>
 
         <!-- Copy to Clipboard Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">12. Copy to Clipboard</h2>
-            <p class="text-gray-600 mb-6">Click to copy text with instant feedback:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">12. Copy to Clipboard</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Click to copy text with instant feedback:</p>
             
             <div class="space-y-4 max-w-2xl">
                 <div class="flex items-center gap-3">
                     <input type="text" 
                            value="https://fikrly.uz/company/example-company" 
                            readonly
-                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">
+                           class="flex-1 px-4 py-3 border border-gray-300 rounded-lg bg-[var(--bg)]">
                     <button data-copy="https://fikrly.uz/company/example-company" 
                             data-copy-message="Havola nusxalandi!"
-                            class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2">
+                            class="px-6 py-3 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                         </svg>
@@ -423,9 +423,9 @@
         </section>
 
         <!-- Tooltips Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">13. Tooltips System</h2>
-            <p class="text-gray-600 mb-6">Hover over elements to see helpful tooltips:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">13. Tooltips System</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Hover over elements to see helpful tooltips:</p>
             
             <div class="flex flex-wrap gap-4">
                 <button data-tooltip="Bu tugma hech narsa qilmaydi" 
@@ -493,13 +493,13 @@
         </section>
 
         <!-- Scroll to Top Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">14. Scroll to Top Button</h2>
-            <p class="text-gray-600 mb-6">Scroll down this page to see the floating button appear in the bottom-right corner:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">14. Scroll to Top Button</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Scroll down this page to see the floating button appear in the bottom-right corner:</p>
             
             <div class="bg-gradient-to-r from-primary-50 to-primary-100 rounded-lg p-6 border border-primary-200">
                 <div class="flex items-start gap-3">
-                    <svg class="w-6 h-6 text-primary-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 text-[var(--accent)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <div>
@@ -511,9 +511,9 @@
         </section>
 
         <!-- Search Autocomplete Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">15. Search Autocomplete</h2>
-            <p class="text-gray-600 mb-6">Type to see search suggestions (min 2 characters):</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">15. Search Autocomplete</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Type to see search suggestions (min 2 characters):</p>
             
             <div class="max-w-2xl">
                 <div class="relative">
@@ -526,9 +526,9 @@
                     </svg>
                 </div>
                 
-                <div class="mt-6 bg-gray-50 rounded-lg p-4 space-y-2">
-                    <h3 class="font-semibold text-gray-900 text-sm">Features:</h3>
-                    <ul class="text-sm text-gray-600 space-y-1">
+                <div class="mt-6 bg-[var(--bg)] rounded-lg p-4 space-y-2">
+                    <h3 class="font-semibold text-[var(--text-primary)] text-sm">Features:</h3>
+                    <ul class="text-sm text-[var(--text-secondary)] space-y-1">
                         <li>• Debounced search (300ms delay)</li>
                         <li>• Recent searches stored in localStorage</li>
                         <li>• Keyboard navigation (↑↓ arrows, Enter to select, Esc to close)</li>
@@ -540,41 +540,41 @@
         </section>
 
         <!-- Favorites System Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">16. Favorites / Bookmark System</h2>
-            <p class="text-gray-600 mb-6">Save companies to your favorites list with localStorage persistence:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">16. Favorites / Bookmark System</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Save companies to your favorites list with localStorage persistence:</p>
             
             <div class="space-y-4">
                 <!-- Demo favorite buttons -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                    <div class="border border-[var(--border)] rounded-lg p-4 flex items-center justify-between">
                         <div>
-                            <h4 class="font-semibold text-gray-900">Demo Restaurant</h4>
-                            <p class="text-sm text-gray-500">★ 4.5 • Ovqat</p>
+                            <h4 class="font-semibold text-[var(--text-primary)]">Demo Restaurant</h4>
+                            <p class="text-sm text-[var(--text-secondary)]">★ 4.5 • Ovqat</p>
                         </div>
                         <button data-favorite-btn="demo-1" 
                                 data-company-name="Demo Restaurant"
                                 data-company-slug="demo-restaurant"
                                 data-company-rating="4.5"
                                 data-company-category="Ovqat"
-                                class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                class="p-2 hover:bg-[var(--surface)] rounded-lg transition-colors">
                             <svg class="favorite-icon w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                             </svg>
                         </button>
                     </div>
                     
-                    <div class="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                    <div class="border border-[var(--border)] rounded-lg p-4 flex items-center justify-between">
                         <div>
-                            <h4 class="font-semibold text-gray-900">Demo Hotel</h4>
-                            <p class="text-sm text-gray-500">★ 4.8 • Mehmonxona</p>
+                            <h4 class="font-semibold text-[var(--text-primary)]">Demo Hotel</h4>
+                            <p class="text-sm text-[var(--text-secondary)]">★ 4.8 • Mehmonxona</p>
                         </div>
                         <button data-favorite-btn="demo-2" 
                                 data-company-name="Demo Hotel"
                                 data-company-slug="demo-hotel"
                                 data-company-rating="4.8"
                                 data-company-category="Mehmonxona"
-                                class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                                class="p-2 hover:bg-[var(--surface)] rounded-lg transition-colors">
                             <svg class="favorite-icon w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                             </svg>
@@ -584,7 +584,7 @@
                 
                 <div class="flex gap-3">
                     <button onclick="console.log(Favorites.getAll()); Toast.info(`${Favorites.getCount()} ta sevimli`)" 
-                            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                            class="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90">
                         Show All Favorites (<span class="favorites-count">0</span>)
                     </button>
                     <button onclick="Favorites.clear()" 
@@ -596,17 +596,17 @@
         </section>
 
         <!-- Recent Views Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">17. Recent Views History</h2>
-            <p class="text-gray-600 mb-6">Track recently viewed companies (stored in localStorage):</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">17. Recent Views History</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Track recently viewed companies (stored in localStorage):</p>
             
             <div class="space-y-4">
                 <button onclick="addRecentViewDemo()" 
-                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                        class="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90">
                     Add Demo View
                 </button>
                 
-                <div id="recent-views-demo" class="border border-gray-200 rounded-lg p-4 min-h-[200px]">
+                <div id="recent-views-demo" class="border border-[var(--border)] rounded-lg p-4 min-h-[200px]">
                     <div id="recent-views-list-demo"></div>
                 </div>
                 
@@ -618,81 +618,81 @@
         </section>
 
         <!-- Breadcrumbs Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">18. Breadcrumbs Navigation</h2>
-            <p class="text-gray-600 mb-6">Show the current page location in the site hierarchy:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">18. Breadcrumbs Navigation</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Show the current page location in the site hierarchy:</p>
             
             <div class="space-y-6">
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Example 1: Company Page</h3>
+                <div class="bg-[var(--bg)] rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-[var(--text-primary)] mb-2">Example 1: Company Page</h3>
                     <div id="breadcrumbs-1"></div>
                 </div>
                 
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Example 2: Category Page</h3>
+                <div class="bg-[var(--bg)] rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-[var(--text-primary)] mb-2">Example 2: Category Page</h3>
                     <div id="breadcrumbs-2"></div>
                 </div>
                 
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-2">Example 3: Deep Navigation</h3>
+                <div class="bg-[var(--bg)] rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-[var(--text-primary)] mb-2">Example 3: Deep Navigation</h3>
                     <div id="breadcrumbs-3"></div>
                 </div>
             </div>
         </section>
 
         <!-- Empty States Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">19. Empty States</h2>
-            <p class="text-gray-600 mb-6">Show helpful messages when no data is available:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">19. Empty States</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Show helpful messages when no data is available:</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="border border-gray-200 rounded-lg">
+                <div class="border border-[var(--border)] rounded-lg">
                     <div id="empty-search"></div>
                 </div>
                 
-                <div class="border border-gray-200 rounded-lg">
+                <div class="border border-[var(--border)] rounded-lg">
                     <div id="empty-reviews"></div>
                 </div>
                 
-                <div class="border border-gray-200 rounded-lg">
+                <div class="border border-[var(--border)] rounded-lg">
                     <div id="empty-favorites"></div>
                 </div>
                 
-                <div class="border border-gray-200 rounded-lg">
+                <div class="border border-[var(--border)] rounded-lg">
                     <div id="empty-custom"></div>
                 </div>
             </div>
         </section>
 
         <!-- Review Voting Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">20. Review Voting System</h2>
-            <p class="text-gray-600 mb-6">Mark reviews as helpful or not helpful:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">20. Review Voting System</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Mark reviews as helpful or not helpful:</p>
             
             <div class="space-y-4">
-                <div class="border border-gray-200 rounded-lg p-4" data-review-vote="demo-review-1">
+                <div class="border border-[var(--border)] rounded-lg p-4" data-review-vote="demo-review-1">
                     <div class="flex items-start gap-4 mb-3">
-                        <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                        <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center font-bold text-[var(--accent)]">
                             A
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
-                                <h4 class="font-semibold text-gray-900">Ali Valiyev</h4>
+                                <h4 class="font-semibold text-[var(--text-primary)]">Ali Valiyev</h4>
                                 <div class="flex text-yellow-400">★★★★★</div>
                             </div>
-                            <p class="text-gray-700">Juda yaxshi xizmat! Tavsiya qilaman.</p>
+                            <p class="text-[var(--text-primary)]">Juda yaxshi xizmat! Tavsiya qilaman.</p>
                         </div>
                     </div>
                     
                     <div class="flex items-center gap-2 text-sm">
-                        <span class="text-gray-500">Foydali bo'ldimi?</span>
-                        <button data-vote="helpful" class="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <span class="text-[var(--text-secondary)]">Foydali bo'ldimi?</span>
+                        <button data-vote="helpful" class="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-lg hover:bg-[var(--bg)] transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                             </svg>
                             <span class="helpful-count">5</span>
                         </button>
-                        <button data-vote="not_helpful" class="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button data-vote="not_helpful" class="flex items-center gap-1 px-3 py-1 border border-gray-300 rounded-lg hover:bg-[var(--bg)] transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"/>
                             </svg>
@@ -703,30 +703,30 @@
         </section>
 
         <!-- Review Filters Demo -->
-        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">21. Review Filters & Sorting</h2>
-            <p class="text-gray-600 mb-6">Filter and sort reviews by rating, date, and helpfulness:</p>
+        <section class="bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-8">
+            <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-6">21. Review Filters & Sorting</h2>
+            <p class="text-[var(--text-secondary)] mb-6">Filter and sort reviews by rating, date, and helpfulness:</p>
             
             <div class="space-y-4">
                 <!-- Filter buttons -->
                 <div class="flex flex-wrap gap-2">
-                    <button data-rating-filter="all" class="active px-4 py-2 border-2 border-primary-600 bg-primary-600 text-white rounded-lg font-medium">
+                    <button data-rating-filter="all" class="active px-4 py-2 border-2 border-primary-600 bg-[var(--accent)] text-white rounded-lg font-medium">
                         Barchasi
                     </button>
-                    <button data-rating-filter="5" class="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-primary-600 transition-colors">
+                    <button data-rating-filter="5" class="px-4 py-2 border-2 border-gray-300 text-[var(--text-primary)] rounded-lg hover:border-primary-600 transition-colors">
                         ★★★★★ (5)
                     </button>
-                    <button data-rating-filter="4" class="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-primary-600 transition-colors">
+                    <button data-rating-filter="4" class="px-4 py-2 border-2 border-gray-300 text-[var(--text-primary)] rounded-lg hover:border-primary-600 transition-colors">
                         ★★★★☆ (4)
                     </button>
-                    <button data-rating-filter="3" class="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-primary-600 transition-colors">
+                    <button data-rating-filter="3" class="px-4 py-2 border-2 border-gray-300 text-[var(--text-primary)] rounded-lg hover:border-primary-600 transition-colors">
                         ★★★☆☆ (3)
                     </button>
                 </div>
                 
                 <!-- Sort dropdown -->
                 <div class="flex items-center gap-3">
-                    <label class="text-sm font-medium text-gray-700">Saralash:</label>
+                    <label class="text-sm font-medium text-[var(--text-primary)]">Saralash:</label>
                     <select id="review-sort-demo" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
                         <option value="newest">Eng yangi</option>
                         <option value="oldest">Eng eski</option>
@@ -736,7 +736,7 @@
                     </select>
                 </div>
                 
-                <p class="text-sm text-gray-500" id="reviews-count-demo">Demo: Filters working on company detail pages</p>
+                <p class="text-sm text-[var(--text-secondary)]" id="reviews-count-demo">Demo: Filters working on company detail pages</p>
             </div>
         </section>
     </div>
@@ -789,12 +789,12 @@
             title: 'Custom Content Modal',
             content: `
                 <div class="space-y-4">
-                    <p class="text-gray-700">Bu yerga istalgan HTML kontentni qo'yishingiz mumkin!</p>
+                    <p class="text-[var(--text-primary)]">Bu yerga istalgan HTML kontentni qo'yishingiz mumkin!</p>
                     <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-gray-900 mb-2">Gradient Box</h4>
-                        <p class="text-sm text-gray-600">Chiroyli gradient fon bilan.</p>
+                        <h4 class="font-semibold text-[var(--text-primary)] mb-2">Gradient Box</h4>
+                        <p class="text-sm text-[var(--text-secondary)]">Chiroyli gradient fon bilan.</p>
                     </div>
-                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                    <ul class="list-disc list-inside text-[var(--text-primary)] space-y-1">
                         <li>Birinchi element</li>
                         <li>Ikkinchi element</li>
                         <li>Uchinchi element</li>
@@ -814,11 +814,11 @@
             content: `
                 <form id="demoForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Ismingiz</label>
+                        <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Ismingiz</label>
                         <input type="text" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Ismingizni kiriting">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Xabar</label>
+                        <label class="block text-sm font-medium text-[var(--text-primary)] mb-2">Xabar</label>
                         <textarea required rows="4" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Xabaringizni yozing..."></textarea>
                     </div>
                 </form>
@@ -866,20 +866,20 @@
         setTimeout(() => {
             container.innerHTML = `
                 <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
-                    <h3 class="font-bold text-gray-900 mb-2">Ma'lumot 1</h3>
-                    <p class="text-gray-600 text-sm">Ma'lumotlar muvaffaqiyatli yuklandi!</p>
+                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Ma'lumot 1</h3>
+                    <p class="text-[var(--text-secondary)] text-sm">Ma'lumotlar muvaffaqiyatli yuklandi!</p>
                 </div>
                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
-                    <h3 class="font-bold text-gray-900 mb-2">Ma'lumot 2</h3>
-                    <p class="text-gray-600 text-sm">Barcha componentlar ishlayapti!</p>
+                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Ma'lumot 2</h3>
+                    <p class="text-[var(--text-secondary)] text-sm">Barcha componentlar ishlayapti!</p>
                 </div>
                 <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
-                    <h3 class="font-bold text-gray-900 mb-2">Ma'lumot 3</h3>
-                    <p class="text-gray-600 text-sm">UI juda yaxshi ko'rinadi!</p>
+                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Ma'lumot 3</h3>
+                    <p class="text-[var(--text-secondary)] text-sm">UI juda yaxshi ko'rinadi!</p>
                 </div>
                 <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl border border-yellow-200">
-                    <h3 class="font-bold text-gray-900 mb-2">Ma'lumot 4</h3>
-                    <p class="text-gray-600 text-sm">Foydalanuvchi tajribasi yaxshilandi!</p>
+                    <h3 class="font-bold text-[var(--text-primary)] mb-2">Ma'lumot 4</h3>
+                    <p class="text-[var(--text-secondary)] text-sm">Foydalanuvchi tajribasi yaxshilandi!</p>
                 </div>
             `;
             Toast.success('Ma\'lumotlar muvaffaqiyatli yuklandi!');
@@ -949,14 +949,14 @@
         for (let i = 0; i < count; i++) {
             const item = document.createElement('div');
             const itemNum = container.children.length + 1;
-            item.className = 'flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors';
+            item.className = 'flex items-center space-x-4 p-4 bg-[var(--bg)] rounded-lg hover:bg-[var(--surface)] transition-colors';
             item.innerHTML = `
-                <div class="w-12 h-12 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold text-lg">
+                <div class="w-12 h-12 bg-primary-100 text-[var(--accent)] rounded-full flex items-center justify-center font-bold text-lg">
                     ${itemNum}
                 </div>
                 <div class="flex-1">
-                    <h4 class="font-semibold text-gray-900">Item #${itemNum}</h4>
-                    <p class="text-sm text-gray-500">This is demo item number ${itemNum}</p>
+                    <h4 class="font-semibold text-[var(--text-primary)]">Item #${itemNum}</h4>
+                    <p class="text-sm text-[var(--text-secondary)]">This is demo item number ${itemNum}</p>
                 </div>
             `;
             container.appendChild(item);

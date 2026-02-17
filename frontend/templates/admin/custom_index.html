@@ -167,7 +167,7 @@ table.activity-table tr:hover {
         <a href="{% url 'admin:frontend_company_changelist' %}?is_verified__exact=0">Biznes tasdiqlamalari ({{ pending_verifications }})</a>
         <a href="{% url 'admin:frontend_reviewreport_changelist' %}?status__exact=pending">Reportlar ({{ pending_reports }})</a>
         <a href="{% url 'admin:frontend_companyclaim_changelist' %}?status__exact=pending">Claimlar ({{ pending_claims }})</a>
-        <a href="{% url 'admin:frontend_user_changelist' %}">Foydalanuvchilar</a>
+        <a href="{% url 'admin:auth_user_changelist' %}">Foydalanuvchilar</a>
     </div>
 </div>
 
@@ -231,7 +231,7 @@ table.activity-table tr:hover {
                 <td>{{ activity.get_action_display }}</td>
                 <td>
                     {% if activity.actor %}
-                        <a href="{% url 'admin:frontend_user_change' activity.actor.id %}">
+                        <a href="{% url 'admin:auth_user_change' activity.actor.id %}">
                             {{ activity.actor.username }}
                         </a>
                     {% else %}
@@ -283,7 +283,13 @@ table.activity-table tr:hover {
                         {{ review.company.name }}
                     </a>
                 </td>
-                <td>{{ review.user_name|default:review.author.username }}</td>
+                <td>
+                    {% if review.user %}
+                        {{ review.user.username }}
+                    {% else %}
+                        {{ review.user_name }}
+                    {% endif %}
+                </td>
                 <td>
                     {{ review.rating }} ⭐
                 </td>
