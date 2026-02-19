@@ -1,614 +1,68 @@
 ================================================================================
-                        FIKRLY PROJECT - COMPLETE STATE REPORT
+                     FIKRLY PROJECT - CURRENT STATE (LIVE)
 ================================================================================
-Generated: 2026-02-17 17:51 UTC+5
-Location: /home/ubuntu/projects/fikrly
-Repository: https://github.com/khdrvss/fikrly
-
-================================================================================
-                              PROJECT OVERVIEW
-================================================================================
-
-NAME: Fikrly Reviews Platform
-TYPE: Django-based Web Application
-PURPOSE: Business review and rating platform for Uzbekistan
-LANGUAGES: Uzbek (primary), Russian (secondary)
-STATUS: Production-ready, actively deployed
-
-DESCRIPTION:
-Fikrly is a comprehensive reviews platform where users can discover, review,
-and rate businesses across Uzbekistan. Features include multilingual support,
-business management dashboard, social authentication, and real-time
-notifications via Telegram.
+Generated: 2026-02-19
+Path: /home/ubuntu/projects/fikrly
+Branch: main
 
 ================================================================================
-                           CURRENT STATE (2026-02-17)
+1) GIT STATE
 ================================================================================
-
-OVERALL HEALTH: 8.5/10 (Improved from 6.5/10)
-DEPLOYMENT STATUS: ✅ All production containers healthy
-LOCAL DEVELOPMENT: ✅ Fully operational
-CODE QUALITY: ✅ Significantly improved
-GIT STATUS: ✅ Clean, all work committed
-
-RECENT IMPROVEMENTS:
-- Committed and pushed 86 files with translation support
-- Fixed Docker database connection
-- Reformatted 56 Python files (Black)
-- Fixed all critical linting errors
-- Applied database migrations
-
-LATEST COMMITS:
-- 36fc6e1: fix: code quality improvements
-- 1151515: feat: add Uzbek translations and multilingual support
-- dc6f297: gulugulu
+- Working tree: clean (no pending tracked changes)
+- Last synced remote: origin/main
+- Latest pushed commit: 7f64dd5
 
 ================================================================================
-                            TECHNOLOGY STACK
+2) INFRASTRUCTURE STATE
 ================================================================================
+Docker services:
+- fikrly_web:    healthy
+- fikrly_nginx:  healthy
+- fikrly_db:     healthy
+- fikrly_redis:  healthy
 
-BACKEND:
-- Python 3.12
-- Django 5.2.4 (upgrade to 6.0.2 available)
-- PostgreSQL 15
-- Redis 7
-- Gunicorn 23.0.0
-
-FRONTEND:
-- HTML5
-- Tailwind CSS (via npm)
-- Vanilla JavaScript
-- Node.js 18+ (for build tools)
-
-DEPLOYMENT:
-- Docker Compose (multi-container setup)
-- Nginx 1.25 (reverse proxy)
-- WhiteNoise (static files)
-
-THIRD-PARTY SERVICES:
-- Google OAuth (allauth)
-- Telegram Bot API (notifications)
-- Eskiz.uz (SMS/OTP)
-- Google Analytics 4
+Health endpoint:
+- GET /health/ => HTTP 200
+- payload status => healthy
 
 ================================================================================
-                          PROJECT ARCHITECTURE
+3) APPLICATION HEALTH
 ================================================================================
+Django check:
+- System check identified no issues (0 silenced)
 
-DIRECTORY STRUCTURE:
-/home/ubuntu/projects/fikrly/
-├── frontend/              # Main Django app
-│   ├── models.py          # Database models (Company, Review, etc.)
-│   ├── views.py           # Business logic (1795 lines)
-│   ├── admin.py           # Django admin customization
-│   ├── forms.py           # Form definitions
-│   ├── templates/         # HTML templates (100+ files)
-│   ├── static/            # CSS, JS, images
-│   ├── migrations/        # 40 database migrations
-│   ├── management/        # Custom commands
-│   ├── templatetags/      # Custom template tags
-│   └── utils/             # Helper utilities
-├── myproject/             # Django project settings
-│   ├── settings.py        # Configuration (525 lines)
-│   ├── urls.py            # URL routing
-│   └── wsgi.py            # WSGI entry point
-├── core/                  # Core utilities
-│   └── context_processors.py
-├── docker/                # Docker configuration
-│   ├── nginx/             # Nginx configs
-│   └── scripts/           # Deployment scripts
-├── locale/                # Translations (uz, ru)
-├── docs/                  # Documentation (13 files)
-├── scripts/               # Helper scripts (11 files)
-├── media/                 # User uploads (4.1MB)
-├── staticfiles/           # Collected static files
-└── logs/                  # Application logs
-
-DJANGO APPS:
-- frontend: Main application (business listings, reviews)
-- core: Shared utilities
-- allauth: Authentication
-- modeltranslation: Multilingual content
-
-KEY MODELS:
-- Company: Business listings (verified, ratings, categories)
-- Review: User reviews (approval workflow, likes, helpful votes)  
-- UserProfile: Extended user information (verification status)
-- BusinessCategory: Business categorization
-- PhoneOTP: SMS verification
-- CompanyClaim: Business ownership verification
-- ActivityLog: Audit trail
+Migrations:
+- All migrations applied
+- frontend latest: 0042_alter_businesscategory_name_ru_and_more
 
 ================================================================================
-                         CONFIGURATION & SETTINGS
+4) AUDIT RESULTS (CURRENT ONLY)
 ================================================================================
+Command:
+python manage.py audit_links --max-pages 150 --max-check 400 --json
 
-ENVIRONMENT: Production (.env configured for Docker)
+Results:
+- pages_visited: 150
+- paths_discovered: 366
+- paths_checked: 366
+- 2xx: 288
+- 3xx: 74
+- 4xx: 4
+- 5xx: 0
+- err: 0
 
-DATABASE:
-- Engine: PostgreSQL
-- Host: db (Docker service)
-- Database: fikrly_db
-- User: fikrly_user
-- Connection pooling: 60s max age
-
-CACHE:
-- Backend: Redis
-- URL: redis://redis:6379/1
-- Fallback: Local memory cache
-
-SECURITY:
-- DEBUG: False
-- SECRET_KEY: Properly set (not default)
-- ALLOWED_HOSTS: fikrly.uz, www.fikrly.uz
-- HTTPS: Configurable (USE_HTTPS env var)
-- HSTS: Enabled in production (1 year)
-- SECURE_SSL_REDIRECT: Configurable
-- CSRF trusted origins: Configured
-- Session cookies: Secure, HttpOnly, SameSite=Lax
-- Rate limiting: Enabled in production
-
-SECURITY HEADERS:
-- X-Content-Type-Options: nosniff
-- X-Frame-Options: DENY
-- X-XSS-Protection: Enabled
-- Referrer-Policy: same-origin
-
-INTERNATIONALIZATION:
-- Default language: uz (Uzbek)
-- Supported: uz, ru
-- Django i18n: Enabled
-- Model translation: django-modeltranslation
-- Translation fields: name_uz, name_ru, description_uz, etc.
-
-STATIC FILES:
-- URL: /static/
-- Storage: WhiteNoise (compressed manifest)
-- Sources: frontend/static/, public/
-
-MEDIA FILES:
-- URL: /media/
-- Path: /home/ubuntu/projects/fikrly/media
-- Size: 4.1MB
-
-EMAIL:
-- Backend: SMTP (Gmail)
-- Console backend in DEBUG mode
-- From: noreply@fikrly.uz
-
-MONITORING:
-- Logging: File-based rotation (10MB, 5 backups)
-- Django Silk: Disabled in production
-- Google Analytics: G-VF0K77S81T
+Current 404 items:
+1) /favicon.ico
+2) /media/company_images/photo_2023-02-03_21-52-25.jpg
+3) /static/bundle.css
+4) /static/dhws-data-injector.js
 
 ================================================================================
-                        DOCKER INFRASTRUCTURE
+5) STATE CLEANUP NOTE
 ================================================================================
-
-CONTAINERS (all healthy):
-┌────────────────┬────────────────────┬──────────┬───────────────┐
-│ Container      │ Image              │ Status   │ Ports         │
-├────────────────┼────────────────────┼──────────┼───────────────┤
-│ fikrly_nginx   │ nginx:1.25-alpine  │ Healthy  │ 80, 443       │
-│ fikrly_web     │ fikrly-web         │ Healthy  │ 8000          │
-│ fikrly_db      │ postgres:15-alpine │ Healthy  │ 5432          │
-│ fikrly_redis   │ redis:7-alpine     │ Healthy  │ 6379          │
-└────────────────┴────────────────────┴──────────┴───────────────┘
-
-VOLUMES:
-- postgres_data: Database persistence
-- redis_data: Cache persistence
-- static_volume: Static files
-- media_volume: User uploads
-- logs_volume: Application logs
-
-NETWORK:
-- fikrly_network (bridge driver)
-
-HEALTH CHECKS:
-- Web: HTTP GET /health/ (30s interval)
-- Nginx: HTTP GET /health/ (30s interval)
-- PostgreSQL: pg_isready (10s interval)
-- Redis: redis-cli ping (10s interval)
+- Old transient audit artifact removed: resp.status_code
+- This file intentionally reflects the current state only (legacy state history removed)
 
 ================================================================================
-                          DATABASE STATUS
-================================================================================
-
-MIGRATIONS: 40 applied (all up to date)
-
-LATEST MIGRATIONS:
-- 0040: Alter translated fields (name_ru, name_uz)
-- 0039: Add translated fields for BusinessCategory and Company
-- 0038: Add indexes for performance
-- 0037: Add review attachments
-- 0036: Performance indexes
-
-KEY TABLES:
-- frontend_company: Business listings
-- frontend_review: User reviews
-- frontend_userprofile: User profiles
-- frontend_businesscategory: Categories
-- frontend_phoneotp: OTP verification
-- frontend_companyclaim: Ownership claims
-- frontend_activitylog: Audit trail
-- frontend_companylike: Company likes
-- frontend_reviewlike: Review likes
-- frontend_reviewhelpfulvote: Helpful votes
-
-POSTGRESQL EXTENSIONS:
-- pg_trgm: Trigram similarity for fuzzy search
-- Full-text search: SearchVector support
-
-================================================================================
-                           CODE QUALITY METRICS
-================================================================================
-
-TOTAL PYTHON FILES: 96+
-TOTAL LINES OF CODE: ~15,000+ (estimated)
-
-LINTING STATUS (after fixes):
-- Critical errors (F811): 0 ✅ (was 4)
-- Whitespace issues (W293): 0 ✅ (was 327)
-- Import errors (E402): ~8 ⚠️ (minor, imports after logger)
-- Unused imports (F401): ~2 ⚠️ (minor)
-
-CODE FORMATTER:
-- Tool: Black 24.10.0
-- Files formatted: 56
-- Style: PEP 8 compliant
-
-DJANGO SYSTEM CHECK:
-- Status: ✅ PASS
-- Issues: 0
-- Silenced: 0
-
-TEST COVERAGE:
-- Status: ⚠️ No tests found
-- Recommendation: Add unit tests for models and views
-
-PRE-COMMIT HOOKS:
-- Configured: Yes (.pre-commit-config.yaml)
-- Hooks: black, flake8
-- Status: Not installed (run: pre-commit install)
-
-================================================================================
-                          DEPENDENCY STATUS
-================================================================================
-
-CORE DEPENDENCIES:
-┌─────────────────────────┬─────────┬──────────┬────────────┐
-│ Package                 │ Current │ Latest   │ Status     │
-├─────────────────────────┼─────────┼──────────┼────────────┤
-│ Django                  │ 5.2.4   │ 6.0.2    │ ⚠️ Update  │
-│ django-allauth          │ 65.11.2 │ 65.14.3  │ ⚠️ Minor   │
-│ pillow                  │ 10.4.0  │ 12.1.1   │ ⚠️ Major   │
-│ gunicorn                │ 23.0.0  │ 25.1.0   │ ⚠️ Major   │
-│ psycopg2-binary         │ 2.9.11  │ Current  │ ✅         │
-│ django-redis            │ 5.4.0   │ 6.0.0    │ ⚠️ Major   │
-│ whitenoise              │ 6.6.0   │ Current  │ ✅         │
-│ django-modeltranslation │ 0.19.19 │ Current  │ ✅         │
-└─────────────────────────┴─────────┴──────────┴────────────┘
-
-DEVELOPMENT DEPENDENCIES:
-- black: 24.10.0 → 26.1.0 available
-- flake8: 7.1.1 → 7.3.0 available
-- django-debug-toolbar: 4.4.6 → 6.2.0 available
-
-SECURITY NOTES:
-- Django 6.x includes security patches
-- Pillow updates often include security fixes
-- Recommend updating within 2 weeks
-
-================================================================================
-                          FEATURES & CAPABILITIES
-================================================================================
-
-USER FEATURES:
-✅ User registration and login
-✅ Google OAuth authentication
-✅ Phone number verification (SMS OTP)
-✅ User profile management
-✅ Business search and filtering
-✅ Write and edit reviews
-✅ Like/unlike businesses
-✅ Like reviews
-✅ Mark reviews as helpful
-✅ Report inappropriate reviews
-✅ Multilingual interface (Uzbek/Russian)
-
-BUSINESS FEATURES:
-✅ Business listings with categories
-✅ Company verification system
-✅ Business claim workflow
-✅ Manager dashboard with analytics
-✅ Review approval workflow
-✅ Owner response to reviews
-✅ Contact reveal tracking
-✅ View count tracking
-✅ Like count tracking
-
-ADMIN FEATURES:
-✅ Custom admin dashboard
-✅ Business moderation
-✅ Review approval/rejection
-✅ User verification
-✅ Activity logging
-✅ Telegram notifications
-✅ Export functionality (CSV/Excel)
-
-TECHNICAL FEATURES:
-✅ Full-text search (PostgreSQL)
-✅ Fuzzy search (trigram similarity)
-✅ Redis caching
-✅ Rate limiting
-✅ Email notifications
-✅ SMS notifications (Eskiz.uz)
-✅ Google Analytics integration
-✅ SEO optimization
-✅ Responsive design
-✅ Performance monitoring (Silk)
-✅ Database query optimization
-
-================================================================================
-                            DEPLOYMENT INFO
-================================================================================
-
-PRODUCTION DOMAIN: https://fikrly.uz
-ENVIRONMENT: Docker Compose (4 containers)
-
-DEPLOYMENT METHOD:
-1. Pull latest code: git pull origin main
-2. Build Docker images: docker compose build
-3. Start services: docker compose up -d
-4. Run migrations: docker compose exec web python manage.py migrate
-5. Collect static: docker compose exec web python manage.py collectstatic
-
-CONTAINER UPTIME:
-- fikrly_web: 26 hours
-- fikrly_nginx: 28 hours
-- fikrly_db: 28 hours
-- fikrly_redis: 28 hours
-
-SSL/TLS:
-- Certificate location: docker/nginx/ssl/
-- Auto-renewal: Not configured (manual)
-- HTTPS redirect: Configurable via USE_HTTPS env var
-
-BACKUP STRATEGY:
-- Database backups: Manual (backups/ directory)
-- 7 backup files present
-- Recommendation: Set up automated daily backups
-
-MONITORING:
-- Container health checks: ✅ Active
-- Application logs: logs/django.log, logs/errors.log
-- Web server logs: Nginx container logs
-
-================================================================================
-                          RECENT CHANGES (LAST 7 DAYS)
-================================================================================
-
-2026-02-17 (Today):
-✅ Code quality improvements
-   - Reformatted 56 files with Black
-   - Fixed duplicate import errors
-   - Cleaned up unused imports
-   - Applied migration 0040
-
-✅ Translation system implementation
-   - Added Uzbek translations
-   - Implemented django-modeltranslation
-   - Created migration 0039
-   - Updated all templates
-   - Added management commands
-
-2026-02-16:
-✅ Business visibility fixes
-✅ Language detection improvements
-
-2026-02-16:
-✅ PostgreSQL setup
-✅ Swagger API documentation
-
-UNCOMMITTED CHANGES:
-- None (all work committed and pushed)
-
-================================================================================
-                        KNOWN ISSUES & LIMITATIONS
-================================================================================
-
-MINOR ISSUES:
-⚠️ 8 import statements not at top of file (E402)
-⚠️ Some dependencies outdated (non-critical)
-⚠️ No automated tests
-
-PLACEHOLDERS (need real credentials):
-⚠️ EMAIL_HOST_USER: your-email@gmail.com
-⚠️ TELEGRAM_BOT_TOKEN: your_bot_token
-⚠️ ESKIZ_EMAIL: your-email@example.com
-⚠️ GOOGLE_CLIENT_ID: your-client-id
-
-RECOMMENDATIONS:
-1. Add unit tests for models and views
-2. Set up automated database backups
-3. Configure real email/SMS/OAuth credentials
-4. Update Django to 6.x (review breaking changes)
-5. Update Pillow and Gunicorn
-6. Enable pre-commit hooks
-7. Set up SSL auto-renewal
-
-================================================================================
-                          QUICK REFERENCE COMMANDS
-================================================================================
-
-DEVELOPMENT:
-# Start virtual environment
-source .venv/bin/activate
-
-# Run Django development server
-python manage.py runserver
-
-# Run Tailwind watcher
-npm run dev
-
-# Run migrations
-python manage.py migrate
-
-# Create superuser
-python manage.py createsuperuser
-
-# Collect static files
-python manage.py collectstatic
-
-DOCKER:
-# Start all services
-docker compose up -d
-
-# View logs
-docker compose logs -f web
-
-# Execute command in container
-docker compose exec web python manage.py shell
-
-# Stop all services
-docker compose down
-
-# Rebuild containers
-docker compose build
-
-CODE QUALITY:
-# Format code
-black frontend/ core/ myproject/
-
-# Check linting
-flake8 frontend/ core/ myproject/
-
-# Run Django checks
-python manage.py check
-
-# Run deployment checks
-python manage.py check --deploy
-
-GIT:
-# Check status
-git status
-
-# Commit changes
-git add .
-git commit -m "description"
-
-# Push to remote
-git push origin main
-
-# View recent commits
-git log --oneline -5
-
-DATABASE:
-# Access PostgreSQL (Docker)
-docker compose exec db psql -U fikrly_user -d fikrly_db
-
-# Backup database
-docker compose exec db pg_dump -U fikrly_user fikrly_db > backup.sql
-
-# Restore database
-docker compose exec -T db psql -U fikrly_user fikrly_db < backup.sql
-
-================================================================================
-                          PROJECT STATISTICS
-================================================================================
-
-CODE:
-- Python files: 96+
-- HTML templates: 100+
-- Lines of code: ~15,000 (estimated)
-- Database migrations: 40
-- Django apps: 4
-
-CONTENT:
-- Media files: 4.1MB
-- Static files: 4.0KB (local)
-- Backups: 7 files
-- Documentation: 13 files
-
-REPOSITORY:
-- Total commits: 100+
-- Latest commit: 36fc6e1
-- Branch: main
-- Remote: github.com/khdrvss/fikrly
-
-================================================================================
-                            CONTACT & RESOURCES
-================================================================================
-
-REPOSITORY: https://github.com/khdrvss/fikrly
-DOMAIN: https://fikrly.uz
-ADMIN EMAIL: admin@fikrly.uz
-
-DOCUMENTATION:
-- README.md: Getting started guide
-- DOCKER_QUICKSTART.md: Docker setup guide
-- docs/: Detailed documentation (13 files)
-
-SUPPORT:
-- Django docs: https://docs.djangoproject.com/
-- Docker docs: https://docs.docker.com/
-- Tailwind docs: https://tailwindcss.com/docs
-
-================================================================================
-                              NEXT STEPS
-================================================================================
-
-IMMEDIATE (This Week):
-1. ✅ DONE: Commit uncommitted work
-2. ✅ DONE: Fix database connection
-3. ✅ DONE: Run code formatter
-4. ✅ DONE: Fix critical linting errors
-
-SHORT TERM (Next 2 Weeks):
-5. Update Django to 6.x
-6. Add basic test coverage
-7. Configure real third-party credentials
-8. Update Pillow and Gunicorn
-
-MEDIUM TERM (Next Month):
-9. Implement automated backups
-10. Add comprehensive test suite
-11. Set up CI/CD pipeline
-12. Configure SSL auto-renewal
-13. Performance optimization
-
-LONG TERM:
-14. Mobile app development
-15. API endpoint expansion
-16. Advanced analytics dashboard
-17. Machine learning for recommendations
-
-================================================================================
-                           PROJECT HEALTH SCORE
-================================================================================
-
-OVERALL: 8.5/10 ⭐⭐⭐⭐⭐⭐⭐⭐
-
-BREAKDOWN:
-├── Production Stability:    9/10 ✅ Excellent
-├── Code Quality:            8/10 ✅ Good  
-├── Configuration:           8/10 ✅ Good
-├── Documentation:           8/10 ✅ Good
-├── Security:                8/10 ✅ Good
-├── Testing:                 2/10 ⚠️ Needs work
-├── Dependencies:            7/10 ⚠️ Updates needed
-└── Deployment:              9/10 ✅ Excellent
-
-TREND: 📈 Improving (was 6.5/10, now 8.5/10)
-
-================================================================================
-                              END OF REPORT
-================================================================================
-
-This report was generated automatically based on project analysis.
-Last updated: 2026-02-17 17:51 UTC+5
-
-For questions or updates, review the documentation in the docs/ folder.
-
+END
 ================================================================================
