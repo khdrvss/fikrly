@@ -5,11 +5,10 @@ const RUNTIME_CACHE = 'fikrly-runtime';
 // Assets to cache immediately
 const PRECACHE_URLS = [
   '/',
-  '/static/bundle.css',
+  '/static/dist/bundle.css',
   '/static/main.css',
   '/static/js/ui-enhancements.js',
   '/static/favicons/android-chrome-192x192.png',
-  '/static/favicons/android-chrome-512x512.png',
   '/static/favicons/favicon.png',
   '/offline/',
 ];

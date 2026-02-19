@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
     <link rel="manifest" href="{% static 'manifest.json' %}">
-    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+    <link rel="stylesheet" href="{% static_bust 'dist/bundle.css' %}">
     <style>
         body {
             margin: 0;
@@ -91,7 +91,5 @@
             }, 2500);
         });
     </script>
-{% load static %}
-<script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
 </html>

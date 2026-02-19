@@ -43,19 +43,16 @@ python manage.py audit_links --max-pages 150 --max-check 400 --json
 
 Results:
 - pages_visited: 150
-- paths_discovered: 366
-- paths_checked: 366
-- 2xx: 288
-- 3xx: 74
-- 4xx: 4
+- paths_discovered: 359
+- paths_checked: 359
+- 2xx: 286
+- 3xx: 73
+- 4xx: 0
 - 5xx: 0
 - err: 0
 
 Current 404 items:
-1) /favicon.ico
-2) /media/company_images/photo_2023-02-03_21-52-25.jpg
-3) /static/bundle.css
-4) /static/dhws-data-injector.js
+- None at current audit scope.
 
 ================================================================================
 5) STATE CLEANUP NOTE

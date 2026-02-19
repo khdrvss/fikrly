@@ -1074,10 +1074,20 @@ def favicon_file(request):
     if static_path.exists():
         return FileResponse(open(static_path, "rb"), content_type="image/x-icon")
 
+    # Fallback to static root public favicon
+    static_public_path = settings.STATIC_ROOT / "favicon.ico"
+    if static_public_path.exists():
+        return FileResponse(open(static_public_path, "rb"), content_type="image/x-icon")
+
     # Fallback to source (development)
     source_path = settings.BASE_DIR / "frontend" / "static" / "favicons" / "favicon.ico"
     if source_path.exists():
         return FileResponse(open(source_path, "rb"), content_type="image/x-icon")
+
+    # Fallback to public source
+    public_source_path = settings.BASE_DIR / "public" / "favicon.ico"
+    if public_source_path.exists():
+        return FileResponse(open(public_source_path, "rb"), content_type="image/x-icon")
 
     return HttpResponse(status=404)
 
