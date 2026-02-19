@@ -24,8 +24,6 @@ from django.http import HttpResponse, FileResponse
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.views.decorators.cache import cache_page
-from .models import PhoneOTP
-from .sms import send_otp_via_eskiz
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail, EmailMessage
 from django_ratelimit.decorators import ratelimit
@@ -354,7 +352,14 @@ def business_list(request, category_slug=None):
     # Query params
     query = request.GET.get("q", "").strip()
     city = request.GET.get("city", "").strip()
-    categories_param = request.GET.get("categories", "").strip()
+    categories_multi = request.GET.getlist("categories")
+    if categories_multi:
+        cat_vals = []
+        for item in categories_multi:
+            cat_vals.extend([v.strip() for v in str(item).split(",") if v.strip()])
+    else:
+        categories_param = request.GET.get("categories", "").strip()
+        cat_vals = [v.strip() for v in categories_param.split(",") if v.strip()]
     min_rating = request.GET.get("min_rating")
     verified = request.GET.get("verified")
     sort = request.GET.get("sort", "top")
@@ -429,18 +434,16 @@ def business_list(request, category_slug=None):
     # Default ordering when no search query
     # Apply filters coming from query params
     # categories (comma-separated ids or slugs)
-    if categories_param:
-        cat_vals = [v.strip() for v in categories_param.split(",") if v.strip()]
-        if cat_vals:
-            # support numeric ids and slugs
-            id_vals = [v for v in cat_vals if v.isdigit()]
-            slug_vals = [v for v in cat_vals if not v.isdigit()]
-            qcats = Q()
-            if id_vals:
-                qcats |= Q(category_fk__id__in=[int(x) for x in id_vals])
-            if slug_vals:
-                qcats |= Q(category_fk__slug__in=slug_vals) | Q(category__in=slug_vals)
-            companies = companies.filter(qcats)
+    if cat_vals:
+        # support numeric ids and slugs
+        id_vals = [v for v in cat_vals if v.isdigit()]
+        slug_vals = [v for v in cat_vals if not v.isdigit()]
+        qcats = Q()
+        if id_vals:
+            qcats |= Q(category_fk__id__in=[int(x) for x in id_vals])
+        if slug_vals:
+            qcats |= Q(category_fk__slug__in=slug_vals) | Q(category__in=slug_vals)
+        companies = companies.filter(qcats)
 
     # city filter (matches exact or icontains)
     if city:
@@ -480,7 +483,7 @@ def business_list(request, category_slug=None):
     # If no explicit search and category filter applied by previous code, keep it ordered by defaults
     if (
         not query
-        and not categories_param
+        and not cat_vals
         and not city
         and not min_rating
         and (verified is None or verified == "")
@@ -557,7 +560,7 @@ def business_list(request, category_slug=None):
         "selected_filters": {
             "q": query,
             "city": city,
-            "categories": categories_param,
+            "categories": cat_vals,
             "min_rating": min_rating,
             "verified": verified,
             "sort": sort,
@@ -749,123 +752,6 @@ def verification_badge(request):
 def privacy_policy(request):
     """Static privacy policy page in Uzbek."""
     return render(request, "pages/privacy_policy.html")
-
-
-class PhoneForm(forms.Form):
-    phone = forms.CharField(max_length=20)
-
-    def clean_phone(self):
-        import re
-
-        raw = self.cleaned_data["phone"]
-        digits = re.sub(r"\D+", "", raw)
-        # Allow 9-digit local (9xxxxxxxx) and normalize; or full 998xxxxxxxxx
-        if len(digits) == 9:
-            digits = "998" + digits
-        if not (digits.startswith("998") and len(digits) == 12 and digits.isdigit()):
-            raise forms.ValidationError("Telefon raqami noto‘g‘ri (998901234567).")
-        return digits
-
-
-def phone_signin(request):
-    """Step 1: Ask phone, send OTP using Eskiz, rate limit by phone and IP."""
-    if request.method == "POST":
-        form = PhoneForm(request.POST)
-        if form.is_valid():
-            phone_norm = form.cleaned_data["phone"]
-            # cool-down: 1 OTP per 60s, max 5/hour per phone
-            ip = request.META.get(
-                "HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR", "")
-            )
-            ip = ip.split(",")[0].strip() if ip else "unknown"
-            key_cool = f"otp_cd:{phone_norm}"
-            key_hour = f"otp_hour:{phone_norm}"
-            if cache.get(key_cool):
-                form.add_error("phone", "Iltimos 1 daqiqadan so‘ng urinib ko‘ring")
-            else:
-                sent_count = cache.get(key_hour, 0)
-                if sent_count >= 5:
-                    form.add_error("phone", "Ko‘p urinish. Bir soat kuting.")
-                else:
-                    import random
-
-                    code = f"{random.randint(100000, 999999)}"
-                    ok = send_otp_via_eskiz(phone_norm, code)
-                    if not ok:
-                        form.add_error(
-                            "phone", "SMS yuborilmadi. Keyinroq urinib ko‘ring."
-                        )
-                    else:
-                        PhoneOTP.objects.create(phone=phone_norm, code=code)
-                        cache.set(key_cool, True, 60)
-                        cache.set(key_hour, sent_count + 1, 3600)
-                        request.session["phone_pending"] = phone_norm
-                        return redirect("phone_verify")
-    else:
-        form = PhoneForm()
-    return render(request, "account/phone_signin.html", {"form": form})
-
-
-class VerifyForm(forms.Form):
-    code = forms.CharField(max_length=6)
-
-    def clean_code(self):
-        code = (self.cleaned_data["code"] or "").strip()
-        if not (len(code) == 6 and code.isdigit()):
-            raise forms.ValidationError("Kod 6 xonali bo‘lishi kerak.")
-        return code
-
-
-def phone_verify(request):
-    """Step 2: Verify OTP and login/create user."""
-    phone = request.session.get("phone_pending")
-    if not phone:
-        return redirect("phone_signin")
-    error = None
-    if request.method == "POST":
-        form = VerifyForm(request.POST)
-        if form.is_valid():
-            code = form.cleaned_data["code"]
-            otp = (
-                PhoneOTP.objects.filter(phone=phone, is_used=False)
-                .order_by("-created_at")
-                .first()
-            )
-            if not otp:
-                error = "Kod topilmadi. Qaytadan yuboring."
-            else:
-                # expire after 5 minutes
-                from django.utils.timezone import now
-
-                if (now() - otp.created_at).total_seconds() > 300:
-                    error = "Kod muddati tugagan."
-                else:
-                    if otp.code != code:
-                        otp.attempts += 1
-                        otp.save(update_fields=["attempts"])
-                        if otp.attempts >= 5:
-                            error = "Juda ko‘p noto‘g‘ri urinish."
-                        else:
-                            error = "Noto‘g‘ri kod."
-                    else:
-                        otp.is_used = True
-                        otp.save(update_fields=["is_used"])
-                        # map phone to a username scheme: u9989xxxxxxx
-                        username = f"u{phone}"
-                        user, created = User.objects.get_or_create(username=username)
-                        # ensure profile exists
-                        UserProfile.objects.get_or_create(user=user)
-                        login(request, user)
-                        request.session.pop("phone_pending", None)
-                        messages.success(request, _("You are now signed in."))
-                        return redirect("user_profile")
-    else:
-        form = VerifyForm()
-    return render(
-        request,
-        "account/phone_verify.html",
-        {"form": form, "phone": phone, "error": error},
-    )
 
 
 def terms_of_service(request):
@@ -1216,10 +1102,11 @@ def service_worker(request):
 
 
 def company_detail(request, pk: int):
-    company = (
-        Company.objects.select_related("category_fk")
-        .prefetch_related("reviews__user", "reviews__likes")
-        .get(pk=pk)
+    company = get_object_or_404(
+        Company.objects.select_related("category_fk").prefetch_related(
+            "reviews__user", "reviews__likes"
+        ),
+        pk=pk,
     )
     if not company.is_active and not (
         request.user.is_superuser

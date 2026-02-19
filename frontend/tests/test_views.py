@@ -10,7 +10,7 @@ class ReviewSubmissionViewTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.category = BusinessCategory.objects.create(
-            name="Test Cat", slug="test-cat"
+            name="Test Cat", name_ru="Тест категория", slug="test-cat"
         )
         self.company = Company.objects.create(
             name="Test Company", category_fk=self.category, is_active=True
@@ -40,7 +40,7 @@ class ReportReviewViewTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.category = BusinessCategory.objects.create(
-            name="Test Cat", slug="test-cat"
+            name="Test Cat", name_ru="Тест категория", slug="test-cat"
         )
         self.company = Company.objects.create(
             name="Test Company", category_fk=self.category, is_active=True

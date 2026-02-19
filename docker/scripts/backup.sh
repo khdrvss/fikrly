@@ -3,7 +3,18 @@
 
 set -e
 
-BACKUP_DIR="./backups"
+# Load environment variables from .env file
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+if [ -f "$PROJECT_DIR/.env" ]; then
+    export $(grep -v '^#' "$PROJECT_DIR/.env" | xargs)
+fi
+
+# Set defaults from environment
+DB_USER=${POSTGRES_USER:-fikrly_user}
+DB_NAME=${POSTGRES_DB:-fikrly_db}
+
+BACKUP_DIR="$PROJECT_DIR/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 
 mkdir -p $BACKUP_DIR
@@ -12,7 +23,7 @@ echo "📦 Starting backup process..."
 
 # Backup PostgreSQL database
 echo "🗄️  Backing up database..."
-docker-compose exec -T db pg_dump -U $DB_USER $DB_NAME > "$BACKUP_DIR/db_backup_$DATE.sql"
+cd "$PROJECT_DIR" && docker compose exec -T db pg_dump -U $DB_USER $DB_NAME > "$BACKUP_DIR/db_backup_$DATE.sql"
 gzip "$BACKUP_DIR/db_backup_$DATE.sql"
 
 # Backup media files

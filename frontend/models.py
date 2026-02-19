@@ -5,6 +5,13 @@ from django.utils.translation import get_language
 import uuid
 
 
+def _is_russian_language(lang_code: str | None) -> bool:
+    if not lang_code:
+        return False
+    normalized = lang_code.lower().replace("_", "-")
+    return normalized.startswith("ru")
+
+
 def company_logo_path(instance, filename):
     ext = filename.split(".")[-1]
     filename = f"{uuid.uuid4()}.{ext}"
@@ -50,7 +57,7 @@ class BusinessCategory(models.Model):
     @property
     def display_name(self):
         lang = get_language()
-        if lang == "ru" and self.name_ru:
+        if _is_russian_language(lang) and self.name_ru:
             return self.name_ru
         return self.name
 
@@ -88,6 +95,11 @@ class Company(models.Model):
     )
     logo_url = models.URLField(
         blank=True, help_text=_("Logo uchun tashqi URL (agar fayl yuklanmasa)")
+    )
+    logo_url_backup = models.URLField(
+        blank=True,
+        help_text=_("Logo URL zaxirasi (avtomatik saqlanadi)"),
+        editable=False,
     )
     logo_scale = models.PositiveIntegerField(
         default=100,
@@ -157,8 +169,15 @@ class Company(models.Model):
     class Meta:
         ordering = ["-review_count", "-rating", "name"]
         indexes = [
+            # Basic filtering by active status and sorting
             models.Index(fields=["is_active", "-rating"]),
             models.Index(fields=["is_active", "-review_count"]),
+            # Category filtering (most common filter)
+            models.Index(fields=["category_fk", "is_active", "-rating"]),
+            # City filtering
+            models.Index(fields=["city", "is_active"]),
+            # Verified filtering
+            models.Index(fields=["is_verified", "is_active"]),
         ]
 
     def __str__(self) -> str:
@@ -187,6 +206,9 @@ class Company(models.Model):
         return self.image_url_for_size(1200)
 
     def save(self, *args, **kwargs):
+        if self.logo_url:
+            self.logo_url_backup = self.logo_url
+
         # If a new image file was uploaded, generate WEBP variants.
         try:
             # detect new upload by checking if `image` has a file-like object
@@ -232,16 +254,22 @@ class Company(models.Model):
     @property
     def display_description(self):
         lang = get_language()
-        if lang == "ru" and self.description_ru:
+        if _is_russian_language(lang) and self.description_ru:
             return self.description_ru
         return self.description
 
     @property
     def display_logo(self) -> str:
-        """Return uploaded logo url if present, else fallback to logo_url."""
+        """Return uploaded logo if file exists, then external URL, then backup URL."""
         if self.logo:
-            return self.logo.url
-        return self.logo_url or ""
+            try:
+                if self.logo.name and self.logo.storage.exists(self.logo.name):
+                    return self.logo.url
+            except Exception:
+                pass
+        if self.logo_url:
+            return self.logo_url
+        return self.logo_url_backup or ""
 
     @property
     def display_image_url(self) -> str:
@@ -468,21 +496,6 @@ class ActivityLog(models.Model):
 
     def __str__(self) -> str:
         return f"{self.created_at:%Y-%m-%d %H:%M} {self.action} by {getattr(self.actor, 'username', 'system')}"
-
-
-class PhoneOTP(models.Model):
-    phone = models.CharField(max_length=20, db_index=True)
-    code = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
-    attempts = models.PositiveIntegerField(default=0)
-    is_used = models.BooleanField(default=False)
-
-    class Meta:
-        indexes = [models.Index(fields=["phone", "created_at"])]
-        ordering = ["-created_at"]
-
-    def __str__(self) -> str:
-        return f"OTP({self.phone}) {self.code}"
 
 
 class CompanyClaim(models.Model):

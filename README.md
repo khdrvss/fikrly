@@ -94,6 +94,12 @@ More details in docs:
 - Optional Telegram/SMS via env vars
 - Phone OTP routes exist but are hidden from UI by default
 
+Health audit (safe, no nginx rate-limit noise):
+
+```bash
+python manage.py audit_links --max-pages 120 --max-check 300
+```
+
 ## 🚀 Features
 
 - **HTML5** - Modern HTML structure with best practices

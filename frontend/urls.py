@@ -111,9 +111,7 @@ urlpatterns = [
         lambda request: render(request, "pages/ui_demo.html"),
         name="ui_demo",
     ),
-    # Phone OTP auth
-    path("accounts/phone/", views.phone_signin, name="phone_signin"),
-    path("accounts/phone/verify/", views.phone_verify, name="phone_verify"),
+
     # PWA offline page
     path(
         "offline/",

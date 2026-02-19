@@ -23,7 +23,24 @@ from .models import (
     ReviewFlag,
     DataExport,
 )
+from .cache_utils import clear_public_cache
 from pathlib import Path
+
+
+@admin.action(description="Clear public cache (emergency refresh)")
+def clear_public_cache_action(modeladmin, request, queryset):
+    deleted = clear_public_cache()
+    if deleted == -1:
+        modeladmin.message_user(
+            request,
+            "Public cache tozalandi (backend fallback orqali).",
+            level="warning",
+        )
+    else:
+        modeladmin.message_user(
+            request,
+            f"Public cache tozalandi. O'chirilgan keylar: {deleted}",
+        )
 
 
 class CompanyActivityLogInline(admin.TabularInline):
@@ -160,6 +177,7 @@ class BusinessCategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "name_ru", "slug")
     search_fields = ("name", "name_ru")
     prepopulated_fields = {"slug": ("name",)}
+    actions = [clear_public_cache_action]
 
 
 @admin.register(Company)
@@ -255,6 +273,7 @@ class CompanyAdmin(admin.ModelAdmin):
         "toggle_verified",
         "approve_verification",
         "reject_verification",
+        clear_public_cache_action,
     ]
 
     def toggle_visibility(self, request, queryset):
@@ -397,9 +416,15 @@ class CompanyAdmin(admin.ModelAdmin):
 
         logo_src = None
         if obj.logo:
-            logo_src = obj.logo.url
-        elif getattr(obj, "logo_url", None):
+            try:
+                if obj.logo.name and obj.logo.storage.exists(obj.logo.name):
+                    logo_src = obj.logo.url
+            except Exception:
+                logo_src = None
+        if not logo_src and getattr(obj, "logo_url", None):
             logo_src = obj.logo_url
+        elif not logo_src and getattr(obj, "logo_url_backup", None):
+            logo_src = obj.logo_url_backup
 
         if logo_src:
             return format_html(
@@ -438,6 +463,7 @@ class ReviewAdmin(admin.ModelAdmin):
         "toggle_verified_purchase",
         "bulk_reject_reviews",
         "export_reviews_csv",
+        clear_public_cache_action,
     ]
     inlines = [ReviewActivityLogInline]
     readonly_fields = ("receipt_preview",)

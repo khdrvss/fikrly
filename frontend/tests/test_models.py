@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.utils import translation
 from ..models import Company, Review, BusinessCategory
 
 User = get_user_model()
@@ -7,7 +8,9 @@ User = get_user_model()
 
 class CompanyModelTests(TestCase):
     def setUp(self):
-        self.category = BusinessCategory.objects.create(name="Tech", slug="tech")
+        self.category = BusinessCategory.objects.create(
+            name="Tech", name_ru="Технология", slug="tech"
+        )
         self.company = Company.objects.create(
             name="Test Corp", category_fk=self.category, is_active=True
         )
@@ -25,11 +28,28 @@ class CompanyModelTests(TestCase):
         self.company.save()
         self.assertEqual(self.company.display_image_url, "http://example.com/img.jpg")
 
+    def test_logo_url_backup_persists_when_logo_url_cleared(self):
+        self.company.logo_url = "https://cdn.example.com/logo.png"
+        self.company.save()
+
+        self.company.refresh_from_db()
+        self.assertEqual(self.company.logo_url_backup, "https://cdn.example.com/logo.png")
+        self.assertEqual(self.company.display_logo, "https://cdn.example.com/logo.png")
+
+        self.company.logo_url = ""
+        self.company.save()
+
+        self.company.refresh_from_db()
+        self.assertEqual(self.company.logo_url_backup, "https://cdn.example.com/logo.png")
+        self.assertEqual(self.company.display_logo, "https://cdn.example.com/logo.png")
+
 
 class ReviewLogicTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="reviewer", password="password")
-        self.category = BusinessCategory.objects.create(name="Food", slug="food")
+        self.category = BusinessCategory.objects.create(
+            name="Food", name_ru="Еда", slug="food"
+        )
         self.company = Company.objects.create(
             name="Burger King", category_fk=self.category
         )
@@ -62,3 +82,24 @@ class ReviewLogicTests(TestCase):
         self.company.refresh_from_db()
         self.assertEqual(self.company.review_count, 1)
         self.assertEqual(self.company.rating, 5.0)
+
+
+class LocalizationDisplayTests(TestCase):
+    def test_category_display_name_uses_ru_for_regional_code(self):
+        category = BusinessCategory.objects.create(
+            name="Aviakompaniya", name_ru="Авиакомпания", slug="aviacompany"
+        )
+
+        with translation.override("ru-ru"):
+            self.assertEqual(category.display_name, "Авиакомпания")
+
+    def test_company_display_description_uses_ru_for_regional_code(self):
+        company = Company.objects.create(
+            name="Test Company",
+            category="services",
+            description="Uzbek description",
+            description_ru="Русское описание",
+        )
+
+        with translation.override("ru_RU"):
+            self.assertEqual(company.display_description, "Русское описание")

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -215,6 +216,10 @@ DB_HOST = os.environ.get("DB_HOST", "db")  # docker compose service name default
 DB_PORT = os.environ.get("DB_PORT", "5432")
 
 if DB_ENGINE.endswith("sqlite3") or DB_ENGINE.endswith("sqlite"):
+    if not DEBUG:
+        raise ImproperlyConfigured(
+            "SQLite is disabled when DEBUG=False. Configure PostgreSQL via DB_ENGINE/DB_NAME/DB_USER/DB_PASSWORD/DB_HOST/DB_PORT."
+        )
     # SQLite expects a file path for NAME
     if DB_NAME and DB_NAME.endswith(".sqlite3"):
         sqlite_path = Path(DB_NAME)
@@ -373,6 +378,9 @@ ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
 ACCOUNT_ADAPTER = "frontend.adapters.AccountAdapter"
+ACCOUNT_FORMS = {
+    "signup": "frontend.allauth_forms.CustomSignupForm",
+}
 
 # Email backend & defaults
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "fikrlyuzb@gmail.com")
@@ -413,9 +421,11 @@ TELEGRAM_REVIEWS_CHAT_IDS = [
     for cid in os.environ.get("TELEGRAM_REVIEWS_CHAT_IDS", "").split(",")
     if cid.strip()
 ]
-
-# Eskiz SMS (phone OTP)
-ESKIZ_BASE = os.environ.get("ESKIZ_BASE", "https://notify.eskiz.uz")
+TELEGRAM_ERROR_CHAT_IDS = [
+    cid.strip()
+    for cid in os.environ.get("TELEGRAM_ERROR_CHAT_IDS", "").split(",")
+    if cid.strip()
+]
 
 # Google Analytics
 GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "")
@@ -435,10 +445,6 @@ SILKY_MAX_RECORDED_REQUESTS_CHECK_PERCENT = 10
 if not DEBUG:
     SILKY_INTERCEPT_PERCENT = 0  # Disable in production
 
-ESKIZ_EMAIL = os.environ.get("ESKIZ_EMAIL", "")
-ESKIZ_PASSWORD = os.environ.get("ESKIZ_PASSWORD", "")
-ESKIZ_FROM = os.environ.get("ESKIZ_FROM", "4546")
-
 
 # ============================================
 # LOGGING CONFIGURATION
@@ -449,6 +455,10 @@ LOGGING = {
     "formatters": {
         "verbose": {
             "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "structured": {
+            "format": '{{"level":"{levelname}","time":"{asctime}","logger":"{name}","module":"{module}","message":"{message}"}}',
             "style": "{",
         },
         "simple": {
@@ -484,6 +494,12 @@ LOGGING = {
             "filename": BASE_DIR / "logs" / "errors.log",
             "maxBytes": 1024 * 1024 * 10,  # 10MB
             "backupCount": 5,
+            "formatter": "structured",
+            "filters": ["require_debug_false"],
+        },
+        "telegram_errors": {
+            "level": "ERROR",
+            "class": "frontend.logging_handlers.TelegramErrorHandler",
             "formatter": "verbose",
             "filters": ["require_debug_false"],
         },
@@ -495,12 +511,12 @@ LOGGING = {
             "propagate": False,
         },
         "django.request": {
-            "handlers": ["error_file", "console"],
+            "handlers": ["error_file", "telegram_errors", "console"],
             "level": "ERROR",
             "propagate": False,
         },
         "frontend": {
-            "handlers": ["console", "file"],
+            "handlers": ["console", "file", "telegram_errors"],
             "level": "INFO",
             "propagate": False,
         },
@@ -532,3 +548,22 @@ if not DEBUG:
 
     # Additional security
     SECURE_REFERRER_POLICY = "same-origin"
+    
+    # SSL/HTTPS Settings (production only)
+    USE_HTTPS = os.environ.get("USE_HTTPS", "False").lower() in ("true", "1", "yes")
+    
+    if USE_HTTPS:
+        # HTTP Strict Transport Security
+        SECURE_HSTS_SECONDS = 31536000  # 1 year
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+        SECURE_HSTS_PRELOAD = True
+        
+        # SSL Redirect
+        SECURE_SSL_REDIRECT = True
+        
+        # Secure Cookies
+        SESSION_COOKIE_SECURE = True
+        CSRF_COOKIE_SECURE = True
+        
+        # Set secure cookie age
+        SESSION_COOKIE_AGE = 1209600  # 2 weeks

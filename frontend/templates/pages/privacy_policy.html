@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
     <link rel="manifest" href="{% static 'manifest.json' %}">
-    <link rel="stylesheet" href="{% static_bust 'bundle.css' %}">
+    <link rel="stylesheet" href="{% static_bust 'dist/bundle.css' %}">
 </head>
 <body class="bg-background">
     <header class="bg-surface shadow-subtle sticky top-0 z-50">
@@ -98,7 +98,5 @@
         </div>
     </footer>
 
-    {% load static %}
-    <script id="dhws-dataInjector" src="{% static_bust 'dhws-data-injector.js' %}"></script>
 </body>
 </html>

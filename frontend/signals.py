@@ -10,12 +10,14 @@ from .models import (
     ReviewReport,
     ActivityLog,
     Company,
+    BusinessCategory,
     UserGamification,
     Badge,
     ReviewHelpfulVote,
     ReviewImage,
 )
 from .utils import send_telegram_message
+from .cache_utils import clear_public_cache
 
 User = get_user_model()
 
@@ -139,6 +141,44 @@ def update_company_stats_signal(sender, instance, **kwargs):
 
     if instance.company_id:
         recalculate_company_stats(instance.company_id)
+
+
+@receiver([post_save, post_delete], sender=BusinessCategory)
+def clear_cache_on_category_change(sender, instance, **kwargs):
+    clear_public_cache()
+
+
+@receiver([post_save, post_delete], sender=Company)
+def clear_cache_on_company_change(sender, instance, **kwargs):
+    update_fields = kwargs.get("update_fields")
+    if update_fields and set(update_fields).issubset({"review_count", "rating"}):
+        return
+    clear_public_cache()
+
+
+@receiver(pre_save, sender=Review)
+def track_review_approval_state(sender, instance, **kwargs):
+    if not instance.pk:
+        instance._old_is_approved = False
+        return
+    try:
+        old = Review.objects.only("is_approved").get(pk=instance.pk)
+        instance._old_is_approved = old.is_approved
+    except Review.DoesNotExist:
+        instance._old_is_approved = False
+
+
+@receiver(post_save, sender=Review)
+def clear_cache_on_approved_review_save(sender, instance, created, **kwargs):
+    old_is_approved = getattr(instance, "_old_is_approved", False)
+    if instance.is_approved or old_is_approved:
+        clear_public_cache()
+
+
+@receiver(post_delete, sender=Review)
+def clear_cache_on_approved_review_delete(sender, instance, **kwargs):
+    if instance.is_approved:
+        clear_public_cache()
 
 
 @receiver(pre_save, sender=Company)

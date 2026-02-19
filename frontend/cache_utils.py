@@ -157,3 +157,30 @@ class CachedProperty:
         if not hasattr(instance, attr_name):
             setattr(instance, attr_name, self.func(instance))
         return getattr(instance, attr_name)
+
+
+def clear_public_cache() -> int:
+    """Clear public-facing cache keys.
+
+    Returns:
+        Number of deleted keys when pattern deletion is available,
+        -1 when fallback `cache.clear()` is used.
+    """
+    patterns = ["business_list:*", "api:*"]
+    deleted = 0
+
+    try:
+        from django_redis import get_redis_connection
+
+        conn = get_redis_connection("default")
+        for pattern in patterns:
+            keys = conn.keys(pattern)
+            if keys:
+                deleted += conn.delete(*keys)
+        return deleted
+    except Exception:
+        try:
+            cache.clear()
+            return -1
+        except Exception:
+            return 0

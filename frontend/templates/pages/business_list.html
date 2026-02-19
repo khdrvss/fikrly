@@ -11,7 +11,8 @@
 
 {% block meta_description %}
 {% if category_filter %}
-{% blocktrans %}{{ category_filter }} bo'yicha O'zbekistondagi kompaniyalar haqida sharhlar, baholar va foydalanuvchi fikrlari.{% endblocktrans %}
+{% blocktrans %}{{ category_filter }} bo'yicha O'zbekistondagi kompaniyalar haqida sharhlar, baholar va foydalanuvchi
+fikrlari.{% endblocktrans %}
 {% else %}
 {% trans "Fikrly.uz — O'zbekistondagi barcha bizneslar va xizmatlar ro'yxati. Sharhlar o'qing va qoldiring." %}
 {% endif %}
@@ -27,10 +28,12 @@
                 <form method="get" action="{% url 'business_list' %}" class="flex-1 lg:hidden">
                     <div class="relative">
                         <input type="search" name="q" value="{{ request.GET.q }}"
-                               placeholder="{% trans 'Qidiring...' %}"
-                               class="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            placeholder="{% trans 'Qidiring...' %}"
+                            class="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                 </form>
@@ -44,16 +47,17 @@
                 <div class="flex items-center gap-2">
                     <form method="get" action="" class="inline-block" id="sortForm">
                         {% for key, value in request.GET.items %}
-                            {% if key != 'sort' and key != 'page' %}
-                                <input type="hidden" name="{{ key }}" value="{{ value }}">
-                            {% endif %}
+                        {% if key != 'sort' and key != 'page' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
                         {% endfor %}
-                        <select name="sort" onchange="this.form.submit()" 
-                                class="h-10 pl-3 pr-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white cursor-pointer">
-                            <option value="top" {% if selected_filters.sort == 'top' %}selected{% endif %}>{% trans "Eng mos" %}</option>
-                            <option value="most_reviews" {% if selected_filters.sort == 'most_reviews' %}selected{% endif %}>{% trans "Eng ko'p sharhlar" %}</option>
-                            <option value="new" {% if selected_filters.sort == 'new' %}selected{% endif %}>{% trans "Yangi" %}</option>
-                            <option value="az" {% if selected_filters.sort == 'az' %}selected{% endif %}>{% trans "A-Z" %}</option>
+                        <select name="sort" onchange="this.form.submit()"
+                            class="h-10 pl-3 pr-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white cursor-pointer">
+                            <option value="top" {% if selected_filters.sort == 'top' %}selected{% endif %}>{% trans "Eng yaxshilar" %}</option>
+                            <option value="most_reviews" {% if selected_filters.sort == 'most_reviews' %}selected{% endif %}>{% trans "Ko'p sharhlar" %}</option>
+                            <option value="new" {% if selected_filters.sort == 'new' %}selected{% endif %}>{% trans "Yangi qo'shilganlar" %}</option>
+                            <option value="az" {% if selected_filters.sort == 'az' %}selected{% endif %}>{% trans "A-Z" %}
+                            </option>
                         </select>
                     </form>
                 </div>
@@ -73,7 +77,7 @@
             <aside class="col-span-12 lg:col-span-3">
                 <div class="bg-white rounded-xl border border-slate-200 p-6 lg:sticky lg:top-24">
                     <h2 class="text-lg font-bold text-gray-900 mb-6">{% trans "Filtrlar" %}</h2>
-                    
+
                     <form id="filtersForm" method="get" action="{% url 'business_list' %}" class="space-y-6">
                         <input type="hidden" name="q" value="{{ selected_filters.q }}">
                         <input type="hidden" name="sort" value="{{ selected_filters.sort }}">
@@ -83,12 +87,13 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-900 mb-2">{% trans "Barcha shaharlar" %}</label>
                             <select name="city" onchange="this.form.submit()"
-                                    class="w-full h-10 px-3 pr-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
+                                class="w-full h-10 px-3 pr-10 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">
                                 <option value="">{% trans "Barcha shaharlar" %}</option>
                                 {% for ct in all_cities %}
-                                    {% if ct %}
-                                    <option value="{{ ct }}" {% if selected_filters.city == ct %}selected{% endif %}>{{ ct }}</option>
-                                    {% endif %}
+                                {% if ct %}
+                                <option value="{{ ct }}" {% if selected_filters.city == ct %}selected{% endif %}>{{ ct }}
+                                </option>
+                                {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
@@ -98,12 +103,13 @@
                             <label class="block text-sm font-semibold text-gray-900 mb-3">{% trans "Barcha kategoriyalar" %}</label>
                             <div class="space-y-2 max-h-64 overflow-y-auto pr-2">
                                 {% for cat in all_categories %}
-                                <label class="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer group">
+                                <label
+                                    class="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer group">
                                     <div class="flex items-center gap-2 flex-1">
-                                        <input type="checkbox" name="cat_{{ cat.id }}" value="{{ cat.id }}" 
-                                               class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 category-checkbox"
-                                               {% if cat.id|stringformat:"s" in selected_filters.categories %}checked{% endif %}
-                                               onchange="handleCategoryChange(this)">
+                                        <input type="checkbox" name="categories" value="{{ cat.id }}"
+                                            onchange="this.form.submit()"
+                                            class="w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 category-checkbox"
+                                            {% if cat.id|stringformat:"s" in selected_filters.categories %}checked{% endif %}>
                                         <span class="text-sm text-gray-700 group-hover:text-gray-900">{{ cat.display_name }}</span>
                                     </div>
                                     <span class="text-xs text-gray-400 ml-2">({{ cat.company_count }})</span>
@@ -116,25 +122,31 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-900 mb-3">{% trans "Minimal baho" %}</label>
                             <div class="space-y-2">
-                                <label class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="min_rating" value="4" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
-                                           {% if selected_filters.min_rating == '4' %}checked{% endif %} onchange="this.form.submit()">
+                                <label
+                                    class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="min_rating" value="4"
+                                        class="w-4 h-4 text-emerald-600 focus:ring-emerald-500" {% if selected_filters.min_rating == '4' %}checked{% endif %}
+                                        onchange="this.form.submit()">
                                     <span class="text-sm text-gray-700 flex items-center gap-1">
                                         <span class="text-yellow-400">★★★★</span><span class="text-gray-300">☆</span>
                                         <span class="text-gray-600">& up</span>
                                     </span>
                                 </label>
-                                <label class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="min_rating" value="3" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
-                                           {% if selected_filters.min_rating == '3' %}checked{% endif %} onchange="this.form.submit()">
+                                <label
+                                    class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="min_rating" value="3"
+                                        class="w-4 h-4 text-emerald-600 focus:ring-emerald-500" {% if selected_filters.min_rating == '3' %}checked{% endif %}
+                                        onchange="this.form.submit()">
                                     <span class="text-sm text-gray-700 flex items-center gap-1">
                                         <span class="text-yellow-400">★★★</span><span class="text-gray-300">☆☆</span>
                                         <span class="text-gray-600">& up</span>
                                     </span>
                                 </label>
-                                <label class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
-                                    <input type="radio" name="min_rating" value="2" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500"
-                                           {% if selected_filters.min_rating == '2' %}checked{% endif %} onchange="this.form.submit()">
+                                <label
+                                    class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="min_rating" value="2"
+                                        class="w-4 h-4 text-emerald-600 focus:ring-emerald-500" {% if selected_filters.min_rating == '2' %}checked{% endif %}
+                                        onchange="this.form.submit()">
                                     <span class="text-sm text-gray-700 flex items-center gap-1">
                                         <span class="text-yellow-400">★★</span><span class="text-gray-300">☆☆☆</span>
                                         <span class="text-gray-600">& up</span>
@@ -148,17 +160,20 @@
                             <label class="flex items-center justify-between py-2 cursor-pointer">
                                 <span class="text-sm font-semibold text-gray-900">{% trans "Faqat tasdiqlangan" %}</span>
                                 <div class="relative">
-                                    <input type="checkbox" name="verified" value="1" class="sr-only peer" id="verifiedToggle"
-                                           {% if selected_filters.verified == '1' %}checked{% endif %} onchange="this.form.submit()">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <input type="checkbox" name="verified" value="1" class="sr-only peer"
+                                        id="verifiedToggle" {% if selected_filters.verified == '1' %}checked{% endif %}
+                                        onchange="this.form.submit()">
+                                    <div
+                                        class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-emerald-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600">
+                                    </div>
                                 </div>
                             </label>
                         </div>
 
                         <!-- Reset Button -->
                         <div class="pt-4 border-t border-slate-200">
-                            <a href="{% url 'business_list' %}" 
-                               class="block w-full px-4 py-2.5 text-center text-sm font-medium text-gray-700 border border-slate-300 rounded-lg hover:bg-gray-50 transition">
+                            <a href="{% url 'business_list' %}"
+                                class="block w-full px-4 py-2.5 text-center text-sm font-medium text-gray-700 border border-slate-300 rounded-lg hover:bg-gray-50 transition">
                                 {% trans "Filtrlarni tozalash" %}
                             </a>
                         </div>
@@ -172,29 +187,42 @@
                 {% if selected_filters.city or selected_filters.categories or selected_filters.min_rating or selected_filters.verified == '1' %}
                 <div class="flex flex-wrap gap-2 mb-6">
                     {% if selected_filters.city %}
-                    <a href="?{% querystring_without 'city' %}" 
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                    <a href="?{% querystring_without 'city' %}"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
                         {{ selected_filters.city }}
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if selected_filters.categories %}
+                    <a href="?{% querystring_without 'categories' %}"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                        {% trans "Kategoriyalar" %}
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </a>
                     {% endif %}
                     {% if selected_filters.min_rating %}
-                    <a href="?{% querystring_without 'min_rating' %}" 
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                    <a href="?{% querystring_without 'min_rating' %}"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
                         {{ selected_filters.min_rating }}★ & up
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </a>
                     {% endif %}
                     {% if selected_filters.verified == '1' %}
-                    <a href="?{% querystring_without 'verified' %}" 
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
+                    <a href="?{% querystring_without 'verified' %}"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium hover:bg-emerald-100 transition">
                         {% trans "Tasdiqlangan" %}
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </a>
                     {% endif %}
@@ -204,23 +232,22 @@
                 <!-- Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {% for company in companies %}
-                    <a href="{% url 'company_detail' company.pk %}" 
-                       class="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+                    <a href="{% url 'company_detail' company.pk %}"
+                        class="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
                         <!-- Company Image -->
                         <div class="relative aspect-[2/1] bg-gray-100 overflow-hidden">
                             <img src="{{ company.image_800_url|default:company.display_image_url|default:company.image_url }}"
-                                 srcset="{{ company.image_400_url }} 400w, {{ company.image_800_url }} 800w"
-                                 alt="{{ company.name }}"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                 onerror="this.src='{% static 'img/placeholder-2x1.svg' %}'">
-                            
+                                alt="{{ company.name }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                onerror="this.src='{% static 'img/placeholder-2x1.svg' %}'">
+
                             <!-- Logo Overlay -->
-                            {% if company.logo_url %}
-                            <div class="absolute bottom-3 left-3 w-14 h-14 bg-white rounded-lg border-2 border-white shadow-lg overflow-hidden">
-                                <img src="{{ company.logo_url }}" 
-                                     alt="{{ company.name }} logo"
-                                     class="w-full h-full object-contain p-1"
-                                     style="transform: scale({{ company.logo_scale|default:100 }}%);">
+                            {% if company.display_logo %}
+                            <div
+                                class="absolute bottom-3 left-3 w-14 h-14 bg-white rounded-lg border-2 border-white shadow-lg overflow-hidden">
+                                <img src="{{ company.display_logo }}" alt="{{ company.name }} logo"
+                                    class="w-full h-full object-contain p-1"
+                                    style="transform: scale({{ company.logo_scale|default:100 }}%);">
                             </div>
                             {% endif %}
                         </div>
@@ -229,11 +256,15 @@
                         <div class="p-4">
                             <!-- Title Row -->
                             <div class="flex items-start justify-between gap-2 mb-2">
-                                <h3 class="font-bold text-gray-900 text-base line-clamp-1 flex-1">{{ company.name }}</h3>
+                                <h3 class="font-bold text-gray-900 text-base line-clamp-1 flex-1">{{ company.name }}
+                                </h3>
                                 {% if company.is_verified %}
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium shrink-0">
+                                <span
+                                    class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium shrink-0">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                     {% trans "Tasdiqlangan" %}
                                 </span>
@@ -243,9 +274,7 @@
                             <!-- Stars & Reviews -->
                             <div class="flex items-center gap-2 mb-3">
                                 <div class="flex items-center text-yellow-400">
-                                    {% with rating=company.rating %}
-                                        {% if rating >= 1 %}★{% else %}☆{% endif %}{% if rating >= 2 %}★{% else %}☆{% endif %}{% if rating >= 3 %}★{% else %}☆{% endif %}{% if rating >= 4 %}★{% else %}☆{% endif %}{% if rating >= 5 %}★{% else %}☆{% endif %}
-                                    {% endwith %}
+                                    {% render_stars company.rating %}
                                 </div>
                                 <span class="text-sm text-gray-600">({{ company.review_count }})</span>
                             </div>
@@ -265,15 +294,20 @@
                                 {% if company.city %}
                                 <div class="flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                        </path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
                                     <span class="truncate">{{ company.city }}</span>
                                 </div>
                                 {% endif %}
                                 <div class="flex items-center gap-1">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
+                                        </path>
                                     </svg>
                                     <span>{{ company.review_count }} {% trans "sharhlar" %}</span>
                                 </div>
@@ -286,8 +320,8 @@
                         <div class="text-6xl mb-4">🔍</div>
                         <h3 class="text-xl font-bold text-gray-900 mb-2">{% trans "Hech qanday natija topilmadi" %}</h3>
                         <p class="text-gray-600 mb-6">{% trans "Filtrlarni o'zgartiring yoki boshqa kategoriya sinab ko'ring." %}</p>
-                        <a href="{% url 'business_list' %}" 
-                           class="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition">
+                        <a href="{% url 'business_list' %}"
+                            class="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition">
                             {% trans "Filtrlarni tozalash" %}
                         </a>
                     </div>
@@ -300,25 +334,25 @@
                     <nav class="flex items-center gap-2" aria-label="Pagination">
                         {% if page_obj.has_previous %}
                         <a href="?{% url_replace request 'page' page_obj.previous_page_number %}"
-                           class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                            class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
                             ←
                         </a>
                         {% endif %}
 
                         {% for num in page_obj.paginator.page_range %}
-                            {% if num == page_obj.number %}
-                            <span class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium">{{ num }}</span>
-                            {% else %}
-                            <a href="?{% url_replace request 'page' num %}"
-                               class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                                {{ num }}
-                            </a>
-                            {% endif %}
+                        {% if num == page_obj.number %}
+                        <span class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium">{{ num }}</span>
+                        {% else %}
+                        <a href="?{% url_replace request 'page' num %}"
+                            class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                            {{ num }}
+                        </a>
+                        {% endif %}
                         {% endfor %}
 
                         {% if page_obj.has_next %}
                         <a href="?{% url_replace request 'page' page_obj.next_page_number %}"
-                           class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                            class="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
                             →
                         </a>
                         {% endif %}
@@ -331,36 +365,16 @@
 </div>
 
 <script>
-// Handle category checkbox changes
-function handleCategoryChange(checkbox) {
-    const form = document.getElementById('filtersForm');
-    const checkedBoxes = form.querySelectorAll('.category-checkbox:checked');
-    const categories = Array.from(checkedBoxes).map(cb => cb.value).join(',');
-    
-    // Update or remove hidden categories input
-    let categoriesInput = form.querySelector('input[name="categories"]');
-    if (!categoriesInput) {
-        categoriesInput = document.createElement('input');
-        categoriesInput.type = 'hidden';
-        categoriesInput.name = 'categories';
-        form.appendChild(categoriesInput);
-    }
-    categoriesInput.value = categories;
-    
-    // Submit form
-    form.submit();
-}
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
 
-// Mobile menu toggle
-document.addEventListener('DOMContentLoaded', function() {
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const menu = document.getElementById('mobile-menu');
-    
-    if (menuBtn && menu) {
-        menuBtn.addEventListener('click', function() {
-            menu.classList.toggle('hidden');
-        });
-    }
-});
+        if (menuBtn && menu) {
+            menuBtn.addEventListener('click', function () {
+                menu.classList.toggle('hidden');
+            });
+        }
+    });
 </script>
 {% endblock %}

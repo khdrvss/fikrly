@@ -87,10 +87,14 @@ def recalculate_company_stats(company_id: int) -> None:
         agg = company.reviews.filter(is_approved=True).aggregate(
             avg=Avg("rating"), cnt=Count("id")
         )
-        company.review_count = int(agg.get("cnt") or 0)
-        company.rating = (
-            round(float(agg.get("avg") or 0.0), 2) if company.review_count else 0
-        )
-        company.save(update_fields=["review_count", "rating"])
+        new_review_count = int(agg.get("cnt") or 0)
+        new_rating = round(float(agg.get("avg") or 0.0), 2) if new_review_count else 0
+
+        if company.review_count != new_review_count or float(company.rating) != float(
+            new_rating
+        ):
+            company.review_count = new_review_count
+            company.rating = new_rating
+            company.save(update_fields=["review_count", "rating"])
     except Company.DoesNotExist:
         pass
