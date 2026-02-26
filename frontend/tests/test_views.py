@@ -18,7 +18,7 @@ class ReviewSubmissionViewTests(TestCase):
         self.url = reverse("review_submission")
 
     def test_redirect_if_not_logged_in(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, secure=True)
         self.assertNotEqual(response.status_code, 200)
         # Should redirect to login page
         self.assertEqual(response.status_code, 302)
@@ -32,7 +32,7 @@ class ReviewSubmissionViewTests(TestCase):
         profile.save()
 
         self.client.login(username="testuser", password="password")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, secure=True)
         self.assertEqual(response.status_code, 200)
 
 
@@ -55,7 +55,7 @@ class ReportReviewViewTests(TestCase):
         self.url = reverse("report_review", args=[self.review.pk])
 
     def test_redirect_if_not_logged_in(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, secure=True)
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
@@ -67,5 +67,53 @@ class ReportReviewViewTests(TestCase):
         profile.save()
 
         self.client.login(username="reporter", password="password")
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, secure=True)
         self.assertEqual(response.status_code, 200)
+
+
+class PublicVisibilityTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.business_category = BusinessCategory.objects.create(
+            name="Hidden Cat", name_ru="Скрытая", slug="hidden-cat", is_active=True
+        )
+        self.company = Company.objects.create(
+            name="Hidden Category Company",
+            category_fk=self.business_category,
+            is_active=True,
+        )
+
+    def test_business_list_excludes_company_when_category_is_hidden(self):
+        self.business_category.is_active = False
+        self.business_category.save()
+
+        response = self.client.get(reverse("business_list"), secure=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.company.name)
+
+    def test_company_detail_returns_404_when_category_is_hidden(self):
+        self.business_category.is_active = False
+        self.business_category.save()
+
+        response = self.client.get(
+            reverse("company_detail", args=[self.company.pk]), secure=True
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_company_detail_visible_when_category_is_active(self):
+        response = self.client.get(
+            reverse("company_detail", args=[self.company.pk]), secure=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_business_list_excludes_deactivated_company(self):
+        self.company.is_active = False
+        self.company.save()
+
+        response = self.client.get(reverse("business_list"), secure=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.company.name)

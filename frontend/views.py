@@ -1,9 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.cache import cache_control
 from django.db.models import Avg, Count, Q, Sum, F
 from django.utils.translation import gettext as _
-from .models import Company, Review, UserProfile, BusinessCategory
+from .models import Company, Review, UserProfile, BusinessCategory, UserGamification, Badge
+from .visibility import (
+    is_company_publicly_visible,
+    public_companies_queryset,
+    visible_business_categories,
+)
 from .utils import compute_assessment, send_telegram_message, diff_instance_fields
 import json
 from .forms import ProfileForm, ReviewForm
@@ -23,10 +30,10 @@ from django.utils import timezone
 from django.http import HttpResponse, FileResponse
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.views.decorators.cache import cache_page
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail, EmailMessage
 from django_ratelimit.decorators import ratelimit
+from django.utils.http import url_has_allowed_host_and_scheme
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,17 +55,93 @@ from django.contrib.postgres.search import (
 # Create your views here.
 
 
+def safe_set_language(request):
+    """Compatibility language switcher for both legacy form posts and link-based UI.
+
+    Handles stale cached clients that still POST to /i18n/setlang/ with a `next`
+    URL that may be prefixed with /ru. It normalizes redirects so:
+    - language=uz -> redirects to non-/ru path
+    - language=ru -> redirects to /ru-prefixed path
+    """
+
+    language = (
+        request.POST.get("language")
+        or request.GET.get("language")
+        or request.POST.get("lang")
+        or request.GET.get("lang")
+        or "uz"
+    )
+    next_url = (
+        request.POST.get("next")
+        or request.GET.get("next")
+        or request.META.get("HTTP_REFERER")
+        or "/"
+    )
+
+    allowed_hosts = {request.get_host()} if request.get_host() else None
+    if not url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts=allowed_hosts,
+        require_https=request.is_secure(),
+    ):
+        next_url = "/"
+
+    if not next_url.startswith("/"):
+        next_url = "/"
+
+    if language == "uz":
+        if next_url == "/ru":
+            next_url = "/"
+        elif next_url.startswith("/ru/"):
+            next_url = next_url[3:]
+    elif language == "ru":
+        if next_url == "/":
+            next_url = "/ru/"
+        elif next_url == "/ru":
+            next_url = "/ru/"
+        elif not next_url.startswith("/ru/"):
+            next_url = f"/ru{next_url}"
+    else:
+        language = "uz"
+
+    response = redirect(next_url)
+    response.set_cookie(
+        settings.LANGUAGE_COOKIE_NAME,
+        language,
+        max_age=365 * 24 * 60 * 60,
+        path=settings.LANGUAGE_COOKIE_PATH,
+        domain=settings.LANGUAGE_COOKIE_DOMAIN,
+        secure=settings.LANGUAGE_COOKIE_SECURE,
+        httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+        samesite=settings.LANGUAGE_COOKIE_SAMESITE,
+    )
+    return response
+
+
 def home(request):
-    top_companies = Company.objects.filter(is_active=True).order_by("-rating")[:6]
-    trending = Company.objects.filter(is_active=True).order_by("-review_count")[:6]
+    # Cache home page for anonymous GET requests (5 min per language)
+    _is_anon_get = request.method == "GET" and not request.user.is_authenticated
+    _home_cache_key = None
+    if _is_anon_get:
+        from django.utils.translation import get_language
+        _home_cache_key = f"home_page:{get_language()}"
+        _cached = cache.get(_home_cache_key)
+        if _cached is not None:
+            from django.http import HttpResponse
+            _resp = HttpResponse(_cached)
+            _resp["Vary"] = "Accept-Language"
+            return _resp
+
+    top_companies = public_companies_queryset().select_related("category_fk").order_by("-rating")[:6]
+    trending = public_companies_queryset().select_related("category_fk").order_by("-review_count")[:6]
     latest_reviews = (
-        Review.objects.filter(company__is_active=True)
-        .select_related("company")
-        .all()[:6]
+        Review.objects.filter(company__in=public_companies_queryset())
+        .select_related("company", "user")
+        .order_by("-created_at")[:6]
     )
 
     # Fetch popular categories for homepage (by company count)
-    featured_categories = BusinessCategory.objects.annotate(
+    featured_categories = visible_business_categories(BusinessCategory.objects.all()).annotate(
         company_count=Count("companies", filter=Q(companies__is_active=True))
     ).order_by("-company_count")[:4]
 
@@ -78,7 +161,11 @@ def home(request):
             "_next_after_login", "/profile/"
         )
         request.session["_redirected_once"] = True
-    return render(request, "pages/home.html", ctx)
+    response = render(request, "pages/home.html", ctx)
+    response["Vary"] = "Accept-Language"
+    if _is_anon_get and _home_cache_key:
+        cache.set(_home_cache_key, response.content, 60 * 5)
+    return response
 
 
 @login_required
@@ -168,6 +255,32 @@ def business_dashboard(request):
             "chart_clicks": json.dumps(chart_clicks),
         },
     )
+
+
+from django.views.decorators.clickjacking import xframe_options_exempt
+
+@xframe_options_exempt
+def company_widget(request, pk):
+    """Embeddable trust badge iframe for third-party sites.
+    Supports ?theme=light|dark|auto, ?size=sm|md|lg, ?style=full|compact.
+    """
+    VALID_THEMES = {"light", "dark", "auto"}
+    VALID_SIZES  = {"sm", "md", "lg"}
+    VALID_STYLES = {"full", "compact"}
+    theme = request.GET.get("theme", "light")
+    size  = request.GET.get("size",  "md")
+    style = request.GET.get("style", "full")
+    if theme not in VALID_THEMES: theme = "light"
+    if size  not in VALID_SIZES:  size  = "md"
+    if style not in VALID_STYLES: style = "full"
+    company  = get_object_or_404(Company, pk=pk, is_active=True)
+    base_url = f"{request.scheme}://{request.get_host()}"
+    response = render(request, "pages/company_widget.html", {
+        "company": company, "theme": theme, "size": size,
+        "style": style, "base_url": base_url,
+    })
+    response["Cache-Control"] = "public, max-age=300"
+    return response
 
 
 def business_profile(request):
@@ -261,46 +374,32 @@ def manager_request_approval(request, pk: int):
     )
 
 
-@cache_page(60 * 5)  # Cache for 5 minutes
 @ratelimit(key="ip", rate="30/m", method="GET")
 def search_suggestions_api(request):
-    """API endpoint for live search suggestions"""
+    """API endpoint for live search suggestions – returns businesses only, never categories."""
     query = request.GET.get("q", "").strip()
     if len(query) < 2:
         return JsonResponse({"results": []})
 
-    results = []
+    # Manual cache so clear_public_cache() (called on admin saves) flushes it immediately.
+    from django.utils.translation import get_language
+    cache_key = f"api:search_suggestions:{get_language()}:{query.lower()}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return JsonResponse({"results": cached})
 
-    # Search categories first
-    categories = BusinessCategory.objects.filter(
-        Q(name__icontains=query) | Q(name_ru__icontains=query)
-    )[:3]
-
-    for cat in categories:
-        results.append(
-            {
-                "type": "category",
-                "id": cat.id,
-                "name": cat.display_name,
-                "url": reverse("business_list") + f"?category={cat.slug}",
-                "icon": cat.icon_svg,
-            }
-        )
-
-    # Search companies
+    # Search companies by name only (strict – no category-name matching so category
+    # entries never leak into the results).
     companies = (
-        Company.objects.filter(is_active=True)
+        public_companies_queryset()
         .filter(
             Q(name__icontains=query)
-            | Q(category_fk__name__icontains=query)
-            | Q(category_fk__name_ru__icontains=query)
-            | Q(category__icontains=query)
+            | Q(description__icontains=query)
         )
         .select_related("category_fk")
         .only(
             "id",
             "name",
-            "category",
             "category_fk",
             "logo",
             "logo_url",
@@ -308,16 +407,18 @@ def search_suggestions_api(request):
             "image",
             "image_url",
             "library_image_path",
-        )[:5]
+        )
+        .order_by("-rating")[:8]
     )
 
+    results = []
     for c in companies:
         results.append(
             {
                 "type": "company",
                 "id": c.id,
                 "name": c.name,
-                "category": c.category_fk.display_name if c.category_fk else c.category,
+                "category": c.category_fk.display_name if c.category_fk else "",
                 "logo": c.display_logo,
                 "image": c.display_image_url,
                 "logo_scale": c.logo_scale,
@@ -325,12 +426,40 @@ def search_suggestions_api(request):
             }
         )
 
+    cache.set(cache_key, results, 60 * 5)
     return JsonResponse({"results": results})
 
 
 def business_list(request, category_slug=None):
     """View that lists all businesses as clickable cards with enhanced search"""
-    companies = Company.objects.filter(is_active=True).select_related("category_fk")
+    companies = (
+        public_companies_queryset()
+        .select_related("category_fk")
+        .only(
+            "id",
+            "name",
+            "city",
+            "created_at",
+            "description",
+            "description_ru",
+            "image",
+            "image_800",
+            "image_url",
+            "library_image_path",
+            "logo",
+            "logo_url",
+            "logo_url_backup",
+            "logo_scale",
+            "is_verified",
+            "rating",
+            "review_count",
+            "category_fk",
+            "category_fk__id",
+            "category_fk__name",
+            "category_fk__name_ru",
+            "category_fk__slug",
+        )
+    )
 
     # Per-language page-level caching for anonymous GET requests (HTML only).
     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
@@ -338,7 +467,6 @@ def business_list(request, category_slug=None):
     use_cache = is_get and (not request.user.is_authenticated) and (not is_ajax)
     cache_key = None
     if use_cache:
-        from django.core.cache import cache
         from django.utils.translation import get_language
 
         # include full path (querystring) and language to keep separate caches
@@ -382,7 +510,6 @@ def business_list(request, category_slug=None):
                 SearchVector("name", weight="A")
                 + SearchVector("description", weight="B")
                 + SearchVector("city", weight="C")
-                + SearchVector("category", weight="C")
             )
 
             search_query = SearchQuery(query, search_type="websearch")
@@ -404,7 +531,28 @@ def business_list(request, category_slug=None):
             # Fallback to trigram similarity for better fuzzy matching
             if not companies.exists():
                 companies = (
-                    Company.objects.filter(is_active=True)
+                    public_companies_queryset()
+                    .select_related("category_fk")
+                    .only(
+                        "id",
+                        "name",
+                        "city",
+                        "created_at",
+                        "description",
+                        "description_ru",
+                        "image",
+                        "image_800",
+                        "image_url",
+                        "library_image_path",
+                        "logo",
+                        "logo_url",
+                        "logo_url_backup",
+                        "logo_scale",
+                        "is_verified",
+                        "rating",
+                        "review_count",
+                        "category_fk",
+                    )
                     .annotate(similarity=TrigramSimilarity("name", query))
                     .filter(similarity__gt=0.3)
                     .order_by("-similarity")
@@ -416,20 +564,21 @@ def business_list(request, category_slug=None):
                 | Q(city__icontains=query)
                 | Q(category_fk__name__icontains=query)
                 | Q(category_fk__name_ru__icontains=query)
-                | Q(category__icontains=query)
                 | Q(description__icontains=query)
             ).order_by("-review_count", "-rating", "name")
 
     category_display_name = category_filter
     if category_filter:
         # Try to find category by slug first
-        cat_obj = BusinessCategory.objects.filter(slug=category_filter).first()
+        cat_obj = visible_business_categories(BusinessCategory.objects.all()).filter(
+            slug=category_filter
+        ).first()
         if cat_obj:
             companies = companies.filter(category_fk=cat_obj)
             category_display_name = cat_obj.display_name
         else:
-            # Fallback to old text search
-            companies = companies.filter(category__icontains=category_filter)
+            # Unknown category slug — no results
+            companies = companies.none()
 
     # Default ordering when no search query
     # Apply filters coming from query params
@@ -442,7 +591,7 @@ def business_list(request, category_slug=None):
         if id_vals:
             qcats |= Q(category_fk__id__in=[int(x) for x in id_vals])
         if slug_vals:
-            qcats |= Q(category_fk__slug__in=slug_vals) | Q(category__in=slug_vals)
+            qcats |= Q(category_fk__slug__in=slug_vals)
         companies = companies.filter(qcats)
 
     # city filter (matches exact or icontains)
@@ -490,28 +639,8 @@ def business_list(request, category_slug=None):
     ):
         companies = companies.order_by("-review_count", "-rating", "name")
 
-    # Get search suggestions if no results found
+    # Prepare search suggestions after count is known (avoids extra exists() query)
     search_suggestions = []
-    if (query or category_filter) and not companies.exists():
-        # Suggest top categories by count
-        popular_categories = (
-            BusinessCategory.objects.annotate(
-                count=Count("companies", filter=Q(companies__is_active=True))
-            )
-            .order_by("-count")[:5]
-            .values_list("name", flat=True)
-        )
-
-        popular_cities = (
-            Company.objects.filter(is_active=True)
-            .values_list("city", flat=True)
-            .distinct()[:5]
-        )
-
-        search_suggestions = {
-            "categories": list(popular_categories),
-            "cities": list(popular_cities),
-        }
 
     # Set search context
     search_context = query or category_display_name
@@ -522,10 +651,11 @@ def business_list(request, category_slug=None):
     )
 
     # Pagination - show 20 companies per page as required
+    total_count = companies.count()
     paginator = Paginator(companies, 20)
     page_number = request.GET.get("page", 1)
     logger.debug(
-        f"business_list requested page: {page_number}; total_companies={companies.count()}"
+        f"business_list requested page: {page_number}; total_companies={total_count}"
     )
 
     try:
@@ -538,6 +668,46 @@ def business_list(request, category_slug=None):
         # Show the last available page for any request
         page_obj = paginator.page(paginator.num_pages)
 
+    if (query or category_filter) and total_count == 0:
+        popular_categories = (
+            visible_business_categories(BusinessCategory.objects.all())
+            .annotate(
+                count=Count("companies", filter=Q(companies__is_active=True))
+            )
+            .order_by("-count")[:5]
+            .values_list("name", flat=True)
+        )
+        popular_cities = (
+            public_companies_queryset()
+            .values_list("city", flat=True)
+            .distinct()[:5]
+        )
+        search_suggestions = {
+            "categories": list(popular_categories),
+            "cities": list(popular_cities),
+        }
+
+    from django.utils.translation import get_language
+
+    current_lang = get_language() or "uz"
+    filter_cache_key = f"business_list:filters:{current_lang}"
+    filter_data = cache.get(filter_cache_key)
+    if filter_data is None:
+        filter_data = {
+            "all_categories": list(
+                visible_business_categories(BusinessCategory.objects.all()).annotate(
+                company_count=Count("companies", filter=Q(companies__is_active=True))
+                ).order_by("name")
+            ),
+            "all_cities": list(
+                public_companies_queryset()
+                .values_list("city", flat=True)
+                .distinct()
+                .order_by("city")
+            ),
+        }
+        cache.set(filter_cache_key, filter_data, 60 * 10)
+
     # Note: We intentionally removed the AJAX/JSON endpoint for infinite-scroll
     # to enforce strict pagination. The view always returns full HTML pages.
 
@@ -545,18 +715,13 @@ def business_list(request, category_slug=None):
         "companies": page_obj,
         "page_obj": page_obj,
         "search_query": search_context,
-        "search_results_count": companies.count(),
+        "search_results_count": total_count,
         "category_filter": category_display_name,
         "search_display": search_display,
         "search_suggestions": search_suggestions,
         "canonical_url": request.build_absolute_uri(),
-        "all_categories": BusinessCategory.objects.annotate(
-            company_count=Count("companies", filter=Q(companies__is_active=True))
-        ).order_by("name"),
-        "all_cities": Company.objects.filter(is_active=True)
-        .values_list("city", flat=True)
-        .distinct()
-        .order_by("city"),
+        "all_categories": filter_data["all_categories"],
+        "all_cities": filter_data["all_cities"],
         "selected_filters": {
             "q": query,
             "city": city,
@@ -569,7 +734,6 @@ def business_list(request, category_slug=None):
 
     if use_cache and cache_key:
         from django.template.loader import render_to_string
-        from django.core.cache import cache
 
         rendered = render_to_string("pages/business_list.html", ctx, request=request)
         # cache for 5 minutes
@@ -583,7 +747,8 @@ def business_list(request, category_slug=None):
 
 def category_browse(request):
     categories = (
-        BusinessCategory.objects.annotate(
+        visible_business_categories(BusinessCategory.objects.all())
+        .annotate(
             company_count=Count("companies", filter=Q(companies__is_active=True)),
             review_count=Count(
                 "companies__reviews", filter=Q(companies__is_active=True)
@@ -624,7 +789,7 @@ def homepage(request):
 def claim_company(request, pk: int):
     try:
         company = Company.objects.get(pk=pk)
-        if not company.is_active and not request.user.is_superuser:
+        if not is_company_publicly_visible(company) and not request.user.is_superuser:
             raise Http404
     except Company.DoesNotExist:
         raise Http404
@@ -793,9 +958,7 @@ def contact_us(request):
                     f"📩 <b>Yangi xabar</b>\nKimdan: {name}\nEmail: {email}\nMavzu: {subject}\n\n{message[:200]}..."
                 )
             except Exception as e:
-                print(f"Email sending failed: {e}")
-                # We still show success to user to not alarm them, but log it
-                pass
+                logger.warning("Email sending failed: %s", e)
 
             messages.success(
                 request, "Xabaringiz yuborildi. Tez orada siz bilan bog'lanamiz."
@@ -814,6 +977,7 @@ def contact_us(request):
     return render(request, "pages/contact_us.html", {"form": form})
 
 
+@ensure_csrf_cookie
 @login_required
 def review_submission(request):
     """
@@ -830,6 +994,8 @@ def review_submission(request):
             initial["company"] = Company.objects.get(
                 pk=int(preselected_company_id), is_active=True
             )
+            if not is_company_publicly_visible(initial["company"]):
+                initial.pop("company", None)
         except Company.DoesNotExist:
             pass
 
@@ -844,8 +1010,8 @@ def review_submission(request):
             return f"review_submission_rl:{uid}:{ip}"
 
         key = client_key()
-        window_seconds = 3600  # 1 hour
-        max_reviews = 5  # max allowed per window
+        window_seconds = 300  # 5 minute cooldown window
+        max_reviews = 15  # max reviews per window before cooldown
         entry = cache.get(key)
         if entry is None:
             entry = {"count": 0, "ts": now().timestamp()}
@@ -856,7 +1022,7 @@ def review_submission(request):
         if entry["count"] >= max_reviews:
             messages.error(
                 request,
-                "Siz qisqa vaqt ichida juda ko'p sharh yozdingiz. Iltimos, keyinroq urinib ko'ring.",
+                "Siz qisqa vaqt ichida juda ko'p sharh yozdingiz. Iltimos, 5 daqiqadan keyin urinib ko'ring.",
             )
             if preselected_company_id:
                 return redirect("company_detail", pk=preselected_company_id)
@@ -872,6 +1038,18 @@ def review_submission(request):
             form.add_error("rating", "To'g'ri baho kiriting (1-5).")
 
         if form.is_valid():
+            # Prevent duplicate: one review per authenticated user per company
+            if request.user.is_authenticated:
+                selected_company = form.cleaned_data.get("company")
+                if selected_company and Review.objects.filter(
+                    user=request.user, company=selected_company
+                ).exists():
+                    messages.error(
+                        request,
+                        "Siz bu kompaniyaga allaqachon sharh yozdingiz.",
+                    )
+                    return redirect("company_detail", pk=selected_company.pk)
+
             # increment counter and persist
             entry["count"] += 1
             cache.set(key, entry, timeout=window_seconds)
@@ -880,6 +1058,7 @@ def review_submission(request):
             review.user = request.user
             # New reviews require admin approval
             review.is_approved = False
+            review.approval_requested = True
             review.save()
 
             # Update company stats using approved reviews only
@@ -892,6 +1071,13 @@ def review_submission(request):
                 round(float(agg.get("avg") or 0.0), 2) if company.review_count else 0
             )
             company.save(update_fields=["review_count", "rating"])
+
+            # Notify company manager about the new review
+            try:
+                from .email_notifications import EmailNotificationService
+                EmailNotificationService.send_new_review_notification(company, review)
+            except Exception:
+                pass
 
             messages.success(
                 request,
@@ -906,7 +1092,7 @@ def review_submission(request):
 
     # Provide top companies for the inline picker (scrollable + client-side filter)
     # Ordered by popularity first for convenience
-    suggested_companies = Company.objects.filter(is_active=True).order_by(
+    suggested_companies = public_companies_queryset().order_by(
         "-review_count", "-rating", "name"
     )[:20]
 
@@ -948,6 +1134,15 @@ def manager_review_response(request, pk: int):
                 details=f"Owner responded to review #{review.pk}",
             )
 
+            # Notify the reviewer that the owner has replied
+            try:
+                from .email_notifications import EmailNotificationService
+                EmailNotificationService.send_review_response_notification(
+                    review, review.owner_response_text
+                )
+            except Exception:
+                pass
+
             messages.success(request, "Javob saqlandi.")
             return redirect("company_detail", pk=review.company.pk)
     else:
@@ -967,7 +1162,7 @@ def manager_review_response(request, pk: int):
 def report_review(request, pk: int):
     try:
         review = Review.objects.select_related("company").get(pk=pk)
-        if not review.company.is_active and not (
+        if not is_company_publicly_visible(review.company) and not (
             request.user.is_superuser
             or (
                 request.user.is_authenticated and review.company.manager == request.user
@@ -1044,6 +1239,7 @@ def report_review(request, pk: int):
     )
 
 
+@cache_control(max_age=86400)
 def robots_txt(request):
     scheme = request.scheme
     host = request.get_host()
@@ -1097,28 +1293,34 @@ def service_worker(request):
     # Try serving from STATIC_ROOT (production collected files)
     static_path = settings.STATIC_ROOT / "service-worker.js"
     if static_path.exists():
-        return FileResponse(
+        response = FileResponse(
             open(static_path, "rb"), content_type="application/javascript"
         )
+        response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = "0"
+        return response
 
     # Fallback to source (development)
     source_path = settings.BASE_DIR / "frontend" / "static" / "service-worker.js"
     if source_path.exists():
-        return FileResponse(
+        response = FileResponse(
             open(source_path, "rb"), content_type="application/javascript"
         )
+        response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = "0"
+        return response
 
     return HttpResponse(status=404)
 
 
 def company_detail(request, pk: int):
     company = get_object_or_404(
-        Company.objects.select_related("category_fk").prefetch_related(
-            "reviews__user", "reviews__likes"
-        ),
+        Company.objects.select_related("category_fk"),
         pk=pk,
     )
-    if not company.is_active and not (
+    if not is_company_publicly_visible(company) and not (
         request.user.is_superuser
         or (request.user.is_authenticated and company.manager == request.user)
     ):
@@ -1187,6 +1389,9 @@ def company_detail(request, pk: int):
         pct = round((count / total) * 100)
         dist.append({"star": star, "count": count, "percent": pct})
 
+    # Prefetch related objects only for the reviews actually shown
+    reviews_qs = reviews_qs.select_related("user").prefetch_related("likes")
+
     # --- Pagination ---
     paginator = Paginator(reviews_qs, 10)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -1226,17 +1431,11 @@ def company_detail(request, pk: int):
 
     # Similar Companies
     similar_companies = (
-        Company.objects.filter(is_active=True, category_fk=company.category_fk)
+        public_companies_queryset().filter(category_fk=company.category_fk)
         .exclude(pk=company.pk)
         .order_by("-rating", "-review_count")[:3]
     )
 
-    if not similar_companies and company.category:
-        similar_companies = (
-            Company.objects.filter(is_active=True, category=company.category)
-            .exclude(pk=company.pk)
-            .order_by("-rating")[:3]
-        )
     window = 2
     start = max(1, current - window)
     end = min(total_pages, current + window)
@@ -1301,8 +1500,8 @@ def company_detail(request, pk: int):
 def reveal_contact(request, pk: int, kind: str):
     """Reveal phone or email; increments counters and logs activity."""
     try:
-        company = Company.objects.get(pk=pk)
-        if not company.is_active and not (
+        company = Company.objects.select_related("category_fk").get(pk=pk)
+        if not is_company_publicly_visible(company) and not (
             request.user.is_superuser
             or (request.user.is_authenticated and company.manager == request.user)
         ):
@@ -1326,9 +1525,12 @@ def reveal_contact(request, pk: int, kind: str):
 @login_required
 @ratelimit(key="user", rate="20/m", method="POST")
 def like_company(request, pk: int):
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "POST required"}, status=405)
+
     try:
-        company = Company.objects.get(pk=pk)
-        if not company.is_active and not (
+        company = Company.objects.select_related("category_fk").get(pk=pk)
+        if not is_company_publicly_visible(company) and not (
             request.user.is_superuser
             or (request.user.is_authenticated and company.manager == request.user)
         ):
@@ -1348,8 +1550,6 @@ def like_company(request, pk: int):
     else:
         # already liked → unlike
         obj.delete()
-        from django.db.models import F
-
         Company.objects.filter(pk=pk, like_count__gt=0).update(
             like_count=F("like_count") - 1
         )
@@ -1367,8 +1567,13 @@ def like_company(request, pk: int):
 @login_required
 @ratelimit(key="user", rate="20/m", method="POST")
 def like_review(request, pk: int):
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "POST required"}, status=405)
+
     try:
-        review = Review.objects.get(pk=pk)
+        review = Review.objects.select_related("company__category_fk").get(pk=pk)
+        if not is_company_publicly_visible(review.company):
+            raise Http404
     except Review.DoesNotExist:
         raise Http404
 
@@ -1398,7 +1603,9 @@ def vote_review_helpful(request, pk: int):
         return JsonResponse({"success": False, "error": "POST required"}, status=405)
 
     try:
-        review = Review.objects.select_for_update().get(pk=pk)
+        review = Review.objects.select_related("company__category_fk").select_for_update().get(pk=pk)
+        if not is_company_publicly_visible(review.company):
+            return JsonResponse({"success": False, "error": "Not found"}, status=404)
     except Review.DoesNotExist:
         return JsonResponse({"success": False, "error": "Review not found"}, status=404)
 
@@ -1416,48 +1623,39 @@ def vote_review_helpful(request, pk: int):
         from .models import ReviewHelpfulVote
         from django.db import transaction
 
-        # Use transaction to prevent race conditions
         with transaction.atomic():
-            # Check if user already voted
             existing_vote = ReviewHelpfulVote.objects.filter(
                 review=review, user=request.user
             ).first()
 
-        if existing_vote:
-            # Update existing vote
-            old_type = existing_vote.vote_type
-
-            if old_type != vote_type:
-                # Decrement old count
-                if old_type == "helpful":
-                    Review.objects.filter(pk=pk, helpful_count__gt=0).update(
-                        helpful_count=F("helpful_count") - 1
-                    )
-                else:
-                    Review.objects.filter(pk=pk, not_helpful_count__gt=0).update(
-                        not_helpful_count=F("not_helpful_count") - 1
-                    )
-
-                # Increment new count
-                if vote_type == "helpful":
-                    Review.objects.filter(pk=pk).update(
-                        helpful_count=F("helpful_count") + 1
-                    )
-                else:
-                    Review.objects.filter(pk=pk).update(
-                        not_helpful_count=F("not_helpful_count") + 1
-                    )
-
-                # Update vote
-                existing_vote.vote_type = vote_type
-                existing_vote.save()
+            if existing_vote:
+                old_type = existing_vote.vote_type
+                if old_type != vote_type:
+                    # Switch vote: decrement old, increment new
+                    if old_type == "helpful":
+                        Review.objects.filter(pk=pk, helpful_count__gt=0).update(
+                            helpful_count=F("helpful_count") - 1
+                        )
+                    else:
+                        Review.objects.filter(pk=pk, not_helpful_count__gt=0).update(
+                            not_helpful_count=F("not_helpful_count") - 1
+                        )
+                    if vote_type == "helpful":
+                        Review.objects.filter(pk=pk).update(
+                            helpful_count=F("helpful_count") + 1
+                        )
+                    else:
+                        Review.objects.filter(pk=pk).update(
+                            not_helpful_count=F("not_helpful_count") + 1
+                        )
+                    existing_vote.vote_type = vote_type
+                    existing_vote.save()
+                # else: same type clicked again — idempotent, do nothing
             else:
-                # Create new vote
+                # First time voting
                 ReviewHelpfulVote.objects.create(
                     review=review, user=request.user, vote_type=vote_type
                 )
-
-                # Increment count
                 if vote_type == "helpful":
                     Review.objects.filter(pk=pk).update(
                         helpful_count=F("helpful_count") + 1
@@ -1467,8 +1665,17 @@ def vote_review_helpful(request, pk: int):
                         not_helpful_count=F("not_helpful_count") + 1
                     )
 
-            # Get updated counts
-            review.refresh_from_db()
+        review.refresh_from_db()
+
+        # Send milestone notification (5, 10, 25, 50, 100 helpful votes)
+        if vote_type == "helpful":
+            try:
+                from .email_notifications import EmailNotificationService
+                EmailNotificationService.send_helpful_vote_notification(
+                    review, review.helpful_count
+                )
+            except Exception:
+                pass
 
         return JsonResponse(
             {
@@ -1518,6 +1725,9 @@ def user_profile(request):
         user_reviews.aggregate(total_likes=Sum("like_count"))["total_likes"] or 0
     )
 
+    gamification, _ = UserGamification.objects.get_or_create(user=request.user)
+    badges = Badge.objects.filter(user=request.user).order_by("-earned_at")[:5]
+
     return render(
         request,
         "pages/user_profile.html",
@@ -1531,6 +1741,8 @@ def user_profile(request):
                 "unique_companies": unique_companies,
                 "helpful_votes": helpful_votes,
             },
+            "gamification": gamification,
+            "badges": badges,
         },
     )
 
@@ -1546,11 +1758,18 @@ def review_edit(request, pk: int):
         raise Http404
 
     if request.method == "POST":
-        form = ReviewEditForm(request.POST, instance=review)
+        form = ReviewEditForm(request.POST, request.FILES, instance=review)
         if form.is_valid():
             review = form.save(commit=False)
             review.is_approved = False
+            review.approval_requested = True
             review.save()
+            # Notify admin via Telegram
+            try:
+                from .utils import send_telegram_review_notification
+                send_telegram_review_notification(review)
+            except Exception:
+                pass
             messages.success(
                 request, "Sharh yangilandi va qayta moderatsiyaga yuborildi."
             )
@@ -1596,6 +1815,9 @@ def public_profile(request, username: str):
     avg_rating = reviews.aggregate(Avg("rating"))["rating__avg"] or 0.0
     helpful_votes = reviews.aggregate(Sum("like_count"))["like_count__sum"] or 0
 
+    gamification = UserGamification.objects.filter(user=user).first()
+    badges = Badge.objects.filter(user=user).order_by("-earned_at")[:5]
+
     return render(
         request,
         "pages/public_profile.html",
@@ -1608,6 +1830,8 @@ def public_profile(request, username: str):
                 "avg_rating": avg_rating,
                 "helpful_votes": helpful_votes,
             },
+            "gamification": gamification,
+            "badges": badges,
         },
     )
 

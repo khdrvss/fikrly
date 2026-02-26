@@ -1,102 +1,99 @@
-{% load static %}
-{% load static_bust %}
+{% extends 'legal/base_legal.html' %}
 {% load i18n %}
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% trans "Maxfiylik siyosati | Fikrly" %}</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
-    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    <link rel="stylesheet" href="{% static_bust 'dist/bundle.css' %}">
-</head>
-<body class="bg-background">
-    <header class="bg-surface shadow-subtle sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <a href="{% url 'index' %}" class="text-2xl font-bold text-primary">Fikrly</a>
-                <nav class="hidden md:flex items-center space-x-8">
-                    <a href="{% url 'index' %}" class="text-text-secondary hover:text-primary transition-smooth">{% trans "Bosh sahifa" %}</a>
-                </nav>
-            </div>
-        </div>
-    </header>
 
-    <main class="min-h-screen py-10">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-primary mb-6">{% trans "Maxfiylik siyosati" %}</h1>
-            <p class="text-text-secondary mb-6">
-                {% trans "Ushbu Maxfiylik siyosati Fikrly platformasidan foydalanganda siz haqingizdagi ma'lumotlar qanday to'planishi, saqlanishi va ishlatilishini tushuntiradi." %}
-            </p>
+{% block title %}{% trans "Maxfiylik siyosati" %} | Fikrly{% endblock %}
+{% block meta_description %}{% trans "Fikrly sizning ma'lumotlaringizni qanday to'plashi, saqlashi va himoyalashi haqida." %}{% endblock %}
+{% block schema_name %}{% trans "Maxfiylik siyosati" %} | Fikrly{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "1. To'planadigan ma'lumotlar" %}</h2>
-                <ul class="list-disc pl-6 text-text-secondary space-y-2">
-                    <li>{% trans "Hisob qaydnomasini yaratishda kiritilgan ma'lumotlar (ism, email va hokazo)" %}</li>
-                    <li>{% trans "Platformada yozgan sharhlaringiz, baholaringiz va yuklagan rasm(lar)ingiz" %}</li>
-                    <li>{% trans "Texnik ma'lumotlar: qurilma turi, brauzer, IP manzil, cookie va sessiya ma'lumotlari" %}</li>
-                </ul>
-            </section>
+{% block breadcrumb_label %}{% trans "Maxfiylik siyosati" %}{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "2. Ma'lumotlardan foydalanish" %}</h2>
-                <ul class="list-disc pl-6 text-text-secondary space-y-2">
-                    <li>{% trans "Xizmatlarimizni ko'rsatish va yaxshilash" %}</li>
-                    <li>{% trans "Foydalanuvchi xavfsizligini ta'minlash va suiiste'mollarning oldini olish" %}</li>
-                    <li>{% trans "Qonunchilik talablarini bajarish" %}</li>
-                </ul>
-            </section>
+{% block page_icon %}
+<svg class="w-5 h-5 text-[#18C58F]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+</svg>
+{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "3. Uchinchi tomonlar" %}</h2>
-                <p class="text-text-secondary">
-                    {% trans "Biz texnik xizmatlar (xosting, tahlil vositalari) uchun uchinchi tomon provayderlardan foydalanishimiz mumkin. Ular bilan ma'lumotlar faqat zarur texnik maqsadlarda ulashiladi va shartnoma asosida himoyalanadi." %}
-                </p>
-            </section>
+{% block page_title %}{% trans "Maxfiylik siyosati" %}{% endblock %}
+{% block last_updated %}{% trans "Oxirgi yangilanish: 2025 yil 22 sentyabr" %}{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "4. Cookie va shaxsiy sozlamalar" %}</h2>
-                <p class="text-text-secondary">
-                    {% trans "Cookie fayllari sayt funksionalligi va tahlil maqsadida ishlatiladi. Brauzer sozlamalari orqali cookie'larni boshqarishingiz mumkin." %}
-                </p>
-            </section>
+{% block page_intro %}
+<p class="mt-3 text-sm text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+  {% trans "Fikrly platformasidan foydalanganda siz haqingizdagi ma'lumotlar qanday to'planishi, saqlanishi va ishlatilishini tushuntiradi." %}
+</p>
+{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "5. Ma'lumotlarni saqlash muddati" %}</h2>
-                <p class="text-text-secondary">
-                    {% trans "Ma'lumotlar maqsad amalga oshirilishi uchun zarur bo'lgan muddat davomida yoki qonun talab qilgan muddatda saqlanadi." %}
-                </p>
-            </section>
+{% block toc %}
+<aside class="hidden lg:block">
+  <div class="sticky top-24">
+    <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">{% trans "Mundarija" %}</p>
+    <nav aria-label="{% trans 'Sahifa mundarijasi' %}">
+      <a href="#collected" class="toc-link">{% trans "1. To'planadigan ma'lumotlar" %}</a>
+      <a href="#usage" class="toc-link">{% trans "2. Ma'lumotlardan foydalanish" %}</a>
+      <a href="#third-party" class="toc-link">{% trans "3. Uchinchi tomonlar" %}</a>
+      <a href="#cookies" class="toc-link">{% trans "4. Cookie fayllar" %}</a>
+      <a href="#retention" class="toc-link">{% trans "5. Saqlash muddati" %}</a>
+      <a href="#rights" class="toc-link">{% trans "6. Foydalanuvchi huquqlari" %}</a>
+      <a href="#contact" class="toc-link">{% trans "7. Bog'lanish" %}</a>
+    </nav>
+  </div>
+</aside>
+{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "6. Foydalanuvchi huquqlari" %}</h2>
-                <ul class="list-disc pl-6 text-text-secondary space-y-2">
-                    <li>{% trans "Ma'lumotlarga kirish va ularni yangilash" %}</li>
-                    <li>{% trans "Ma'lumotlarni o'chirishni so'rash (qonuniy cheklovlar doirasida)" %}</li>
-                    <li>{% trans "Rozilikni bekor qilish (agar qo'llanilsa)" %}</li>
-                </ul>
-            </section>
+{% block article_label %}{% trans "Maxfiylik siyosati mazmuni" %}{% endblock %}
 
-            <section class="space-y-4 mb-8">
-                <h2 class="text-xl font-semibold text-primary">{% trans "7. Bog'lanish" %}</h2>
-                <p class="text-text-secondary">
-                    {% trans "Savol va murojaatlar uchun:" %} <a href="mailto:fikrlyuzb@gmail.com" class="text-primary underline">fikrlyuzb@gmail.com</a>
-                </p>
-            </section>
+{% block legal_content %}
+<section id="collected">
+  <h2>{% trans "1. To'planadigan ma'lumotlar" %}</h2>
+  <ul>
+    <li>{% trans "Hisob qaydnomasini yaratishda kiritilgan ma'lumotlar (ism, email va hokazo)" %}</li>
+    <li>{% trans "Platformada yozgan sharhlaringiz, baholaringiz va yuklagan rasm(lar)ingiz" %}</li>
+    <li>{% trans "Texnik ma'lumotlar: qurilma turi, brauzer, IP manzil, cookie va sessiya ma'lumotlari" %}</li>
+  </ul>
+</section>
 
-            <div class="mt-10">
-                <a href="{% url 'index' %}" class="btn-outline">{% trans "Bosh sahifaga qaytish" %}</a>
-            </div>
-        </div>
-    </main>
+<section id="usage">
+  <h2>{% trans "2. Ma'lumotlardan foydalanish" %}</h2>
+  <ul>
+    <li>{% trans "Xizmatlarimizni ko'rsatish va yaxshilash" %}</li>
+    <li>{% trans "Foydalanuvchi xavfsizligini ta'minlash va suiiste'mollarning oldini olish" %}</li>
+    <li>{% trans "Qonunchilik talablarini bajarish" %}</li>
+  </ul>
+</section>
 
-    <footer class="bg-primary text-white py-12 mt-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">© 2025 Fikrly</div>
-        </div>
-    </footer>
+<section id="third-party">
+  <h2>{% trans "3. Uchinchi tomonlar" %}</h2>
+  <p>{% trans "Biz texnik xizmatlar (xosting, tahlil vositalari) uchun uchinchi tomon provayderlardan foydalanishimiz mumkin. Ular bilan ma'lumotlar faqat zarur texnik maqsadlarda ulashiladi va shartnoma asosida himoyalanadi." %}</p>
+  <div class="callout">
+    <p>{% trans "Biz hech qachon shaxsiy ma'lumotlaringizni reklama maqsadida sotmaymiz." %}</p>
+  </div>
+</section>
 
-</body>
-</html>
+<section id="cookies">
+  <h2>{% trans "4. Cookie va shaxsiy sozlamalar" %}</h2>
+  <p>{% trans "Cookie fayllari sayt funksionalligi va tahlil maqsadida ishlatiladi. Brauzer sozlamalari orqali cookie'larni boshqarishingiz mumkin." %}</p>
+</section>
+
+<section id="retention">
+  <h2>{% trans "5. Ma'lumotlarni saqlash muddati" %}</h2>
+  <p>{% trans "Ma'lumotlar maqsad amalga oshirilishi uchun zarur bo'lgan muddat davomida yoki qonun talab qilgan muddatda saqlanadi." %}</p>
+</section>
+
+<section id="rights">
+  <h2>{% trans "6. Foydalanuvchi huquqlari" %}</h2>
+  <ul>
+    <li>{% trans "Ma'lumotlarga kirish va ularni yangilash" %}</li>
+    <li>{% trans "Ma'lumotlarni o'chirishni so'rash (qonuniy cheklovlar doirasida)" %}</li>
+    <li>{% trans "Rozilikni bekor qilish (agar qo'llanilsa)" %}</li>
+  </ul>
+</section>
+
+<section id="contact">
+  <h2>{% trans "7. Bog'lanish" %}</h2>
+  <p>{% trans "Savol va murojaatlar uchun:" %}
+    <a href="mailto:fikrlyuzb&#64;gmail&#46;com">fikrlyuzb&#64;gmail&#46;com</a>
+    {% trans "yoki" %}
+    <a href="{% url 'contact_us' %}">{% trans "aloqa formi" %}</a>
+    {% trans "orqali murojaat qiling." %}
+  </p>
+</section>
+{% endblock %}

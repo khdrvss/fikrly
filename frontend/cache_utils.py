@@ -166,7 +166,7 @@ def clear_public_cache() -> int:
         Number of deleted keys when pattern deletion is available,
         -1 when fallback `cache.clear()` is used.
     """
-    patterns = ["business_list:*", "api:*"]
+    patterns = ["*business_list:*", "*api:*"]
     deleted = 0
 
     try:

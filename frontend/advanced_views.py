@@ -8,11 +8,8 @@ from django.http import JsonResponse
 from django.db.models import Count, Avg, Q, F
 from django.utils import timezone
 from datetime import timedelta
-from .models import Company, Review, UserGamification, Badge, TwoFactorAuth, ReviewImage
-import pyotp
-import qrcode
-import io
-import base64
+from .models import Company, Review, UserGamification, Badge, ReviewImage, BusinessCategory
+from .visibility import public_companies_queryset
 import json
 
 
@@ -33,7 +30,7 @@ def analytics_dashboard(request, company_id):
     # Basic stats
     stats = {
         "total_reviews": company.review_count,
-        "average_rating": company.average_rating,
+        "average_rating": float(company.rating),
         "new_reviews": reviews.count(),
         "response_rate": calculate_response_rate(company),
         "helpful_reviews": reviews.filter(helpful_count__gte=5).count(),
@@ -57,7 +54,7 @@ def analytics_dashboard(request, company_id):
 
     # Recent reviews needing response
     pending_responses = Review.objects.filter(
-        company=company, is_approved=True, owner_response_text__isnull=True
+        company=company, is_approved=True, owner_response_text=""
     ).order_by("-created_at")[:10]
 
     context = {
@@ -124,104 +121,6 @@ def user_gamification_profile(request):
     return render(request, "frontend/gamification_profile.html", context)
 
 
-@login_required
-def setup_2fa(request):
-    """Setup two-factor authentication"""
-    two_factor, created = TwoFactorAuth.objects.get_or_create(user=request.user)
-
-    if request.method == "POST":
-        action = request.POST.get("action")
-
-        if action == "enable":
-            # Generate secret key
-            secret = pyotp.random_base32()
-            two_factor.secret_key = secret
-            two_factor.save()
-
-            # Generate QR code
-            totp = pyotp.TOTP(secret)
-            provisioning_uri = totp.provisioning_uri(
-                name=request.user.email, issuer_name="Fikrly"
-            )
-
-            qr = qrcode.QRCode(version=1, box_size=10, border=5)
-            qr.add_data(provisioning_uri)
-            qr.make(fit=True)
-
-            img = qr.make_image(fill_color="black", back_color="white")
-            buffer = io.BytesIO()
-            img.save(buffer, format="PNG")
-            qr_code = base64.b64encode(buffer.getvalue()).decode()
-
-            return render(
-                request,
-                "frontend/2fa_setup.html",
-                {"qr_code": qr_code, "secret": secret, "step": "scan"},
-            )
-
-        elif action == "verify":
-            # Verify TOTP code
-            code = request.POST.get("code")
-            totp = pyotp.TOTP(two_factor.secret_key)
-
-            if totp.verify(code):
-                two_factor.is_enabled = True
-                backup_codes = two_factor.generate_backup_codes()
-                two_factor.save()
-
-                return render(
-                    request,
-                    "frontend/2fa_setup.html",
-                    {"step": "complete", "backup_codes": backup_codes},
-                )
-            else:
-                return render(
-                    request,
-                    "frontend/2fa_setup.html",
-                    {"step": "scan", "error": "Invalid code. Please try again."},
-                )
-
-        elif action == "disable":
-            two_factor.is_enabled = False
-            two_factor.secret_key = ""
-            two_factor.backup_codes = []
-            two_factor.save()
-            return redirect("user_profile")
-
-    context = {"two_factor": two_factor, "step": "start"}
-
-    return render(request, "frontend/2fa_setup.html", context)
-
-
-@login_required
-def verify_2fa(request):
-    """Verify 2FA code during login"""
-    if request.method == "POST":
-        code = request.POST.get("code")
-        use_backup = request.POST.get("use_backup") == "true"
-
-        try:
-            two_factor = request.user.two_factor
-
-            if use_backup:
-                if two_factor.use_backup_code(code):
-                    two_factor.last_used = timezone.now()
-                    two_factor.save()
-                    return JsonResponse({"success": True})
-            else:
-                totp = pyotp.TOTP(two_factor.secret_key)
-                if totp.verify(code):
-                    two_factor.last_used = timezone.now()
-                    two_factor.save()
-                    return JsonResponse({"success": True})
-
-            return JsonResponse({"success": False, "error": "Invalid code"})
-        except TwoFactorAuth.DoesNotExist:
-            return JsonResponse({"success": False, "error": "2FA not enabled"})
-
-    return render(request, "frontend/2fa_verify.html")
-
-
 def advanced_search(request):
     """Advanced search with filters"""
     query = request.GET.get("q", "")
@@ -230,29 +129,30 @@ def advanced_search(request):
     min_rating = request.GET.get("min_rating", "")
     sort_by = request.GET.get("sort", "rating")
 
-    # Base queryset
-    companies = Company.objects.filter(is_active=True)
+    companies = public_companies_queryset()
 
     # Apply filters
     if query:
         companies = companies.filter(
             Q(name__icontains=query)
             | Q(description__icontains=query)
-            | Q(category__icontains=query)
+            | Q(category_fk__name__icontains=query)
         )
 
     if category:
-        companies = companies.filter(category=category)
+        companies = companies.filter(
+            Q(category_fk__name__icontains=category)
+        )
 
     if city:
         companies = companies.filter(city__icontains=city)
 
     if min_rating:
-        companies = companies.filter(average_rating__gte=float(min_rating))
+        companies = companies.filter(rating__gte=float(min_rating))
 
     # Sorting
     if sort_by == "rating":
-        companies = companies.order_by("-average_rating", "-review_count")
+        companies = companies.order_by("-rating", "-review_count")
     elif sort_by == "reviews":
         companies = companies.order_by("-review_count")
     elif sort_by == "newest":
@@ -260,9 +160,13 @@ def advanced_search(request):
     elif sort_by == "name":
         companies = companies.order_by("name")
 
-    # Get filter options
-    categories = Company.objects.values_list("category", flat=True).distinct()
-    cities = Company.objects.exclude(city="").values_list("city", flat=True).distinct()
+    # Build filter options from the current result set
+    categories = (
+        BusinessCategory.objects.filter(companies__in=companies)
+        .distinct()
+        .values_list("name", flat=True)
+    )
+    cities = companies.exclude(city="").values_list("city", flat=True).distinct()
 
     context = {
         "companies": companies,

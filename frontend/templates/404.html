@@ -6,73 +6,129 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% trans "404 - Sahifa topilmadi | Fikrly.uz" %}</title>
-    <link rel="stylesheet" href="{% static 'tailwind.css' %}">
+    <link rel="icon" href="{% static 'favicons/favicon.svg' %}" type="image/svg+xml">
     <style>
-        .error-animation {
-            animation: float 3s ease-in-out infinite;
+        :root {
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --muted: #475569;
+            --accent: #00a86d;
+            --accent-hover: #008f5d;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--text);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 760px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            font-weight: 700;
+            font-size: 28px;
+        }
+
+        .brand img {
+            width: 34px;
+            height: 34px;
+        }
+
+        .code {
+            font-size: clamp(56px, 13vw, 110px);
+            line-height: 1;
+            margin: 0;
+            color: var(--accent);
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        h1 {
+            margin: 14px 0 10px;
+            font-size: clamp(24px, 4vw, 34px);
+        }
+
+        p {
+            margin: 0 auto;
+            max-width: 520px;
+            color: var(--muted);
+            font-size: 17px;
+        }
+
+        .actions {
+            margin-top: 26px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--text);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
         }
     </style>
 </head>
-<body class="bg-bg-light text-[var(--text-primary)] dark:bg-bg-dark dark:text-slate-100">
-    <div class="min-h-screen flex items-center justify-center px-4">
-        <div class="max-w-2xl w-full text-center">
-            <!-- 404 Illustration -->
-            <div class="error-animation mb-8">
-                <svg class="w-64 h-64 mx-auto text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-
-            <!-- Error Code -->
-            <h1 class="text-9xl font-bold text-[var(--accent)] mb-4">404</h1>
-            
-            <!-- Message -->
-            <h2 class="text-3xl font-bold text-[var(--text-primary)] dark:text-slate-100 mb-4">
-                {% trans "Sahifa topilmadi" %}
-            </h2>
-            <p class="text-xl text-muted-light dark:text-muted-dark mb-8">
-                {% trans "Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki o'chirilgan." %}
-            </p>
-
-            <!-- Actions -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/" 
-                   class="inline-flex items-center justify-center px-6 py-3 bg-[var(--accent)] text-white font-semibold rounded-lg hover:opacity-90 transition duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                    </svg>
-                    {% trans "Bosh sahifaga qaytish" %}
-                </a>
-                
-                <a href="/bizneslar/" 
-                   class="inline-flex items-center justify-center px-6 py-3 border-2 border-primary-600 text-[var(--accent)] font-semibold rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition duration-200">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    {% trans "Bizneslarni ko'rish" %}
-                </a>
-            </div>
-
-            <!-- Popular Links -->
-            <div class="mt-12 pt-8 border-t border-border-light dark:border-border-dark">
-                <p class="text-sm text-muted-light dark:text-muted-dark mb-4">
-                    {% trans "Mashhur sahifalar:" %}
-                </p>
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <a href="/kategoriyalar/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Kategoriyalar" %}</a>
-                    <span class="text-muted-light dark:text-muted-dark">•</span>
-                    <a href="/sharh-yozish/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Sharh yozish" %}</a>
-                    <span class="text-muted-light dark:text-muted-dark">•</span>
-                    <a href="/profile/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Profilim" %}</a>
-                    <span class="text-muted-light dark:text-muted-dark">•</span>
-                    <a href="/contact/" class="text-sm text-[var(--accent)] hover:underline">{% trans "Bog'lanish" %}</a>
-                </div>
-            </div>
+<body>
+    <main class="card" role="main">
+        <div class="brand">
+            <img src="{% static 'favicons/favicon.svg' %}" alt="Fikrly">
+            <span>Fikrly</span>
         </div>
-    </div>
+
+        <p class="code">404</p>
+        <h1>{% trans "Sahifa topilmadi" %}</h1>
+        <p>{% trans "Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki ko‘chirilgan." %}</p>
+
+        <div class="actions">
+            <a class="btn btn-primary" href="/">{% trans "Bosh sahifaga qaytish" %}</a>
+            <a class="btn btn-secondary" href="/bizneslar/">{% trans "Bizneslarni ko‘rish" %}</a>
+        </div>
+    </main>
 </body>
 </html>

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from frontend.models import Company, Review
+from frontend.models import BusinessCategory, Company, Review
 
 COMPANIES = [
     {
@@ -376,6 +376,15 @@ class Command(BaseCommand):
                 rating_hint = float(raw_rating) if raw_rating is not None else 4.0
             except Exception:
                 rating_hint = 4.0
+
+            # Resolve category string to BusinessCategory FK
+            category_name = payload.pop("category", None)
+            if category_name:
+                cat_obj, _ = BusinessCategory.objects.get_or_create(
+                    name=category_name,
+                    defaults={"slug": category_name.lower().replace(" ", "-").replace(",", "")[:60]},
+                )
+                payload["category_fk"] = cat_obj
 
             # Ensure optional fields exist
             payload.setdefault("image_url", "")

@@ -13,12 +13,12 @@ from .models import (
     UserProfile,
     ActivityLog,
     ReviewReport,
+    BusinessOwnershipClaim,
     CompanyClaim,
     BusinessCategory,
     ReviewHelpfulVote,
     UserGamification,
     Badge,
-    TwoFactorAuth,
     ReviewImage,
     ReviewFlag,
     DataExport,
@@ -116,22 +116,6 @@ class CompanyAdminForm(forms.ModelForm):
                 self.instance.working_hours, ensure_ascii=False, indent=2
             )
 
-        # Make category a dropdown from categories_uz.json if available
-        try:
-            data_path = Path(__file__).resolve().parent / "data" / "categories_uz.json"
-            with open(data_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            # Use human labels as both value and label for simplicity
-            labels = sorted((v for v in data.values() if v), key=lambda s: s.lower())
-            cat_choices = [("", "— Kategoriya tanlang —")] + [
-                (lbl, lbl) for lbl in labels
-            ]
-            self.fields["category"] = forms.ChoiceField(
-                choices=cat_choices, required=False
-            )
-        except Exception:
-            # Fallback keeps default text input
-            pass
 
     def clean_working_hours(self):
         data = self.cleaned_data.get("working_hours")
@@ -174,10 +158,40 @@ class CompanyAdminForm(forms.ModelForm):
 
 @admin.register(BusinessCategory)
 class BusinessCategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "name_ru", "slug")
+    list_display = ("name", "name_ru", "slug", "is_active", "is_featured", "color")
+    list_editable = ("is_active",)
+    list_filter = ("is_active", "color")
     search_fields = ("name", "name_ru")
     prepopulated_fields = {"slug": ("name",)}
-    actions = [clear_public_cache_action]
+    actions = ["toggle_visibility", clear_public_cache_action]
+
+    def _bust_category_caches(self):
+        from django.core.cache import cache
+        for lang in ("uz", "ru", "en"):
+            cache.delete(f"business_list:filters:{lang}")
+        clear_public_cache()
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        self._bust_category_caches()
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        self._bust_category_caches()
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+        self._bust_category_caches()
+
+    @admin.action(description="Ko'rinish holatini o'zgartirish (Active/Inactive)")
+    def toggle_visibility(self, request, queryset):
+        for cat in queryset:
+            cat.is_active = not cat.is_active
+            cat.save(update_fields=["is_active"])
+        self._bust_category_caches()
+        self.message_user(
+            request, f"{queryset.count()} ta kategoriya holati o'zgartirildi."
+        )
 
 
 @admin.register(Company)
@@ -756,82 +770,116 @@ class CompanyClaimAdmin(admin.ModelAdmin):
     )
 
 
-from .models import Category
+@admin.action(description="✅ Tanlangan so'rovlarni tasdiqlash")
+def approve_ownership_claims(modeladmin, request, queryset):
+    from django.utils.timezone import now
+    from .utils import edit_telegram_message
+    from django.conf import settings as ds
+    token = getattr(ds, "TELEGRAM_BOT_TOKEN", "")
+    approved = 0
+    for claim in queryset.filter(status="pending"):
+        claim.status = "approved"
+        claim.reviewed_at = now()
+        claim.reviewed_by = request.user
+        claim.save(update_fields=["status", "reviewed_at", "reviewed_by"])
+        company = claim.company
+        company.is_claimed = True
+        company.is_verified = True
+        company.owner = claim.user
+        if claim.user and not company.manager:
+            company.manager = claim.user
+        company.save(update_fields=["is_claimed", "is_verified", "owner", "manager"])
+        if token and claim.telegram_message_id and claim.telegram_chat_id:
+            try:
+                edit_telegram_message(
+                    chat_id=claim.telegram_chat_id,
+                    message_id=int(claim.telegram_message_id),
+                    new_text=f"✅ TASDIQLANDI: {company.name} → {claim.full_name} (#{claim.id})",
+                    token=token,
+                )
+            except Exception:
+                pass
+        approved += 1
+    modeladmin.message_user(request, f"{approved} ta so'rov tasdiqlandi.")
 
 
-class CategoryAdminForm(forms.ModelForm):
-    """Custom form for Category admin with better icon field"""
+@admin.action(description="❌ Tanlangan so'rovlarni rad etish")
+def reject_ownership_claims(modeladmin, request, queryset):
+    from django.utils.timezone import now
+    from .utils import edit_telegram_message
+    from django.conf import settings as ds
+    token = getattr(ds, "TELEGRAM_BOT_TOKEN", "")
+    rejected = 0
+    for claim in queryset.filter(status="pending"):
+        claim.status = "rejected"
+        claim.reviewed_at = now()
+        claim.reviewed_by = request.user
+        claim.save(update_fields=["status", "reviewed_at", "reviewed_by"])
+        if token and claim.telegram_message_id and claim.telegram_chat_id:
+            try:
+                edit_telegram_message(
+                    chat_id=claim.telegram_chat_id,
+                    message_id=int(claim.telegram_message_id),
+                    new_text=f"❌ RAD ETILDI: {claim.company.name} → {claim.full_name} (#{claim.id})",
+                    token=token,
+                )
+            except Exception:
+                pass
+        rejected += 1
+    modeladmin.message_user(request, f"{rejected} ta so'rov rad etildi.")
 
-    icon_svg = forms.CharField(
-        label="SVG Icon",
-        required=False,
-        widget=forms.Textarea(
-            attrs={
-                "rows": 3,
-                "class": "font-mono",
-                "placeholder": '<path d="M12 2L2 7L12 12L22 7L12 2Z"/>',
-            }
-        ),
-        help_text="SVG path elementi. Masalan: &lt;path d='M12 2L2 7L12 12L22 7L12 2Z'/&gt;",
-    )
 
-    class Meta:
-        model = Category
-        fields = "__all__"
-
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    form = CategoryAdminForm
+@admin.register(BusinessOwnershipClaim)
+class BusinessOwnershipClaimAdmin(admin.ModelAdmin):
+    date_hierarchy = "created_at"
     list_display = (
         "id",
-        "name",
-        "slug",
-        "color",
-        "is_active",
-        "sort_order",
-        "company_count",
-        "review_count",
+        "company",
+        "full_name",
+        "phone",
+        "email",
+        "position",
+        "status",
         "created_at",
+        "reviewed_at",
+        "reviewed_by",
     )
-    list_display_links = ("id",)
-    list_filter = ("color", "is_active", "created_at")
-    search_fields = ("name", "slug", "description")
-    prepopulated_fields = {"slug": ("name",)}
-    list_editable = ("name", "is_active", "sort_order", "color")
-    ordering = ("sort_order", "name")
-
+    list_filter = ("status", "position", "created_at")
+    search_fields = ("company__name", "full_name", "email", "phone")
+    actions = [approve_ownership_claims, reject_ownership_claims]
+    readonly_fields = (
+        "company",
+        "user",
+        "full_name",
+        "phone",
+        "email",
+        "position",
+        "proof_file",
+        "comment",
+        "status",
+        "rejection_reason",
+        "reviewed_at",
+        "reviewed_by",
+        "telegram_message_id",
+        "telegram_chat_id",
+        "request_ip",
+        "created_at",
+        "updated_at",
+    )
     fieldsets = (
-        (
-            "Asosiy ma'lumotlar",
-            {"fields": ("name", "slug", "description", "is_active")},
-        ),
-        (
-            "Dizayn",
-            {
-                "fields": ("icon_svg", "color", "sort_order"),
-                "description": "Kategoriya ko'rinishi uchun sozlamalar",
-            },
-        ),
-        (
-            "Statistika",
-            {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
-        ),
+        ("So'rov ma'lumotlari", {
+            "fields": ("company", "user", "full_name", "phone", "email", "position", "proof_file", "comment"),
+        }),
+        ("Holat", {
+            "fields": ("status", "rejection_reason", "reviewed_at", "reviewed_by"),
+        }),
+        ("Texnik ma'lumotlar", {
+            "classes": ("collapse",),
+            "fields": ("telegram_message_id", "telegram_chat_id", "request_ip", "created_at", "updated_at"),
+        }),
     )
 
-    readonly_fields = ("created_at", "updated_at")
 
-    def company_count(self, obj):
-        """Display company count for this category"""
-        return obj.company_count
-
-    company_count.short_description = "Kompaniyalar soni"
-
-    def review_count(self, obj):
-        """Display review count for this category"""
-        return obj.review_count
-
-    review_count.short_description = "Sharhlar soni"
 
 
 @admin.register(UserGamification)
@@ -882,21 +930,6 @@ class BadgeAdmin(admin.ModelAdmin):
             {"fields": ("user", "badge_type", "name", "description", "icon")},
         ),
         ("Status", {"fields": ("is_new", "earned_at")}),
-    )
-
-
-@admin.register(TwoFactorAuth)
-class TwoFactorAuthAdmin(admin.ModelAdmin):
-    list_display = ("user", "is_enabled", "last_used", "created_at")
-    list_filter = ("is_enabled", "last_used")
-    search_fields = ("user__username", "user__email")
-    readonly_fields = ("created_at", "secret_key")
-
-    fieldsets = (
-        ("User", {"fields": ("user",)}),
-        ("Settings", {"fields": ("is_enabled", "secret_key")}),
-        ("Backup Codes", {"fields": ("backup_codes",)}),
-        ("Activity", {"fields": ("last_used", "created_at")}),
     )
 
 

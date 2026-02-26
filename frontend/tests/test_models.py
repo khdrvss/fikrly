@@ -96,7 +96,6 @@ class LocalizationDisplayTests(TestCase):
     def test_company_display_description_uses_ru_for_regional_code(self):
         company = Company.objects.create(
             name="Test Company",
-            category="services",
             description="Uzbek description",
             description_ru="Русское описание",
         )

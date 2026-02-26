@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_head %}
+<meta name="description" content="{% block meta_description %}Fikrly — O'zbekistonning eng ishonchli sharh platformasi.{% endblock %}">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "{% block schema_name %}Fikrly{% endblock %}",
+  "url": "{{ request.build_absolute_uri }}",
+  "inLanguage": "uz",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Fikrly",
+    "url": "https://fikrly.uz"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-950">
+
+  {# ── Page hero ── #}
+  <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      {# Breadcrumb #}
+      <nav class="flex items-center gap-1.5 text-xs text-gray-400 mb-6" aria-label="{% trans 'Navigatsiya' %}">
+        <a href="{% url 'index' %}" class="hover:text-[#18C58F] transition-colors duration-150">{% trans "Bosh sahifa" %}</a>
+        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+        <span class="text-gray-500 dark:text-gray-400">{% block breadcrumb_label %}{% endblock %}</span>
+      </nav>
+
+      {# Title row #}
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[#18C58F]/10 flex items-center justify-center mt-1" aria-hidden="true">
+          {% block page_icon %}
+          <svg class="w-5 h-5 text-[#18C58F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          {% endblock %}
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 leading-tight">
+            {% block page_title %}{% endblock %}
+          </h1>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 flex-wrap">
+            <span>{% block last_updated %}{% endblock %}</span>
+          </p>
+          {% block page_intro %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Body with optional sidebar TOC ── #}
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+    <div class="lg:grid lg:grid-cols-[220px_1fr] lg:gap-12 xl:grid-cols-[240px_1fr]">
+
+      {# Sticky TOC — desktop only #}
+      {% block toc %}{% endblock %}
+
+      {# Main article content #}
+      <article class="min-w-0" aria-label="{% block article_label %}{% endblock %}">
+        <div class="legal-prose">
+          {% block legal_content %}{% endblock %}
+        </div>
+
+        {# Bottom nav #}
+        <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <a href="{% url 'index' %}"
+             class="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#18C58F] transition-colors duration-200 focus:outline-none focus:underline group">
+            <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            {% trans "Bosh sahifaga qaytish" %}
+          </a>
+          <div class="flex items-center gap-4 text-xs text-gray-400">
+            <a href="{% url 'privacy_policy' %}" class="hover:text-[#18C58F] transition-colors duration-200 focus:outline-none focus:underline">{% trans "Maxfiylik" %}</a>
+            <span aria-hidden="true">·</span>
+            <a href="{% url 'terms_of_service' %}" class="hover:text-[#18C58F] transition-colors duration-200 focus:outline-none focus:underline">{% trans "Shartlar" %}</a>
+            <span aria-hidden="true">·</span>
+            <a href="{% url 'contact_us' %}" class="hover:text-[#18C58F] transition-colors duration-200 focus:outline-none focus:underline">{% trans "Aloqa" %}</a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+</div>
+
+{# Back-to-top button #}
+<button id="back-to-top"
+        class="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full bg-gray-900 dark:bg-gray-700 text-white flex items-center justify-center shadow-lg opacity-0 pointer-events-none transition-all duration-300 hover:bg-[#18C58F] focus:outline-none focus:ring-2 focus:ring-[#18C58F] focus:ring-offset-2"
+        aria-label="{% trans 'Tepaga qaytish' %}">
+  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+  </svg>
+</button>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  /* ── Back-to-top ── */
+  var btn = document.getElementById('back-to-top');
+  if (btn) {
+    window.addEventListener('scroll', function() {
+      var show = window.scrollY > 400;
+      btn.style.opacity = show ? '1' : '0';
+      btn.style.pointerEvents = show ? 'auto' : 'none';
+    }, { passive: true });
+    btn.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  /* ── Sticky TOC: highlight active section ── */
+  var tocLinks = document.querySelectorAll('.toc-link');
+  if (tocLinks.length) {
+    var headings = Array.from(document.querySelectorAll('.legal-prose h2[id]'));
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(function(l) {
+            l.classList.toggle(
+              'toc-active',
+              l.getAttribute('href') === '#' + entry.target.id
+            );
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    headings.forEach(function(h) { observer.observe(h); });
+  }
+}());
+</script>
+
+<style>
+/* ── Legal prose ─────────────────────────────────────────── */
+.legal-prose h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding-top: 0.25rem;
+  scroll-margin-top: 5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dark .legal-prose h2 { color: #F9FAFB; }
+.legal-prose h2::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 1.1em;
+  background: #18C58F;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.legal-prose h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  scroll-margin-top: 5rem;
+}
+.dark .legal-prose h3 { color: #D1D5DB; }
+.legal-prose p {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: #4B5563;
+  margin-bottom: 1rem;
+}
+.dark .legal-prose p { color: #9CA3AF; }
+.legal-prose ul, .legal-prose ol {
+  margin: 0.75rem 0 1.25rem 0;
+  padding-left: 1.25rem;
+}
+.legal-prose li {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: #4B5563;
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+}
+.dark .legal-prose li { color: #9CA3AF; }
+.legal-prose ul li { list-style-type: disc; }
+.legal-prose ul li::marker { color: #18C58F; }
+.legal-prose ol li { list-style-type: decimal; }
+.legal-prose ol li::marker { color: #18C58F; font-weight: 600; }
+.legal-prose a {
+  color: #18C58F;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s;
+}
+.legal-prose a:hover { opacity: 0.8; }
+.legal-prose a:focus { outline: 2px solid #18C58F; outline-offset: 2px; border-radius: 2px; }
+.legal-prose strong { color: #111827; font-weight: 600; }
+.dark .legal-prose strong { color: #F3F4F6; }
+.legal-prose .callout {
+  background: #F0FDF9;
+  border-left: 3px solid #18C58F;
+  border-radius: 0 8px 8px 0;
+  padding: 0.875rem 1.125rem;
+  margin: 1.5rem 0;
+}
+.dark .legal-prose .callout { background: rgba(24,197,143,0.08); }
+.legal-prose .callout p { margin: 0; font-size: 0.875rem; color: #065F46; }
+.dark .legal-prose .callout p { color: #6EE7B7; }
+
+/* ── TOC ──────────────────────────────────────────────────── */
+.toc-link {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #6B7280;
+  padding: 0.3rem 0.625rem;
+  border-left: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  border-radius: 0 4px 4px 0;
+  text-decoration: none;
+}
+.toc-link:hover { color: #111827; border-left-color: #D1D5DB; }
+.dark .toc-link:hover { color: #F9FAFB; }
+.toc-link.toc-active { color: #18C58F; border-left-color: #18C58F; font-weight: 600; }
+</style>
+{% endblock %}

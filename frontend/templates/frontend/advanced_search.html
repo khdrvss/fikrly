@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Kengaytirilgan qidiruv" %} - Fikrly{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold text-[var(--text-primary)] mb-6">{% trans "Kengaytirilgan qidiruv" %}</h1>
+
+  <form method="get" class="mb-8 space-y-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <input type="text" name="q" placeholder="{% trans 'Qidiruv...' %}"
+             value="{{ query }}"
+             class="block w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-[var(--text-primary)]">
+
+      <input type="text" name="category" placeholder="{% trans 'Kategoriya' %}"
+             value="{{ selected_category }}"
+             class="block w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-[var(--text-primary)]">
+
+      <input type="text" name="city" placeholder="{% trans 'Shahar' %}"
+             value="{{ selected_city }}"
+             class="block w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-[var(--text-primary)]">
+
+      <select name="min_rating" class="block w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-[var(--text-primary)]">
+        <option value="">{% trans 'Reyting' %}</option>
+        {% for r in "12345" %}
+        <option value="{{ r }}" {% if selected_rating == r %}selected{% endif %}>{{ r }}+</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="flex gap-3 items-center">
+      <select name="sort" class="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-[var(--text-primary)]">
+        <option value="rating" {% if sort_by == "rating" %}selected{% endif %}>{% trans 'Reyting' %}</option>
+        <option value="reviews" {% if sort_by == "reviews" %}selected{% endif %}>{% trans 'Sharhlar' %}</option>
+        <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>{% trans 'Yangi' %}</option>
+        <option value="name" {% if sort_by == "name" %}selected{% endif %}>{% trans 'Nomi' %}</option>
+      </select>
+      <button type="submit" class="bg-[var(--accent)] text-white px-6 py-2 rounded-lg">
+        {% trans "Qidirish" %}
+      </button>
+    </div>
+  </form>
+
+  <div class="grid gap-4">
+    {% for company in companies %}
+    <a href="{{ company.get_absolute_url }}" class="block bg-[var(--surface)] rounded-xl border border-[var(--border)] p-4 hover:border-[var(--accent)] transition-colors">
+      <div class="flex items-center gap-3">
+        <div>
+          <h2 class="font-semibold text-[var(--text-primary)]">{{ company.name }}</h2>
+          <p class="text-sm text-[var(--text-secondary)]">
+            {{ company.category_fk.display_name }}
+            {% if company.city %} &middot; {{ company.city }}{% endif %}
+          </p>
+        </div>
+        <div class="ml-auto text-right">
+          <span class="font-bold text-[var(--accent)]">{{ company.rating }}</span>
+          <span class="text-xs text-[var(--text-secondary)] block">{{ company.review_count }} {% trans "sharh" %}</span>
+        </div>
+      </div>
+    </a>
+    {% empty %}
+    <p class="text-[var(--text-secondary)]">{% trans "Hech narsa topilmadi." %}</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

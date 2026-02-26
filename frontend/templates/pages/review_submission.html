@@ -30,7 +30,7 @@
         <p class="text-[var(--text-secondary)]">{% trans "Sizning fikringiz bizneslarga o'sishga va boshqalarga to'g'ri tanlov qilishga yordam beradi." %}</p>
     </div>
 
-    <form id="reviewForm" method="post" action="" class="space-y-6" enctype="multipart/form-data" data-validate>
+    <form id="reviewForm" method="post" action="" class="space-y-6 pb-24 sm:pb-0" enctype="multipart/form-data" data-validate>
         {% csrf_token %}
 
         <!-- Step 1: Select Company -->
@@ -68,12 +68,14 @@
                                 <img src="{{ c.display_logo|default:c.display_image_url|default:default_placeholder }}"
                                         alt="{{ c.name }}"
                                         class="h-full w-full object-cover absolute inset-0"
+                                    loading="lazy"
+                                    decoding="async"
                                         style="transform: scale(calc({{ c.logo_scale|default:100 }} / 100));"
                                         onerror="this.onerror=null;this.src='{{ default_placeholder }}'">
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--accent)] transition-colors">{{ c.name }}</p>
-                                <p class="text-xs text-[var(--text-secondary)] truncate">{{ c.category_fk.display_name|default:c.category|default:no_category }}</p>
+                                <p class="text-xs text-[var(--text-secondary)] truncate">{{ c.category_fk.display_name|default:no_category }}</p>
                             </div>
                             <div class="md:hidden ml-2">
                                 <span class="text-xs font-medium text-[var(--accent)] bg-primary-50 px-2 py-1 rounded-lg">{% trans "Tanlash" %}</span>
@@ -94,7 +96,7 @@
                     <div class="flex items-center justify-between p-4 bg-primary-50 border border-primary-100 rounded-xl">
                         <div class="flex items-center">
                             <div class="h-12 w-12 rounded-lg overflow-hidden bg-[var(--surface)] border border-primary-100 mr-3">
-                                <img id="selectedCompanyImg" src="" alt="" class="h-full w-full object-cover">
+                                <img id="selectedCompanyImg" src="" alt="" class="h-full w-full object-cover" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{% static 'images/placeholder.png' %}'">
                             </div>
                             <div>
                                 <p class="text-sm text-[var(--accent)] font-medium mb-0.5">{% trans "Tanlangan biznes" %}</p>
@@ -123,6 +125,9 @@
                      data-input-name="rating"
                      class="flex flex-col items-center">
                 </div>
+                <p id="ratingHelper" class="mt-3 text-sm font-medium text-[var(--text-secondary)]" role="status" aria-live="polite">
+                    {% trans "Bahoni tanlang" %}
+                </p>
                 <div class="hidden">
                     {{ form.rating }}
                 </div>
@@ -221,7 +226,7 @@
         </div>
 
         <!-- Submit Actions -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 sm:sticky sm:bottom-4 sm:z-30 sm:bg-[var(--surface)]/95 sm:backdrop-blur sm:border sm:border-[var(--border)] sm:rounded-xl sm:p-4">
             <p class="text-xs text-[var(--text-secondary)] text-center sm:text-left max-w-md">
                 {% trans "Yuborish tugmasini bosish orqali siz" %} <a href="{% url 'terms_of_service' %}" class="text-[var(--accent)] hover:underline">{% trans "Foydalanish shartlari" %}</a> {% trans "va" %} <a href="{% url 'community_guidelines' %}" class="text-[var(--accent)] hover:underline">{% trans "Hamjamiyat qoidalari" %}</a>{% trans "ga rozilik bildirasiz." %}
             </p>
@@ -235,12 +240,59 @@
             </div>
         </div>
     </form>
+
+    <div class="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-[var(--surface)]/95 backdrop-blur border-t border-[var(--border)] px-4 py-3">
+        <button type="submit" form="reviewForm" class="w-full px-8 py-3 bg-[var(--accent)] text-white font-bold rounded-xl hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-200 transition-all">
+            {% trans "Yuborish" %}
+        </button>
+    </div>
 </main>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        function showStatusPopup(message, type = 'success') {
+            const existing = document.getElementById('reviewStatusPopup');
+            if (existing) {
+                existing.remove();
+            }
+
+            const popup = document.createElement('div');
+            popup.id = 'reviewStatusPopup';
+            popup.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[1200] px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white opacity-0 transition-opacity duration-200 ${type === 'error' ? 'bg-red-600' : 'bg-green-600'}`;
+            popup.textContent = message;
+            document.body.appendChild(popup);
+
+            requestAnimationFrame(() => {
+                popup.classList.remove('opacity-0');
+                popup.classList.add('opacity-100');
+            });
+
+            setTimeout(() => {
+                popup.classList.remove('opacity-100');
+                popup.classList.add('opacity-0');
+                setTimeout(() => popup.remove(), 220);
+            }, 2800);
+        }
+
+        function showSubmittingPopup() {
+            showStatusPopup("Sharhingiz yuborilmoqda...", 'success');
+        }
+
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function (e) {
+                if (e.defaultPrevented) return;
+                if (typeof reviewForm.checkValidity === 'function' && !reviewForm.checkValidity()) return;
+                showSubmittingPopup();
+            }, true);
+        }
+
+        {% if form.errors %}
+        showStatusPopup("Iltimos, formadagi xatolarni to'g'rilang.", 'error');
+        {% endif %}
+
         // --- Company Selection Logic ---
         const searchInput = document.getElementById('companySearchInput');
         const companyContainer = document.getElementById('companySuggestions');
@@ -250,6 +302,25 @@
         const selectedImg = document.getElementById('selectedCompanyImg');
         const selectedName = document.getElementById('selectedCompanyName');
         const changeBtn = document.getElementById('changeCompanyBtn');
+        const ratingHelper = document.getElementById('ratingHelper');
+
+        const ratingLabels = {
+            1: "{% trans 'Juda yomon' %}",
+            2: "{% trans 'Yomon' %}",
+            3: "{% trans 'O\'rtacha' %}",
+            4: "{% trans 'Yaxshi' %}",
+            5: "{% trans 'A\'lo' %}"
+        };
+
+        function updateRatingHelper(rating) {
+            if (!ratingHelper) return;
+            const value = parseInt(rating || 0, 10) || 0;
+            if (!value) {
+                ratingHelper.textContent = "{% trans 'Bahoni tanlang' %}";
+                return;
+            }
+            ratingHelper.textContent = `${value}/5 — ${ratingLabels[value] || ''}`;
+        }
 
         // Store initial content to restore if search is cleared
         let initialContent = '';
@@ -257,12 +328,22 @@
             initialContent = companyContainer.innerHTML;
         }
 
-        function selectCompany(id, name, img) {
-             if (companySelect) companySelect.value = id;
-             if (selectedImg) selectedImg.src = img;
-             if (selectedName) selectedName.textContent = name;
-             if (selectionArea) selectionArea.classList.add('hidden');
-             if (selectedView) selectedView.classList.remove('hidden');
+           const defaultCompanyPlaceholder = "{% static 'images/placeholder.png' %}";
+
+           function normalizeCompanyImage(src) {
+              const value = (src || '').trim();
+              return value || defaultCompanyPlaceholder;
+           }
+
+           function selectCompany(id, name, img) {
+               if (companySelect) companySelect.value = id;
+               if (selectedImg) {
+                 selectedImg.src = normalizeCompanyImage(img);
+                 selectedImg.alt = name || 'Company logo';
+               }
+               if (selectedName) selectedName.textContent = name;
+               if (selectionArea) selectionArea.classList.add('hidden');
+               if (selectedView) selectedView.classList.remove('hidden');
         }
 
         function attachCardListeners() {
@@ -321,6 +402,8 @@
                                         <img src="${logoUrl}"
                                              alt="${c.name}"
                                              class="h-full w-full object-cover absolute inset-0"
+                                            loading="lazy"
+                                            decoding="async"
                                              style="transform: scale(${scale / 100});"
                                              onerror="this.src='{% static 'images/placeholder.png' %}'">
                                     </div>
@@ -363,10 +446,152 @@
 
         // Form validation will be handled by ui-enhancements.js FormValidator
 
+        // --- Star Rating Helper ---
+        const ratingContainer = document.querySelector('[data-star-rating]');
+        const ratingInput = document.querySelector('input[name="rating"], select[name="rating"]');
+
+        updateRatingHelper(ratingInput ? ratingInput.value : 0);
+
+        if (ratingContainer) {
+            ratingContainer.addEventListener('ratingChange', function (event) {
+                updateRatingHelper(event.detail && event.detail.rating);
+            });
+        }
+
+        if (ratingContainer && !ratingContainer.querySelector('.star-btn')) {
+            const maxRating = 5;
+            const sizeMap = {
+                small: 'w-5 h-5',
+                medium: 'w-8 h-8',
+                large: 'w-10 h-10'
+            };
+            const sizeClass = sizeMap[ratingContainer.dataset.size] || sizeMap.medium;
+            let currentRating = parseInt((ratingInput && ratingInput.value) || ratingContainer.dataset.starRating || '0', 10) || 0;
+            let hoverRating = 0;
+
+            function commitRating(value) {
+                currentRating = Math.max(0, Math.min(maxRating, value));
+                hoverRating = 0;
+                if (ratingInput) {
+                    ratingInput.value = currentRating;
+                }
+                updateRatingHelper(currentRating);
+                renderStars();
+                ratingContainer.dispatchEvent(new CustomEvent('ratingChange', {
+                    detail: { rating: currentRating }
+                }));
+            }
+
+            function renderStars() {
+                const activeRating = hoverRating || currentRating;
+                let html = '<div class="flex items-center gap-1" role="radiogroup" aria-label="Rating">';
+
+                for (let i = 1; i <= maxRating; i++) {
+                    const starClass = i <= activeRating ? 'text-yellow-400' : 'text-gray-300';
+                    html += `
+                        <button
+                            type="button"
+                            class="star-btn ${sizeClass} ${starClass} transition-all duration-150 transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-sm cursor-pointer"
+                            data-rating="${i}"
+                            role="radio"
+                            aria-checked="${i === currentRating ? 'true' : 'false'}"
+                            aria-label="${i} out of ${maxRating}"
+                        >
+                            <svg class="w-full h-full" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        </button>
+                    `;
+                }
+
+                if (ratingContainer.hasAttribute('data-show-count')) {
+                    html += `<span class="ml-2 text-sm text-gray-600">${currentRating}/${maxRating}</span>`;
+                }
+
+                html += '</div>';
+                ratingContainer.innerHTML = html;
+
+                ratingContainer.querySelectorAll('.star-btn').forEach((starButton) => {
+                    starButton.addEventListener('mouseenter', function () {
+                        hoverRating = parseInt(this.dataset.rating, 10) || 0;
+                        renderStars();
+                    });
+
+                    starButton.addEventListener('click', function () {
+                        commitRating(parseInt(this.dataset.rating, 10) || 0);
+                    });
+
+                    starButton.addEventListener('keydown', function (event) {
+                        const current = parseInt(this.dataset.rating, 10) || 0;
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            commitRating(current);
+                            return;
+                        }
+                        if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+                            event.preventDefault();
+                            const next = Math.min(maxRating, current + 1);
+                            const nextEl = ratingContainer.querySelector(`.star-btn[data-rating="${next}"]`);
+                            if (nextEl) nextEl.focus();
+                        }
+                        if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+                            event.preventDefault();
+                            const prev = Math.max(1, current - 1);
+                            const prevEl = ratingContainer.querySelector(`.star-btn[data-rating="${prev}"]`);
+                            if (prevEl) prevEl.focus();
+                        }
+                    });
+                });
+            }
+
+            ratingContainer.addEventListener('mouseleave', function () {
+                hoverRating = 0;
+                renderStars();
+            });
+
+            renderStars();
+            updateRatingHelper(currentRating);
+        }
+
+        // --- Auto-scroll to first invalid/error field on submit ---
+        const reviewFormForScroll = document.getElementById('reviewForm');
+        if (reviewFormForScroll) {
+            reviewFormForScroll.addEventListener('submit', function () {
+                let target = null;
+
+                if (!reviewFormForScroll.checkValidity()) {
+                    target = reviewFormForScroll.querySelector(':invalid');
+                }
+
+                if (!target) {
+                    const firstError = reviewFormForScroll.querySelector('.text-red-600');
+                    if (firstError) {
+                        target = firstError.closest('div')?.querySelector('input, textarea, select') || firstError;
+                    }
+                }
+
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (typeof target.focus === 'function') {
+                        target.focus({ preventScroll: true });
+                    }
+                }
+            });
+        }
+
 
         // --- Character Count ---
         const textarea = document.querySelector('textarea[name="text"]');
         const charCount = document.getElementById('charCount');
+        const draftKey = 'fikrly_review_draft_text';
+
+        if (textarea) {
+            const savedDraft = localStorage.getItem(draftKey);
+            if (!textarea.value && savedDraft) {
+                textarea.value = savedDraft;
+            }
+        }
+
         if (textarea && charCount) {
             textarea.addEventListener('input', () => {
                 const len = textarea.value.length;
@@ -375,6 +600,20 @@
                     charCount.classList.add('text-red-600');
                 } else {
                     charCount.classList.remove('text-red-600');
+                }
+            });
+        }
+
+        if (textarea) {
+            textarea.addEventListener('input', () => {
+                localStorage.setItem(draftKey, textarea.value || '');
+            });
+        }
+
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', () => {
+                if (reviewForm.checkValidity()) {
+                    localStorage.removeItem(draftKey);
                 }
             });
         }

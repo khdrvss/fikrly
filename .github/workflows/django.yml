@@ -41,6 +41,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -49,6 +53,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Install JS Dependencies
+      run: |
+        npm ci
+    - name: Install Playwright Chromium
+      run: |
+        npx playwright install --with-deps chromium
     - name: Migration Drift Check
       run: |
         python manage.py makemigrations --check --dry-run
@@ -63,3 +73,13 @@ jobs:
       run: |
         flake8 .
         black . --check
+    - name: E2E Smoke (next redirect)
+      run: |
+        python manage.py runserver 127.0.0.1:8000 > /tmp/django.log 2>&1 &
+        for i in {1..30}; do
+          if curl -fsS http://127.0.0.1:8000/ >/dev/null; then
+            break
+          fi
+          sleep 1
+        done
+        E2E_BASE_URL=http://127.0.0.1:8000 npm run test:e2e:smoke

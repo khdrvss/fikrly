@@ -1,6 +1,7 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.contrib.auth import get_user_model
+import logging
 from allauth.account.signals import user_signed_up
 from django.contrib.auth.signals import user_logged_in
 from django.utils import timezone
@@ -16,10 +17,11 @@ from .models import (
     ReviewHelpfulVote,
     ReviewImage,
 )
-from .utils import send_telegram_message
+from .utils import send_telegram_message, send_telegram_review_notification
 from .cache_utils import clear_public_cache
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=User)
@@ -32,30 +34,37 @@ def create_profile_on_user_create(sender, instance, created, **kwargs):
 
 @receiver(user_signed_up)
 def handle_user_signed_up(request, user, **kwargs):
-    # Ensure profile exists and mark pending approval
-    profile, _ = UserProfile.objects.get_or_create(user=user)
-    profile.is_approved = False
-    profile.requested_approval_at = timezone.now()
-    profile.save(update_fields=["is_approved", "requested_approval_at"])
-    # Auto-login is handled by allauth; set a flag in session to redirect
-    request.session["post_login_redirect"] = "/profile/"
+    # Ensure profile exists and auto-approve (reviews are moderated individually)
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        profile.is_approved = True
+        profile.approved_at = timezone.now()
+        profile.requested_approval_at = timezone.now()
+        profile.save(update_fields=["is_approved", "approved_at", "requested_approval_at"])
+    except Exception:
+        logger.exception("Failed to initialize user profile during signup", extra={"user_id": getattr(user, "id", None)})
+    # Auto-login is handled by allauth; preserve explicit next target when present
+    try:
+        explicit_next = (request.POST.get("next") or request.GET.get("next") or "").strip()
+        if explicit_next:
+            request.session["_next_after_login"] = explicit_next
+        elif not (
+            request.session.get("_next_after_login")
+            or request.session.get("post_login_redirect")
+        ):
+            request.session["post_login_redirect"] = "/profile/"
+    except Exception:
+        logger.exception("Failed to preserve redirect intent during signup", extra={"user_id": getattr(user, "id", None)})
 
 
 @receiver(user_logged_in)
 def handle_user_logged_in(sender, request, user, **kwargs):
-    # If not approved, direct to profile with a notice; else proceed
-    try:
-        profile = user.profile
-    except UserProfile.DoesNotExist:
-        profile = None
-    # Determine redirect target
-    target = request.session.pop("post_login_redirect", None)
-    if not target:
-        # If not approved, encourage completing profile/awaiting approval
-        if profile and not profile.is_approved:
-            target = "/profile/"
+    # Restore any intended redirect target set before login
+    explicit_next = (request.POST.get("next") or request.GET.get("next") or "").strip()
+    target = explicit_next or request.session.pop("_next_after_login", None) or request.session.pop(
+        "post_login_redirect", None
+    )
     if target:
-        # Stash the target to be used by a custom middleware or view after login
         request.session["_next_after_login"] = target
 
 
@@ -63,20 +72,11 @@ def handle_user_logged_in(sender, request, user, **kwargs):
 def notify_new_review(sender, instance, created, **kwargs):
     if not created:
         return
-    # Send to reviews group/channel if configured
-    from django.conf import settings
-
-    chat_ids = getattr(settings, "TELEGRAM_REVIEWS_CHAT_IDS", [])
-    if not chat_ids:
-        return
-    text = (
-        f"<b>Yangi sharh</b>\n"
-        f"Kompaniya: {instance.company.name}\n"
-        f"Muallif: {instance.user_name}\n"
-        f"Baho: {instance.rating}⭐\n"
-        f"Matn: {instance.text[:300]}"
-    )
-    send_telegram_message(text, chat_ids=chat_ids)
+    # Send notification with inline Approve / Reject buttons
+    try:
+        send_telegram_review_notification(instance)
+    except Exception:
+        pass
 
     # Log creation
     try:

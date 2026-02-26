@@ -21,6 +21,10 @@ from .views import (
     claim_company,
     verify_claim,
     verification_badge,
+    submit_ownership_claim,
+    admin_approve_claim,
+    admin_reject_claim,
+    telegram_claim_webhook,
 )
 from frontend import views
 from frontend import advanced_views
@@ -82,7 +86,24 @@ urlpatterns = [
         views.search_suggestions_api,
         name="search_suggestions_api",
     ),
-    path("business/<int:pk>/", company_detail, name="company_detail"),
+    path("bizneslar/<int:pk>/", company_detail, name="company_detail"),
+    path("widget/<int:pk>/", views.company_widget, name="company_widget"),
+    path(
+        "business/<int:pk>/",
+        RedirectView.as_view(pattern_name="company_detail", permanent=True),
+    ),
+    path(
+        "biziness/<int:pk>/",
+        RedirectView.as_view(pattern_name="company_detail", permanent=True),
+    ),
+    path(
+        "bizines/<int:pk>/",
+        RedirectView.as_view(pattern_name="company_detail", permanent=True),
+    ),
+    path(
+        "bizness/<int:pk>/",
+        RedirectView.as_view(pattern_name="company_detail", permanent=True),
+    ),
     path(
         "business/<int:pk>/reveal/<str:kind>/",
         views.reveal_contact,
@@ -98,6 +119,11 @@ urlpatterns = [
     path("business/<int:pk>/claim/", claim_company, name="claim_company"),
     path("claim/verify/<str:token>/", verify_claim, name="verify_claim"),
     path("verification-badge/", verification_badge, name="verification_badge"),
+    # New ownership claim API
+    path("api/business/<int:pk>/claim/", submit_ownership_claim, name="submit_ownership_claim"),
+    path("api/admin/claim/<int:claim_id>/approve/", admin_approve_claim, name="admin_approve_claim"),
+    path("api/admin/claim/<int:claim_id>/reject/", admin_reject_claim, name="admin_reject_claim"),
+    path("api/telegram/claim-webhook/", telegram_claim_webhook, name="telegram_claim_webhook"),
     path("reviews/<int:pk>/report/", report_review, name="report_review"),
     path("reviews/<int:pk>/edit/", review_edit, name="review_edit"),
     path("reviews/<int:pk>/delete/", review_delete, name="review_delete"),
@@ -105,6 +131,7 @@ urlpatterns = [
     path("terms/", terms_of_service, name="terms_of_service"),
     path("guidelines/", community_guidelines, name="community_guidelines"),
     path("contact/", views.contact_us, name="contact_us"),
+    path("widgets/", views.widgets_page, name="widgets_page"),
     # UI Demo (development only)
     path(
         "ui-demo/",
@@ -130,9 +157,6 @@ urlpatterns = [
         advanced_views.user_gamification_profile,
         name="gamification_profile",
     ),
-    # Two-Factor Authentication
-    path("security/2fa/setup/", advanced_views.setup_2fa, name="setup_2fa"),
-    path("security/2fa/verify/", advanced_views.verify_2fa, name="verify_2fa"),
     # Advanced Search
     path("advanced-search/", advanced_views.advanced_search, name="advanced_search"),
     # Review Images

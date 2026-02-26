@@ -7,7 +7,7 @@ from frontend.models import Company, BusinessCategory
 class ReviewFileUploadTests(TestCase):
     def setUp(self):
         self.category = BusinessCategory.objects.create(
-            name="Test Cat", slug="test-cat"
+            name="Test Cat", name_ru="Тест категория", slug="test-cat"
         )
         self.company = Company.objects.create(
             name="Test Company", category_fk=self.category, is_active=True

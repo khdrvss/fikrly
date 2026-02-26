@@ -118,7 +118,18 @@ def bulk_moderate_reviews(request):
         reviews = Review.objects.filter(id__in=review_ids)
 
         if action == "approve":
+            company_ids = list(reviews.values_list("company_id", flat=True).distinct())
+            approved_reviews = list(reviews.select_related("user", "company"))
             count = reviews.update(is_approved=True)
+            from .utils import recalculate_company_stats
+            from .email_notifications import EmailNotificationService
+            for cid in company_ids:
+                recalculate_company_stats(cid)
+            for r in approved_reviews:
+                try:
+                    EmailNotificationService.send_review_approved_notification(r)
+                except Exception:
+                    pass
             return JsonResponse(
                 {
                     "success": True,
@@ -128,8 +139,19 @@ def bulk_moderate_reviews(request):
             )
 
         elif action == "reject":
+            company_ids = list(reviews.values_list("company_id", flat=True).distinct())
+            rejected_reviews = list(reviews.select_related("user", "company"))
             count = reviews.count()
+            from .utils import recalculate_company_stats
+            from .email_notifications import EmailNotificationService
+            for r in rejected_reviews:
+                try:
+                    EmailNotificationService.send_review_rejected_notification(r)
+                except Exception:
+                    pass
             reviews.delete()
+            for cid in company_ids:
+                recalculate_company_stats(cid)
             return JsonResponse(
                 {
                     "success": True,
@@ -139,9 +161,12 @@ def bulk_moderate_reviews(request):
             )
 
         elif action == "spam":
-            # Mark as spam and delete
+            company_ids = list(reviews.values_list("company_id", flat=True).distinct())
             count = reviews.count()
             reviews.delete()
+            from .utils import recalculate_company_stats
+            for cid in company_ids:
+                recalculate_company_stats(cid)
             return JsonResponse(
                 {
                     "success": True,
@@ -346,7 +371,7 @@ def export_reviews_pdf(request, company_id):
         )
         elements.append(
             Paragraph(
-                f"<b>Average Rating:</b> {company.average_rating}/5.0", info_style
+                f"<b>Average Rating:</b> {company.rating}/5.0", info_style
             )
         )
         elements.append(
@@ -548,7 +573,7 @@ def export_user_data(request):
         user_data["companies"] = [
             {
                 "name": c.name,
-                "category": c.category,
+                "category": c.category_fk.name if c.category_fk else c.category,
                 "rating": float(c.rating),
                 "review_count": c.review_count,
             }
@@ -619,3 +644,119 @@ def request_data_export(request):
     context = {"exports": exports}
 
     return render(request, "frontend/request_export.html", context)
+
+
+# ---------------------------------------------------------------------------
+# Telegram Bot Webhook — handles Approve / Reject button presses
+# ---------------------------------------------------------------------------
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json as _json
+
+
+@csrf_exempt
+@require_POST
+def telegram_webhook(request):
+    """Receive callback queries from Telegram inline keyboard buttons.
+
+    Security: verified via X-Telegram-Bot-Api-Secret-Token header which
+    Telegram sends with every webhook request when a secret_token is set
+    during setWebhook. Falls back to checking TELEGRAM_BOT_TOKEN if not set.
+    """
+    from django.conf import settings
+    from .models import Review
+    from .utils import answer_telegram_callback, edit_telegram_message
+    from .cache_utils import clear_public_cache
+
+    token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
+    if not token:
+        return JsonResponse({"ok": False}, status=403)
+
+    # Verify secret token header
+    expected_secret = getattr(settings, "TELEGRAM_WEBHOOK_SECRET", token)
+    incoming_secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
+    if incoming_secret != expected_secret:
+        return JsonResponse({"ok": False}, status=403)
+
+    try:
+        body = _json.loads(request.body)
+    except Exception:
+        return JsonResponse({"ok": True})
+
+    callback_query = body.get("callback_query")
+    if not callback_query:
+        return JsonResponse({"ok": True})
+
+    cq_id = callback_query.get("id")
+    chat_id = str(callback_query.get("message", {}).get("chat", {}).get("id", ""))
+    message_id = callback_query.get("message", {}).get("message_id")
+    data = callback_query.get("data", "")
+    actor_name = callback_query.get("from", {}).get("first_name", "Admin")
+
+    if ":" not in data:
+        return JsonResponse({"ok": True})
+
+    action, _, review_id_str = data.partition(":")
+    if not review_id_str.isdigit():
+        return JsonResponse({"ok": True})
+
+    review_id = int(review_id_str)
+
+    try:
+        review = Review.objects.select_related("company", "user").get(pk=review_id)
+    except Review.DoesNotExist:
+        answer_telegram_callback(cq_id, "⚠️ Sharh topilmadi (allaqachon o'chirilgan bo'lishi mumkin).", token)
+        if chat_id and message_id:
+            edit_telegram_message(chat_id, message_id, "⚠️ <b>Sharh topilmadi</b> — allaqachon o'chirilgan.", token)
+        return JsonResponse({"ok": True})
+
+    from .email_notifications import EmailNotificationService
+
+    if action == "approve":
+        if review.is_approved:
+            answer_telegram_callback(cq_id, "ℹ️ Bu sharh allaqachon tasdiqlangan.", token)
+            return JsonResponse({"ok": True})
+        review.is_approved = True
+        review.approval_requested = True
+        review.save(update_fields=["is_approved", "approval_requested"])
+        # Recalculate company stats
+        from .utils import recalculate_company_stats
+        recalculate_company_stats(review.company_id)
+        clear_public_cache()
+        # Notify author
+        try:
+            EmailNotificationService.send_review_approved_notification(review)
+        except Exception:
+            pass
+        answer_telegram_callback(cq_id, "✅ Sharh tasdiqlandi!", token)
+        new_text = (
+            f"✅ <b>Tasdiqlandi</b> — {actor_name}\n\n"
+            f"🏢 {review.company.name}\n"
+            f"👤 {review.user_name}  ⭐ {review.rating}/5\n"
+            f"📝 {review.text[:300]}"
+        )
+        if chat_id and message_id:
+            edit_telegram_message(chat_id, message_id, new_text, token)
+
+    elif action == "reject":
+        company_name = review.company.name
+        user_name_str = review.user_name
+        rating = review.rating
+        # Notify author before deletion
+        try:
+            EmailNotificationService.send_review_rejected_notification(review)
+        except Exception:
+            pass
+        review.delete()
+        clear_public_cache()
+        answer_telegram_callback(cq_id, "🗑 Sharh o'chirildi.", token)
+        new_text = (
+            f"❌ <b>O'chirildi</b> — {actor_name}\n\n"
+            f"🏢 {company_name}\n"
+            f"👤 {user_name_str}  ⭐ {rating}/5"
+        )
+        if chat_id and message_id:
+            edit_telegram_message(chat_id, message_id, new_text, token)
+
+    return JsonResponse({"ok": True})
+

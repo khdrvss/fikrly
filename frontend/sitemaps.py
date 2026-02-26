@@ -1,6 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 from .models import Company, BusinessCategory
+from .visibility import public_companies_queryset, visible_business_categories
 
 
 class CategorySitemap(Sitemap):
@@ -9,7 +10,7 @@ class CategorySitemap(Sitemap):
     protocol = "https"
 
     def items(self):
-        return BusinessCategory.objects.all().order_by("id")
+        return visible_business_categories(BusinessCategory.objects.all()).order_by("id")
 
     def location(self, obj: BusinessCategory):
         return obj.get_absolute_url()
@@ -21,7 +22,7 @@ class CompanySitemap(Sitemap):
     protocol = "https"
 
     def items(self):
-        return Company.objects.filter(is_active=True).order_by("id")
+        return public_companies_queryset().order_by("id")
 
     def lastmod(self, obj: Company):
         return None

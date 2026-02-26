@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from frontend.models import Company, Review
+from frontend.visibility import public_companies_queryset
 import os
 import logging
 
@@ -52,7 +53,7 @@ class Command(BaseCommand):
                 logger.warning(f"Could not reverse URL {url_name}: {e}")
 
         # Add company pages
-        active_companies = Company.objects.filter(is_active=True)
+        active_companies = public_companies_queryset()
         for company in active_companies:
             url = reverse("company_detail", args=[company.pk])
             lastmod = company.updated_at if hasattr(company, "updated_at") else None

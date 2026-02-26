@@ -1,13 +1,12 @@
 // Service Worker for Progressive Web App
-const CACHE_NAME = 'fikrly-v1.0.0';
-const RUNTIME_CACHE = 'fikrly-runtime';
+const CACHE_NAME = 'fikrly-v1.2.0';
+const RUNTIME_CACHE = 'fikrly-runtime-v1.2.0';
 
 // Assets to cache immediately
 const PRECACHE_URLS = [
   '/',
   '/static/dist/bundle.css',
   '/static/main.css',
-  '/static/js/ui-enhancements.js',
   '/static/favicons/android-chrome-192x192.png',
   '/static/favicons/favicon.png',
   '/offline/',
@@ -35,6 +34,13 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Allow page script to force immediate activation of an updated SW.
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Fetch event - network first, fallback to cache
 self.addEventListener('fetch', event => {
   const { request } = event;
@@ -45,8 +51,69 @@ self.addEventListener('fetch', event => {
   // Skip chrome extensions
   if (request.url.startsWith('chrome-extension://')) return;
   
-  // Skip admin and API endpoints from caching
-  if (request.url.includes('/admin/') || request.url.includes('/api/')) {
+  // Skip admin, API, auth, search, and CSRF-sensitive form endpoints from caching
+  if (
+    request.url.includes('/admin/') ||
+    request.url.includes('/api/') ||
+    request.url.includes('/accounts/') ||
+    request.url.includes('/sharh-yozish/') ||
+    request.url.includes('/profile/') ||
+    request.url.includes('/review/') ||
+    request.url.includes('search')
+  ) {
+    return;
+  }
+
+  // HTML navigations should be network-only to avoid stale page UI/layout.
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(response => response)
+        .catch(() => {
+          return caches.match('/offline/');
+        })
+    );
+    return;
+  }
+
+  // Always fetch critical UI/CSS assets from network first to prevent stale first view.
+  if (
+    request.url.includes('/static/js/ui-enhancements') ||
+    request.url.includes('/static/dist/bundle.css') ||
+    request.url.includes('/static/main.css') ||
+    request.url.includes('/static/css/theme.css')
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE).then(cache => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Keep user-uploaded media fresh (logos/avatars/company images).
+  if (request.url.includes('/media/')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE).then(cache => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
   

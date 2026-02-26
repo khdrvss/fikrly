@@ -27,13 +27,17 @@
 {% block content %}
     <!-- Hero Section -->
     <section class="relative bg-[var(--surface)] overflow-hidden">
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-[var(--text-primary)] mb-6 tracking-tight">
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 md:py-32 text-center">
+            <h1 class="text-3xl sm:text-4xl md:text-6xl font-bold text-[var(--text-primary)] mb-4 sm:mb-6 tracking-tight">
                 {% trans "Haqiqiy fikrlar," %} <br />
                 <span class="text-[var(--accent)]">{% trans "ishonchli tanlov" %}</span>
             </h1>
             <p class="text-xl text-[var(--text-secondary)] mb-10 max-w-2xl mx-auto leading-relaxed">
+                {% if LANGUAGE_CODE == 'ru' %}
+                Самая надежная платформа отзывов в Узбекистане. Находите лучшие компании по реальным отзывам клиентов.
+                {% else %}
                 {% trans "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy mijozlar fikrlari orqali eng yaxshi bizneslarni toping." %}
+                {% endif %}
             </p>
 
             <!-- Search Bar -->
@@ -49,7 +53,6 @@
                            id="searchInput" 
                            aria-label="{% trans 'Bizneslarni qidirish' %}" 
                            placeholder="{% trans 'Biznes nomi, kategoriya yoki joylashuvni qidiring...' %}" 
-                           data-search-autocomplete
                            class="block w-full pl-14 pr-32 py-3 md:py-4 text-base md:text-lg bg-[var(--surface)] text-[var(--text-primary)] border-0 rounded-2xl shadow-lg ring-1 ring-[var(--border)] focus:ring-2 focus:ring-[var(--accent)] placeholder-[var(--text-secondary)] transition-shadow" 
                            autocomplete="off" />
 
@@ -80,7 +83,7 @@
     </section>
 
     <!-- Category Navigation -->
-    <section class="py-16 bg-[var(--bg)]">
+    <section class="py-10 sm:py-16 bg-[var(--bg)]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-[var(--text-primary)] mb-4">{% trans "Kategoriyalarni ko'rish" %}</h2>
@@ -89,7 +92,7 @@
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {% for cat in featured_categories %}
-                <a href="{% url 'business_list' %}?category={{ cat.slug }}" class="bg-[var(--surface)] p-6 rounded-2xl shadow-sm hover:shadow-md transition-all border border-[var(--border)] group text-center">
+                <a href="{% url 'business_list' %}?category={{ cat.slug }}" class="bg-[var(--surface)] p-4 md:p-6 rounded-2xl shadow-sm hover:shadow-md transition-all border border-[var(--border)] group text-center">
                     <div class="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform
                         {% if cat.color == 'red' %}bg-red-50 text-red-600 group-hover:bg-red-100
                         {% elif cat.color == 'orange' %}bg-orange-50 text-orange-600 group-hover:bg-orange-100
@@ -119,7 +122,7 @@
     </section>
 
     <!-- Trending Businesses -->
-    <section class="py-16 bg-[var(--surface)]">
+    <section class="py-10 sm:py-16 bg-[var(--surface)]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-end mb-12">
                 <div>
@@ -136,27 +139,30 @@
                 {% for company in trending_companies %}
                 <a href="{% url 'company_detail' company.pk %}" class="block bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] overflow-hidden hover:shadow-md transition-all group">
                     <div class="relative h-48 overflow-hidden bg-gray-100">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23e5e7eb' width='100' height='100'/%3E%3C/svg%3E" 
-                             data-src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}" 
-                             alt="{{ company.name }}" 
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 lazy-image" 
-                             onerror="this.dataset.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop';" />
+                            <img src="{{ company.display_image_url|default:company.image_url|default:'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop' }}"
+                                alt="{{ company.name }}"
+                                {% if forloop.counter <= 3 %}
+                                loading="eager"
+                                fetchpriority="high"
+                                {% else %}
+                                loading="lazy"
+                                {% endif %}
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1584824486509-112e4181ff6b?q=80&w=1200&auto=format&fit=crop';" />
                         <div class="absolute top-4 right-4 bg-[var(--surface)]/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-[var(--text-primary)] shadow-sm">
-                            {{ company.category_fk.display_name|default:company.category }}
+                            {{ company.category_fk.display_name }}
                         </div>
-                        <div class="absolute bottom-4 left-4 bg-[var(--surface)] p-1 rounded-lg shadow-lg overflow-hidden">
-                            <div class="w-10 h-10 rounded-md overflow-hidden relative">
+                        <div class="absolute bottom-4 left-4 w-14 h-14 flex-shrink-0 bg-[#F8FAFC] rounded-2xl border border-[#E5E7EB] shadow-md overflow-hidden flex items-center justify-center">
                                 {% if company.display_logo %}
                                 <img src="{{ company.display_logo }}"
                                      alt="{{ company.name }} logo"
-                                     class="w-full h-full object-cover absolute inset-0"
+                                     class="w-full h-full object-contain p-2.5"
                                      style="transform: scale(calc({{ company.logo_scale|default:100 }} / 100));"
                                      onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear';">
                                 {% else %}
                                 <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear"
-                                     alt="Logo" class="w-full h-full object-cover">
+                                     alt="Logo" class="w-full h-full object-contain p-2.5">
                                 {% endif %}
-                            </div>
                         </div>
                     </div>
                     <div class="p-6">
@@ -198,7 +204,7 @@
     </section>
 
     <!-- Recent Reviews -->
-    <section class="py-16 bg-[var(--bg)]">
+    <section class="py-10 sm:py-16 bg-[var(--bg)]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-end mb-12">
                 <div>
@@ -337,11 +343,12 @@
                     }
 
                     debounceTimer = setTimeout(() => {
-                        fetch(`{% url 'search_suggestions_api' %}?q=${encodeURIComponent(query)}`)
+                        fetch(`{% url 'search_suggestions_api' %}?include_categories=0&q=${encodeURIComponent(query)}`)
                             .then(response => response.json())
                             .then(data => {
-                                if (data.results && data.results.length > 0) {
-                                    renderSuggestions(data.results);
+                                const companies = (data.results || []).filter(item => item.type === 'company');
+                                if (companies.length > 0) {
+                                    renderSuggestions(companies);
                                 } else {
                                     suggestionsBox.classList.add('hidden');
                                 }
@@ -359,44 +366,24 @@
             }
 
             function renderSuggestions(results) {
-                let html = '<ul class="py-2">';
+                let html = '<ul class="divide-y divide-gray-100">';
 
                 results.forEach(item => {
-                    if (item.type === 'category') {
-                        html += `
-                            <li>
-                                <a href="${item.url}" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center mr-3">
-                                        ${item.icon ? `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">${item.icon}</svg>` :
-                                        `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>`}
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-gray-900">${item.name}</div>
-                                        <div class="text-xs text-gray-500">{% trans "Kategoriya" %}</div>
-                                    </div>
-                                </a>
-                            </li>
-                        `;
-                    } else {
-                        // Company
-                        const imgHtml = item.image
-                            ? `<img src="${item.image}" class="w-10 h-10 rounded-lg object-cover mr-3" alt="${item.name}">`
-                            : `<div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center mr-3 text-gray-400">
-                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                               </div>`;
+                    const thumb = item.logo || item.image;
+                    const imgHtml = thumb
+                        ? `<img src="${thumb}" class="w-9 h-9 rounded-md object-cover flex-shrink-0 mr-3" alt="${item.name}" onerror="this.style.display='none'">`
+                        : `<div class="w-9 h-9 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0 mr-3 text-gray-400">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                           </div>`;
 
-                        html += `
-                            <li>
-                                <a href="${item.url}" class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                                    ${imgHtml}
-                                    <div>
-                                        <div class="font-medium text-gray-900">${item.name}</div>
-                                        <div class="text-xs text-gray-500">${item.category || '{% trans "Biznes" %}'}</div>
-                                    </div>
-                                </a>
-                            </li>
-                        `;
-                    }
+                    html += `
+                        <li>
+                            <a href="${item.url}" class="flex items-center px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                                ${imgHtml}
+                                <span class="font-medium text-gray-900 truncate">${item.name}</span>
+                            </a>
+                        </li>
+                    `;
                 });
 
                 html += '</ul>';

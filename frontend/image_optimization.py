@@ -1,9 +1,13 @@
 """Image optimization utilities for better performance."""
 
-from PIL import Image
-from io import BytesIO
-from django.core.files.uploadedfile import InUploadedMemoryFile, InMemoryUploadedFile
+import logging
 import sys
+from io import BytesIO
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 
 def optimize_image(image_field, max_width=1200, max_height=1200, quality=85):
@@ -58,8 +62,7 @@ def optimize_image(image_field, max_width=1200, max_height=1200, quality=85):
             None,
         )
     except Exception as e:
-        # Log error and return original
-        print(f"Image optimization failed: {e}")
+        logger.warning("Image optimization failed: %s", e)
         return None
 
 
@@ -107,5 +110,5 @@ def create_thumbnail(image_field, size=(300, 300)):
             None,
         )
     except Exception as e:
-        print(f"Thumbnail creation failed: {e}")
+        logger.warning("Thumbnail creation failed: %s", e)
         return None

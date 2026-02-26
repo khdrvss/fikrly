@@ -5,6 +5,10 @@ set -e
 
 echo "🐳 Starting Fikrly Django application..."
 
+# Remove stale .pyc bytecode (prevents AttributeError when files are updated via docker cp)
+find /app -name "*.pyc" -delete 2>/dev/null || true
+find /app -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+
 # Basic env validation (fail fast for core requirements)
 if [ -z "${SECRET_KEY:-}" ]; then
     echo "❌ SECRET_KEY is not set. Put it in .env" >&2

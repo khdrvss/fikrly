@@ -83,6 +83,26 @@ class EmailNotificationService:
         )
 
     @classmethod
+    def send_review_rejected_notification(cls, review, reason=""):
+        """Notify user when their review is rejected/removed."""
+        if not review.user or not review.user.email:
+            return False
+
+        context = {
+            "user_name": review.user.get_full_name() or review.user.username,
+            "company_name": review.company.name,
+            "reason": reason,
+            "companies_url": f"{settings.SITE_URL}/",
+        }
+
+        return cls.send_html_email(
+            subject=f"Sharhingiz olib tashlandi: {review.company.name}",
+            template_name="frontend/emails/review_rejected.html",
+            context=context,
+            to_email=review.user.email,
+        )
+
+    @classmethod
     def send_helpful_vote_notification(cls, review, voter_count):
         """Notify user when their review receives helpful votes."""
         if not review.user or not review.user.email:

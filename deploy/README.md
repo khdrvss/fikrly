@@ -163,11 +163,20 @@ curl https://fikrly.uz/health/
 ```bash
 # 17. Setup automated backups
 sudo chmod +x deploy/*.sh
+./deploy/install_backup_cron.sh
+# Optional schedule override example:
+# BACKUP_CRON_SCHEDULE="30 2 * * *" ./deploy/install_backup_cron.sh
+
+# Add other monitoring jobs:
 crontab -e
-# Add these lines:
-0 2 * * * /var/www/fikrly/deploy/backup.sh
+# Keep this line:
 */5 * * * * /var/www/fikrly/deploy/monitor.sh
 0 3 * * 1 /var/www/fikrly/deploy/ssl_renew.sh
+
+# 3-kunlik Telegram statistika hisobotini yoqish:
+./deploy/install_stats_report_cron.sh
+# Optional schedule override:
+# STATS_REPORT_CRON_SCHEDULE="0 10 */3 * *" ./deploy/install_stats_report_cron.sh
 
 # 18. Configure Fail2ban
 # See deploy/SECURITY_HARDENING.md

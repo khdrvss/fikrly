@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="{{ theme }}" data-size="{{ size }}" data-style="{{ style }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if theme == 'dark' %}
+<meta name="color-scheme" content="dark">
+{% elif theme == 'auto' %}
+<meta name="color-scheme" content="light dark">
+{% else %}
+<meta name="color-scheme" content="light">
+{% endif %}
+<title>{{ company.name }} — Fikrly</title>
+<style>
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/*
+ * ROOT CAUSE FIX: explicit white background on html + body.
+ * "background: transparent" caused a black iframe canvas on dark-mode OS
+ * because the browser's default iframe viewport is opaque black when the
+ * host OS/browser is in dark mode. Always set an explicit colour here.
+ */
+html, body {
+  width: 100%;
+  background: #ffffff;
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ── Theme tokens ────────────────────────────────────────────── */
+:root {
+  --bg:          #ffffff;
+  --border:      #E5E7EB;
+  --shadow:      rgba(0,0,0,0.06);
+  --shadow-h:    rgba(0,0,0,0.10);
+  --logo-bg:     #F3F4F6;
+  --name-color:  #111827;
+  --count-color: #9CA3AF;
+  --accent:      #18C58F;
+  --star-empty:  #E5E7EB;
+}
+
+/* explicit light */
+html[data-theme="light"] {
+  color-scheme: light;
+  background: #ffffff;
+  --bg:          #ffffff;
+  --border:      #E5E7EB;
+  --shadow:      rgba(0,0,0,0.06);
+  --shadow-h:    rgba(0,0,0,0.10);
+  --logo-bg:     #F3F4F6;
+  --name-color:  #111827;
+  --count-color: #9CA3AF;
+  --star-empty:  #E5E7EB;
+}
+html[data-theme="light"] body { background: #ffffff; }
+
+/* explicit dark */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  background: #1F2937;
+  --bg:          #1F2937;
+  --border:      #374151;
+  --shadow:      rgba(0,0,0,0.3);
+  --shadow-h:    rgba(0,0,0,0.45);
+  --logo-bg:     #374151;
+  --name-color:  #F9FAFB;
+  --count-color: #9CA3AF;
+  --star-empty:  #4B5563;
+}
+html[data-theme="dark"] body { background: #1F2937; }
+
+/* system preference (only when theme="auto") */
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] {
+    color-scheme: dark;
+    background: #1F2937;
+    --bg:          #1F2937;
+    --border:      #374151;
+    --shadow:      rgba(0,0,0,0.3);
+    --shadow-h:    rgba(0,0,0,0.45);
+    --logo-bg:     #374151;
+    --name-color:  #F9FAFB;
+    --count-color: #9CA3AF;
+    --star-empty:  #4B5563;
+  }
+  html[data-theme="auto"] body { background: #1F2937; }
+}
+@media (prefers-color-scheme: light) {
+  html[data-theme="auto"] {
+    color-scheme: light;
+    background: #ffffff;
+    --bg:          #ffffff;
+    --border:      #E5E7EB;
+    --shadow:      rgba(0,0,0,0.06);
+    --shadow-h:    rgba(0,0,0,0.10);
+    --logo-bg:     #F3F4F6;
+    --name-color:  #111827;
+    --count-color: #9CA3AF;
+    --star-empty:  #E5E7EB;
+  }
+  html[data-theme="auto"] body { background: #ffffff; }
+}
+
+/* ── Size tokens ─────────────────────────────────────────────── */
+[data-size="sm"] {
+  --logo-size:   32px; --logo-radius: 6px;  --letter-size: 14px;
+  --name-size:   11px; --star-size:   11px; --score-size:  11px;
+  --count-size:  10px; --label-size:  9px;  --dot-size:    7px;
+  --gap:         8px;  --pad:         8px 10px; --radius: 10px;
+}
+[data-size="md"] {
+  --logo-size:   40px; --logo-radius: 8px;  --letter-size: 18px;
+  --name-size:   13px; --star-size:   13px; --score-size:  12px;
+  --count-size:  11px; --label-size:  10px; --dot-size:    8px;
+  --gap:         10px; --pad:         10px 14px; --radius: 12px;
+}
+[data-size="lg"] {
+  --logo-size:   50px; --logo-radius: 10px; --letter-size: 22px;
+  --name-size:   15px; --star-size:   16px; --score-size:  14px;
+  --count-size:  12px; --label-size:  11px; --dot-size:    9px;
+  --gap:         12px; --pad:         13px 18px; --radius: 14px;
+}
+
+/* ── Stars ───────────────────────────────────────────────────── */
+.star--filled { fill: var(--accent); }
+.star--empty  { fill: var(--star-empty); }
+
+/* ── Badge ───────────────────────────────────────────────────── */
+a.badge {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  text-decoration: none;
+  color: inherit;
+  width: 100%; max-width: 100%;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 1px 4px var(--shadow);
+  outline: none;
+}
+a.badge:hover { box-shadow: 0 4px 16px var(--shadow-h); transform: translateY(-1px); }
+a.badge:focus-visible { box-shadow: 0 0 0 3px var(--accent); }
+
+/* ── Logo box ────────────────────────────────────────────────── */
+.logo-box {
+  width: var(--logo-size); height: var(--logo-size);
+  border-radius: var(--logo-radius);
+  background: var(--logo-bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.logo-box img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
+.logo-letter { font-size: var(--letter-size); font-weight: 700; color: var(--accent); }
+
+/* ── Info ────────────────────────────────────────────────────── */
+.info { flex: 1; min-width: 0; }
+.company-name {
+  font-size: var(--name-size); font-weight: 600; color: var(--name-color);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2; margin-bottom: 4px;
+}
+[data-style="compact"] .company-name { display: none; }
+[data-style="compact"] .info { display: flex; flex-direction: column; justify-content: center; }
+
+.rating-row { display: flex; align-items: center; gap: 4px; }
+.stars { display: flex; gap: 1px; }
+.star { width: var(--star-size); height: var(--star-size); }
+.rating-num { font-size: var(--score-size); font-weight: 700; color: var(--name-color); }
+.review-count { font-size: var(--count-size); color: var(--count-color); }
+[data-style="compact"] .review-count { display: none; }
+
+/* ── Branding ────────────────────────────────────────────────── */
+.branding { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+.fikrly-dot { width: var(--dot-size); height: var(--dot-size); border-radius: 50%; background: var(--accent); }
+.fikrly-label { font-size: var(--label-size); font-weight: 600; color: var(--accent); letter-spacing: 0.02em; white-space: nowrap; }
+[data-style="compact"] .fikrly-label { display: none; }
+[data-style="compact"] .branding { justify-content: center; }
+</style>
+</head>
+<body>
+
+<a class="badge"
+   href="{{ base_url }}/bizneslar/{{ company.pk }}/"
+   target="_blank"
+   rel="noopener noreferrer"
+   aria-label="{{ company.name }}{% if company.rating %} — {{ company.rating }} out of 5 stars, {{ company.review_count }} reviews{% endif %} — Fikrly.uz">
+
+  <div class="logo-box" aria-hidden="true">
+    {% if company.display_logo %}
+    <img src="{{ base_url }}{{ company.display_logo }}"
+         alt=""
+         loading="lazy"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <span class="logo-letter" style="display:none;" aria-hidden="true">{{ company.name|slice:":1"|upper }}</span>
+    {% else %}
+    <span class="logo-letter" aria-hidden="true">{{ company.name|slice:":1"|upper }}</span>
+    {% endif %}
+  </div>
+
+  <div class="info">
+    <div class="company-name">{{ company.name }}</div>
+    <div class="rating-row"
+         role="img"
+         aria-label="{% if company.rating %}{{ company.rating }} out of 5 stars{% else %}Rating yo'q{% endif %}{% if company.review_count %}, {{ company.review_count }} reviews{% endif %}">
+      <div class="stars" aria-hidden="true">
+        {% for i in "12345" %}
+        <svg class="star {% if company.rating >= forloop.counter %}star--filled{% else %}star--empty{% endif %}"
+             viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+        {% endfor %}
+      </div>
+      <span class="rating-num" aria-hidden="true">{% if company.rating %}{{ company.rating }}{% else %}—{% endif %}</span>
+      <span class="review-count" aria-hidden="true">({{ company.review_count }} sharh)</span>
+    </div>
+  </div>
+
+  <div class="branding" aria-hidden="true">
+    <span class="fikrly-label">fikrly.uz</span>
+    <div class="fikrly-dot"></div>
+  </div>
+
+</a>
+
+</body>
+</html>

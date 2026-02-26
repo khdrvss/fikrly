@@ -86,30 +86,18 @@ if not DEBUG:
     # Additional Security Headers
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
+    SECURE_REFERRER_POLICY = "same-origin"
     X_FRAME_OPTIONS = "DENY"
+
+    # Session age
+    SESSION_COOKIE_AGE = 1209600  # 2 weeks
 
 # Error Reporting via Email
 ADMINS = [
     ("Admin", os.environ.get("ADMINS", "admin@fikrly.uz")),
 ]
 MANAGERS = ADMINS
-
-# Email Configuration
-EMAIL_BACKEND = os.environ.get(
-    "EMAIL_BACKEND",
-    (
-        "django.core.mail.backends.smtp.EmailBackend"
-        if not DEBUG
-        else "django.core.mail.backends.console.EmailBackend"
-    ),
-)
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("true", "1", "t")
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@fikrly.uz")
-SERVER_EMAIL = DEFAULT_FROM_EMAIL
+# NOTE: Email settings are configured below in the "Email backend & defaults" section
 
 
 # Application definition
@@ -145,8 +133,9 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
+    "frontend.middleware.UzbekDefaultLocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "frontend.middleware.ContentSecurityPolicyMiddleware",
     "frontend.middleware.NoCacheMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -252,6 +241,7 @@ else:
                 else DB_PORT
             ),
             "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+            "CONN_HEALTH_CHECKS": True,
         }
     }
 
@@ -336,11 +326,12 @@ USE_X_FORWARDED_HOST = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 # Authentication / django-allauth
-SITE_ID = 1
+SITE_ID = int(os.environ.get("SITE_ID", "2"))
 
 # Skip the intermediate "Continue" page for social login
 SOCIALACCOUNT_LOGIN_ON_GET = True
-# Auto-connect social account if email matches existing user
+# Auto-connect social account to an existing account with the same email
+# (Google verifies email ownership, so this is safe)
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
@@ -378,8 +369,23 @@ ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
 ACCOUNT_ADAPTER = "frontend.adapters.AccountAdapter"
+SOCIALACCOUNT_ADAPTER = "frontend.adapters.SocialAccountAdapter"
 ACCOUNT_FORMS = {
     "signup": "frontend.allauth_forms.CustomSignupForm",
+}
+
+# Stricter allauth rate limits (env-overridable)
+ACCOUNT_RATE_LIMITS = {
+    "login": os.environ.get("ACCOUNT_RATE_LIMIT_LOGIN", "15/5m"),
+    "login_failed": os.environ.get("ACCOUNT_RATE_LIMIT_LOGIN_FAILED", "5/15m"),
+    "signup": os.environ.get("ACCOUNT_RATE_LIMIT_SIGNUP", "5/1h"),
+    "reset_password": os.environ.get("ACCOUNT_RATE_LIMIT_RESET_PASSWORD", "5/1h"),
+    "reset_password_from_key": os.environ.get(
+        "ACCOUNT_RATE_LIMIT_RESET_PASSWORD_FROM_KEY", "10/1h"
+    ),
+    "change_password": os.environ.get("ACCOUNT_RATE_LIMIT_CHANGE_PASSWORD", "5/1h"),
+    "confirm_email": os.environ.get("ACCOUNT_RATE_LIMIT_CONFIRM_EMAIL", "3/1h"),
+    "manage_email": os.environ.get("ACCOUNT_RATE_LIMIT_MANAGE_EMAIL", "10/1h"),
 }
 
 # Email backend & defaults
@@ -410,6 +416,15 @@ if EMAIL_BACKEND.endswith("smtp.EmailBackend"):
 
 # Telegram notifications (optional)
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+# Secret token sent by Telegram in X-Telegram-Bot-Api-Secret-Token header.
+# Must be [A-Za-z0-9_-] — we derive one from the bot token if not set explicitly.
+_tg_secret_default = ""
+if TELEGRAM_BOT_TOKEN:
+    import hashlib as _hashlib
+    _tg_secret_default = _hashlib.sha256(TELEGRAM_BOT_TOKEN.encode()).hexdigest()
+TELEGRAM_WEBHOOK_SECRET = os.environ.get("TELEGRAM_WEBHOOK_SECRET", _tg_secret_default)
+# Site base URL used in notification links and webhook registration
+SITE_URL = os.environ.get("SITE_URL", "https://fikrly.uz")
 # Comma-separated chat IDs (can be user IDs or group IDs)
 TELEGRAM_ADMIN_CHAT_IDS = [
     cid.strip()
@@ -426,6 +441,11 @@ TELEGRAM_ERROR_CHAT_IDS = [
     for cid in os.environ.get("TELEGRAM_ERROR_CHAT_IDS", "").split(",")
     if cid.strip()
 ]
+TELEGRAM_ERRORS_ENABLED = os.environ.get("TELEGRAM_ERRORS_ENABLED", "false").lower() in (
+    "1",
+    "true",
+    "yes",
+)
 
 # Google Analytics
 GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "")
@@ -523,6 +543,15 @@ LOGGING = {
     },
 }
 
+if not TELEGRAM_ERRORS_ENABLED:
+    LOGGING["handlers"].pop("telegram_errors", None)
+    for logger_name in ("django.request", "frontend"):
+        LOGGING["loggers"][logger_name]["handlers"] = [
+            handler
+            for handler in LOGGING["loggers"][logger_name]["handlers"]
+            if handler != "telegram_errors"
+        ]
+
 # Create logs directory
 import os
 
@@ -537,33 +566,31 @@ RATELIMIT_USE_CACHE = "default"
 RATELIMIT_VIEW = "frontend.views.ratelimit_error"
 
 
-# ============================================
-# SECURITY HEADERS
-# ============================================
-if not DEBUG:
-    # Content Security Policy
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_BROWSER_XSS_FILTER = True
-    X_FRAME_OPTIONS = "DENY"
+# (Security headers are set at the top of settings.py in the Production Security Settings block)
 
-    # Additional security
-    SECURE_REFERRER_POLICY = "same-origin"
-    
-    # SSL/HTTPS Settings (production only)
-    USE_HTTPS = os.environ.get("USE_HTTPS", "False").lower() in ("true", "1", "yes")
-    
-    if USE_HTTPS:
-        # HTTP Strict Transport Security
-        SECURE_HSTS_SECONDS = 31536000  # 1 year
-        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-        SECURE_HSTS_PRELOAD = True
-        
-        # SSL Redirect
-        SECURE_SSL_REDIRECT = True
-        
-        # Secure Cookies
-        SESSION_COOKIE_SECURE = True
-        CSRF_COOKIE_SECURE = True
-        
-        # Set secure cookie age
-        SESSION_COOKIE_AGE = 1209600  # 2 weeks
+
+# ============================================
+# CONTENT SECURITY POLICY (CSP)
+# ============================================
+CSP_ENFORCE = not DEBUG and _env_bool("CSP_ENFORCE", default=True)
+CSP_REPORT_ONLY = _env_bool("CSP_REPORT_ONLY", default=False)
+
+CSP_POLICY = os.environ.get(
+    "CSP_POLICY",
+    " ".join(
+        [
+            "default-src 'self';",
+            "base-uri 'self';",
+            "object-src 'none';",
+            "frame-ancestors 'none';",
+            "form-action 'self';",
+            "script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://www.googletagmanager.com;",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+            "font-src 'self' data: https://fonts.gstatic.com;",
+            "img-src 'self' data: blob: https:;",
+            "connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com;",
+            "frame-src 'self';",
+            "upgrade-insecure-requests;",
+        ]
+    ),
+)

@@ -111,6 +111,12 @@
                             {% endif %}
                             <input type="file" id="avatarInput" name="avatar" accept="image/*" class="hidden" onchange="this.form.submit()">
 
+                            <div>
+                                <label class="block text-sm font-medium text-[var(--text-primary)] mb-1">{% trans "Username" %}</label>
+                                <input type="text" name="username" value="{{ form.username.value|default:'' }}" class="block w-full px-3 py-2 border border-[var(--border)] rounded-xl bg-[var(--bg)] focus:bg-[var(--surface)] focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors text-sm">
+                                <p class="text-xs text-[var(--text-secondary)] mt-1">{% trans "Username 3 kun ichida faqat 2 marta o'zgartiriladi." %}</p>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-[var(--text-primary)] mb-1">{% trans "Ism" %}</label>
@@ -132,6 +138,40 @@
                             </button>
                         </form>
                     </div>
+
+                    {% if gamification %}
+                    <!-- Level & XP card -->
+                    <a href="{% url 'gamification_profile' %}" class="block bg-[var(--surface)] rounded-2xl shadow-sm border border-[var(--border)] p-5 hover:border-primary-300 transition-colors group">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
+                                    {{ gamification.level }}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-[var(--text-primary)]">{% trans "Daraja" %} {{ gamification.level }}</div>
+                                    <div class="text-xs text-[var(--text-secondary)]">{{ gamification.xp }} XP</div>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--accent)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                        <!-- XP progress bar -->
+                        <div class="w-full bg-[var(--border)] rounded-full h-1.5 mb-3">
+                            <div class="bg-[var(--accent)] h-1.5 rounded-full transition-all" style="width: {{ gamification.xp_progress|floatformat:0 }}%"></div>
+                        </div>
+                        <!-- Badges row -->
+                        {% if badges %}
+                        <div class="flex items-center gap-1.5">
+                            {% for b in badges %}
+                            <span class="text-base" title="{{ b.name }}">{{ b.icon }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-xs text-[var(--text-secondary)]">{% trans "Sharh yozing — yutuq qozonin!" %}</p>
+                        {% endif %}
+                    </a>
+                    {% endif %}
                 </div>
 
                 <!-- Right Column: Content -->

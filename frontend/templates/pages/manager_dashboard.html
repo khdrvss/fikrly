@@ -126,7 +126,7 @@
                                     </div>
                                     <div>
                                         <h3 class="font-medium text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{{ c.name }}</h3>
-                                        <p class="text-sm text-[var(--text-secondary)]">{{ c.category_fk.display_name|default:c.category }} • {{ c.city }}</p>
+                                        <p class="text-sm text-[var(--text-secondary)]">{{ c.category_fk.display_name }} • {{ c.city }}</p>
                                         <div class="flex items-center gap-2 mt-1 text-xs text-[var(--text-secondary)]">
                                             <span class="flex items-center text-yellow-500">
                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -221,11 +221,267 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Widget / Embed Badge Section -->
+        {% if companies %}
+        <div class="bg-[var(--surface)] rounded-xl shadow-sm border border-[var(--border)] overflow-hidden mt-8">
+            <div class="p-6 border-b border-[var(--border)]">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-[var(--text-primary)]">{% trans "Saytingizga badge qo'shing" %}</h2>
+                        <p class="text-sm text-[var(--text-secondary)] mt-1">{% trans "Bu kodni saytingizga joylashtiring — mijozlar Fikrlydagi reytingingizni ko'radi va fikrly.uz ga havola paydo bo'ladi." %}</p>
+                    </div>
+                    <span class="flex-shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                        Embed
+                    </span>
+                </div>
+            </div>
+            <div class="divide-y divide-[var(--border)]">
+                {% for c in companies %}
+                <div class="p-6" data-widget-pk="{{ c.pk }}" data-widget-base="{{ request.scheme }}://{{ request.get_host }}">
+                    <p class="text-sm font-semibold text-[var(--text-primary)] mb-4">{{ c.name }}</p>
+
+                    {# ── Customiser controls ── #}
+                    <div class="flex flex-wrap gap-4 mb-5">
+
+                        {# Theme #}
+                        <div>
+                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">{% trans "Rang" %}</p>
+                            <div class="widget-toggle flex gap-1" data-widget-param="theme" data-widget-pk="{{ c.pk }}">
+                                <button data-val="light"  class="wt-btn active px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">☀ Yorug'</button>
+                                <button data-val="dark"   class="wt-btn        px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">🌙 To'q</button>
+                                <button data-val="auto"   class="wt-btn        px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">⚙ Auto</button>
+                            </div>
+                        </div>
+
+                        {# Size #}
+                        <div>
+                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">{% trans "O'lcham" %}</p>
+                            <div class="widget-toggle flex gap-1" data-widget-param="size" data-widget-pk="{{ c.pk }}">
+                                <button data-val="sm" class="wt-btn        px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">S</button>
+                                <button data-val="md" class="wt-btn active px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">M</button>
+                                <button data-val="lg" class="wt-btn        px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">L</button>
+                            </div>
+                        </div>
+
+                        {# Style #}
+                        <div>
+                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">{% trans "Uslub" %}</p>
+                            <div class="widget-toggle flex gap-1" data-widget-param="style" data-widget-pk="{{ c.pk }}">
+                                <button data-val="full"    class="wt-btn active px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">{% trans "To'liq" %}</button>
+                                <button data-val="compact" class="wt-btn        px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">{% trans "Ixcham" %}</button>
+                            </div>
+                        </div>
+
+                        {# Embed type #}
+                        <div>
+                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">{% trans "Kod turi" %}</p>
+                            <div class="widget-toggle flex gap-1" data-widget-param="embed" data-widget-pk="{{ c.pk }}">
+                                <button data-val="iframe" class="wt-btn active px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">iframe</button>
+                                <button data-val="script" class="wt-btn        px-3 py-1 text-xs rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium transition-colors">&#60;script&#62;</button>
+                            </div>
+                        </div>
+
+                    </div>{# end controls #}
+
+                    {# ── Preview + Code ── #}
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+                        {# Live preview #}
+                        <div class="flex-shrink-0">
+                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">{% trans "Ko'rinish" %}</p>
+                            <div id="widget-preview-container-{{ c.pk }}" style="width:280px;">
+                                <iframe id="widget-preview-{{ c.pk }}"
+                                    src="{% url 'company_widget' c.pk %}"
+                                    width="280" height="72" frameborder="0" scrolling="no"
+                                    style="border:none;overflow:hidden;border-radius:12px;display:block;"
+                                    loading="lazy"
+                                    title="{{ c.name }} Fikrly badge"
+                                    sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+                                </iframe>
+                            </div>
+                        </div>
+
+                        {# Embed code #}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">{% trans "Embed kodi" %}</p>
+                            <div class="relative">
+                                <pre id="widget-code-{{ c.pk }}" class="bg-[var(--bg)] border border-[var(--border)] rounded-lg p-4 text-xs text-[var(--text-secondary)] overflow-x-auto whitespace-pre-wrap break-all leading-relaxed select-all"></pre>
+                                <button onclick="copyWidget('widget-code-{{ c.pk }}', this)"
+                                    class="absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-[var(--surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--accent)] hover:border-[var(--accent)] transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>{% trans "Nusxalash" %}</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-[var(--text-secondary)] mt-2">
+                                {% trans "HTML faylingizning footer yoki sidebar qismiga joylashtiring." %}
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<style>
+  /* Active state for widget toggle buttons */
+  .wt-btn.active {
+    background-color: var(--accent, #18C58F) !important;
+    color: #fff !important;
+    border-color: var(--accent, #18C58F) !important;
+  }
+</style>
+<script>
+  /* ── Copy helper ────────────────────────────────────────────── */
+  function copyWidget(id, btn) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var text = el.textContent || el.innerText;
+    navigator.clipboard.writeText(text.trim()).then(function() {
+      var span = btn.querySelector('span');
+      if (span) { span.textContent = 'Nusxalandi ✓'; }
+      btn.style.color = '#18C58F';
+      btn.style.borderColor = '#18C58F';
+      setTimeout(function() {
+        if (span) { span.textContent = 'Nusxalash'; }
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    }).catch(function() {
+      // FIX: textarea fallback for iOS Safari which blocks execCommand on range selections
+      var ta = document.createElement('textarea');
+      ta.value = text.trim();
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+    });
+  }
+
+  /* ── Widget configurator ─────────────────────────────────────── */
+  // Size → pixel dimensions for iframe + embed code
+  var WIDGET_SIZES = { sm: [220, 60], md: [280, 72], lg: [360, 90] };
+
+  // Per-company state
+  var widgetState = {};
+
+  function getState(pk) {
+    if (!widgetState[pk]) {
+      widgetState[pk] = { theme: 'light', size: 'md', style: 'full', embed: 'iframe' };
+    }
+    return widgetState[pk];
+  }
+
+  function buildSrc(base, pk, state) {
+    return base + '/widget/' + pk + '/?theme=' + state.theme +
+           '&size=' + state.size + '&style=' + state.style;
+  }
+
+  function buildIframeCode(base, pk, state) {
+    var dims = WIDGET_SIZES[state.size] || WIDGET_SIZES.md;
+    var w = dims[0], h = dims[1];
+    var src = buildSrc(base, pk, state);
+    var r = state.size === 'sm' ? 10 : state.size === 'lg' ? 14 : 12;
+    // FIX: added title (a11y) + sandbox (security) + max-width failsafe
+    return '<!-- Fikrly badge -->\n' +
+      '<iframe src="' + src + '"\n' +
+      '  width="' + w + '" height="' + h + '"\n' +
+      '  frameborder="0" scrolling="no"\n' +
+      '  style="border:none;overflow:hidden;display:block;border-radius:' + r + 'px;max-width:100%;"\n' +
+      '  title="Fikrly reytingi"\n' +
+      '  loading="lazy"\n' +
+      '  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"\n' +
+      '></iframe>';
+  }
+
+  function buildScriptCode(base, pk, state) {
+    var dims = WIDGET_SIZES[state.size] || WIDGET_SIZES.md;
+    var w = dims[0], h = dims[1];
+    var src = buildSrc(base, pk, state);
+    var r = state.size === 'sm' ? 10 : state.size === 'lg' ? 14 : 12;
+    // FIX: use a placeholder <div> instead of document.currentScript (null when deferred)
+    return '<!-- Fikrly badge -->\n' +
+      '<div class="fikrly-widget-placeholder"></div>\n' +
+      '<script>(function(){\n' +
+      '  var ph=document.querySelector(\'.fikrly-widget-placeholder\');\n' +
+      '  if(!ph)return;\n' +
+      '  var i=document.createElement(\'iframe\');\n' +
+      '  i.src=\'' + src + '\';\n' +
+      '  i.width=\'' + w + '\';i.height=\'' + h + '\';\n' +
+      '  i.setAttribute(\'frameborder\',\'0\');i.setAttribute(\'scrolling\',\'no\');\n' +
+      '  i.style.cssText=\'border:none;overflow:hidden;display:block;border-radius:' + r + 'px;max-width:100%;\';\n' +
+      '  i.setAttribute(\'title\',\'Fikrly reytingi\');\n' +
+      '  i.setAttribute(\'loading\',\'lazy\');\n' +
+      '  i.setAttribute(\'sandbox\',\'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox\');\n' +
+      '  ph.parentNode.replaceChild(i,ph);\n' +
+      '})();\x3c/script>';
+  }
+
+  function refreshWidget(pk) {
+    // FIX: scope to [data-widget-base] to avoid matching toggle-group data-widget-pk attrs
+    var container = document.querySelector('[data-widget-base][data-widget-pk="' + pk + '"]');
+    if (!container) return;
+    var base = container.dataset.widgetBase || '';
+    var state = getState(pk);
+
+    // Update preview iframe
+    var iframe = document.getElementById('widget-preview-' + pk);
+    var previewContainer = document.getElementById('widget-preview-container-' + pk);
+    if (iframe) {
+      var dims = WIDGET_SIZES[state.size] || WIDGET_SIZES.md;
+      iframe.src = buildSrc(base, pk, state);
+      iframe.width  = dims[0];
+      iframe.height = dims[1];
+      if (previewContainer) previewContainer.style.width = dims[0] + 'px';
+    }
+
+    // Update embed code
+    var codeEl = document.getElementById('widget-code-' + pk);
+    if (codeEl) {
+      codeEl.textContent = state.embed === 'script'
+        ? buildScriptCode(base, pk, state)
+        : buildIframeCode(base, pk, state);
+    }
+  }
+
+  function initWidgets() {
+    // Initialise all code blocks with defaults
+    document.querySelectorAll('[data-widget-pk][data-widget-base]').forEach(function(container) {
+      var pk = container.dataset.widgetPk;
+      refreshWidget(pk);
+    });
+
+    // Toggle button click handler
+    document.querySelectorAll('.widget-toggle').forEach(function(group) {
+      group.addEventListener('click', function(e) {
+        var btn = e.target.closest('.wt-btn');
+        if (!btn) return;
+        var pk    = group.dataset.widgetPk;
+        var param = group.dataset.widgetParam;
+        var val   = btn.dataset.val;
+        // Update active state
+        group.querySelectorAll('.wt-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        // Update state
+        getState(pk)[param] = val;
+        refreshWidget(pk);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initWidgets);
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

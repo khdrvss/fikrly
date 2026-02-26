@@ -1,0 +1,1014 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Fikrly Widget — Saytingizga reyting badgeni qo'shing{% endblock %}
+{% block meta_description %}Fikrly widgetini saytingizga joylashtiring. Reyting va sharhlarni ko'rsating, ishonchni oshiring va konversiyani yaxshilang.{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── Code block syntax highlight ───────────────────── */
+  .code-block {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    position: relative;
+    white-space: pre;
+  }
+  .code-block .token-tag   { color: #7dd3fc; }
+  .code-block .token-attr  { color: #a5f3fc; }
+  .code-block .token-val   { color: #86efac; }
+  .code-block .token-cmt   { color: #475569; font-style: italic; }
+
+  /* ── Parameter table ────────────────────────────────── */
+  .param-table th { color: var(--text-secondary); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .param-table td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-primary); vertical-align: top; }
+  .param-table tr:last-child td { border-bottom: none; }
+  .param-table code { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 12px; font-family: ui-monospace, monospace; color: var(--accent); }
+
+  /* ── FAQ accordion ──────────────────────────────────── */
+  details > summary { list-style: none; cursor: pointer; user-select: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] .faq-chevron { transform: rotate(180deg); }
+  .faq-chevron { transition: transform .2s ease; }
+  details[open] summary .faq-icon-plus  { display: none; }
+  details[open] summary .faq-icon-minus { display: inline-block; }
+  details:not([open]) .faq-icon-plus    { display: inline-block; }
+  details:not([open]) .faq-icon-minus   { display: none; }
+  details[open] > .faq-answer { animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── Step connector ─────────────────────────────────── */
+  .step-line { position: absolute; left: 19px; top: 40px; bottom: -20px; width: 2px; background: linear-gradient(to bottom, var(--accent), transparent); opacity: .3; }
+
+  /* ── Tag pill ───────────────────────────────────────── */
+  .tag-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+
+  /* ── Copy button ────────────────────────────────────── */
+  .copy-btn { position: absolute; top: 10px; right: 10px; padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s ease; background: rgba(255,255,255,.08); color: #94a3b8; border: 1px solid rgba(255,255,255,.1); }
+  .copy-btn:hover { background: rgba(255,255,255,.14); color: #e2e8f0; }
+  .copy-btn.copied { background: rgba(24,197,143,.15); color: #34d399; border-color: rgba(24,197,143,.3); }
+
+  /* ── Widget preview shell ───────────────────────────── */
+  .preview-shell {
+    background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(0,0,0,.025) 6px, rgba(0,0,0,.025) 12px);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 110px;
+  }
+  .dark .preview-shell { background-color: #0f172a; }
+
+  /* ── Widget card selection ──────────────────────────────────── */
+  .wcard { cursor: default; transition: box-shadow .2s ease, border-color .2s ease; }
+  .wcard.wcard-selected {
+    border-color: #18C58F !important;
+    box-shadow: 0 0 0 2px rgba(24,197,143,.25), 0 4px 16px rgba(24,197,143,.12);
+  }
+  .wcard-selection-badge {
+    display: none; position: absolute; top: 10px; right: 10px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #18C58F; color: #fff;
+    align-items: center; justify-content: center;
+  }
+  .wcard.wcard-selected .wcard-selection-badge { display: flex; }
+
+  /* ── Modal ──────────────────────────────────────────────────── */
+  #wcm { transition: opacity .2s ease; }
+  #wcm.wcm-visible { opacity: 1; }
+  #wcm-panel {
+    animation: wcmSlide .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes wcmSlide {
+    from { opacity: 0; transform: scale(.95) translateY(8px); }
+    to   { opacity: 1; transform: scale(1)  translateY(0); }
+  }
+
+  /* ── Preview skeleton ───────────────────────────────────────── */
+  .wcm-skeleton {
+    width: 280px; height: 72px; border-radius: 10px;
+    background: linear-gradient(90deg, var(--border,#e5e7eb) 25%, rgba(255,255,255,.5) 50%, var(--border,#e5e7eb) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 1. HERO                                                         #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--surface)] border-b border-[var(--border)]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+    <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+
+      {# Left copy #}
+      <div class="flex-1 text-center lg:text-left">
+        <span class="tag-pill bg-[var(--accent)]/10 text-[var(--accent)] mb-5 inline-flex">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z"/><path fill-rule="evenodd" d="M5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          Embed Widget
+        </span>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--text-primary)] leading-tight mb-5 tracking-tight">
+          Fikrly widgetini<br>
+          <span class="text-[var(--accent)]">saytingizga</span> joylashtiring
+        </h1>
+        <p class="text-lg text-[var(--text-secondary)] mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+          Reyting va sharhlarni ko'rsating. Ishonchni oshiring. 2 daqiqada o'rnating.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+          <a href="{% url 'business_dashboard' %}"
+             class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--accent)] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+            Dashboardga o'tish
+          </a>
+          <a href="#demo"
+             class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--surface)] text-[var(--text-primary)] font-semibold rounded-xl border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            Namuna ko'rish
+          </a>
+        </div>
+      </div>
+
+      {# Right — live badge preview in a browser-chrome shell #}
+      <div class="flex-shrink-0 w-full max-w-sm lg:max-w-md" id="demo">
+        <div class="bg-[var(--bg)] rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
+          {# fake browser bar #}
+          <div class="flex items-center gap-1.5 px-4 py-3 bg-[var(--surface)] border-b border-[var(--border)]">
+            <span class="w-3 h-3 rounded-full bg-red-400/70"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-400/70"></span>
+            <span class="w-3 h-3 rounded-full bg-green-400/70"></span>
+            <span class="ml-3 flex-1 bg-[var(--bg)] rounded-md px-3 py-1 text-xs text-[var(--text-secondary)] border border-[var(--border)]">yoursite.com</span>
+          </div>
+          {# page mock #}
+          <div class="p-6">
+            <div class="flex gap-3 mb-5">
+              <div class="w-10 h-10 rounded-lg bg-[var(--border)] flex-shrink-0"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-3 bg-[var(--border)] rounded w-2/3"></div>
+                <div class="h-3 bg-[var(--border)] rounded w-1/2"></div>
+              </div>
+            </div>
+            <div class="h-3 bg-[var(--border)] rounded w-full mb-2"></div>
+            <div class="h-3 bg-[var(--border)] rounded w-5/6 mb-2"></div>
+            <div class="h-3 bg-[var(--border)] rounded w-3/4 mb-6"></div>
+            {# actual live widget iframe #}
+            <div class="rounded-xl overflow-hidden border border-[var(--border)]">
+              {% if demo_pk %}
+              <iframe src="/widget/{{ demo_pk }}/?theme=light&size=md&style=full"
+                      width="100%" height="72" frameborder="0" scrolling="no"
+                      style="border:none;overflow:hidden;display:block;"
+                      loading="lazy"
+                      title="Fikrly widget demo"
+                      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+              </iframe>
+              {% else %}
+              <div class="flex items-center gap-3 bg-white p-4">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                  <span class="text-emerald-500 font-bold text-lg">F</span>
+                </div>
+                <div class="flex-1">
+                  <div class="text-sm font-semibold text-gray-900 mb-1">Kompaniya nomi</div>
+                  <div class="flex items-center gap-1">
+                    {% for i in "12345" %}<svg class="w-3 h-3" viewBox="0 0 20 20" fill="#18C58F"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>{% endfor %}
+                    <span class="text-xs font-bold text-gray-900 ml-1">4.8</span>
+                    <span class="text-xs text-gray-400">(42 sharh)</span>
+                  </div>
+                </div>
+                <div class="text-right"><span class="text-[10px] font-semibold text-[#18C58F]">fikrly.uz</span></div>
+              </div>
+              {% endif %}
+            </div>
+            <div class="mt-4 space-y-2">
+              <div class="h-3 bg-[var(--border)] rounded w-2/3"></div>
+              <div class="h-3 bg-[var(--border)] rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+        <p class="text-center text-xs text-[var(--text-secondary)] mt-3">
+          ↑ Saytingizda shunday ko'rinadi
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 2. WHY USE WIDGETS                                              #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--bg)] py-16 md:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3">Nima uchun widget kerak?</h2>
+      <p class="text-[var(--text-secondary)] max-w-xl mx-auto">Saytingizga joylashtirilgan badge — eng ishonchli marketing vositasi.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div class="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 flex flex-col gap-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-2xl flex-shrink-0">⭐</div>
+        <div>
+          <h3 class="font-semibold text-[var(--text-primary)] mb-2">Ishonchni oshiradi</h3>
+          <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Tashrif buyuruvchilar real reytingni ko'radi va kompaniyaga ko'proq ishonadi. Aktiv reyting ko'rsatish konversiyani 27% gacha oshiradi.</p>
+        </div>
+      </div>
+
+      <div class="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 flex flex-col gap-4">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-2xl flex-shrink-0">🔗</div>
+        <div>
+          <h3 class="font-semibold text-[var(--text-primary)] mb-2">SEO uchun backlink beradi</h3>
+          <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Har bir widget fikrly.uz ga havola beradi. Bu sizning domeningiz obro'sini va qidiruv tizimidagi o'rningizni yaxshilaydi.</p>
+        </div>
+      </div>
+
+      <div class="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 flex flex-col gap-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-2xl flex-shrink-0">📈</div>
+        <div>
+          <h3 class="font-semibold text-[var(--text-primary)] mb-2">Konversiyani oshiradi</h3>
+          <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Ijobiy sharhlar ko'rsatilgan sahifalarda foydalanuvchi uzoqroq qoladi va sotib olishga ko'proq moyil bo'ladi.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 3. WIDGET TYPES                                                 #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--surface)] border-t border-[var(--border)] py-16 md:py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3">Widget turlari</h2>
+      <p class="text-[var(--text-secondary)] max-w-xl mx-auto">Saytingiz dizayniga mos variant tanlang.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      {# A — Standard Badge #}
+      <div id="wcard-standard" data-wtype="standard" class="wcard relative bg-[var(--bg)] rounded-2xl border border-[var(--border)] overflow-hidden flex flex-col">
+        <div class="wcard-selection-badge" aria-hidden="true"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+        <div class="p-5 border-b border-[var(--border)] flex items-center justify-between">
+          <div>
+            <span class="tag-pill bg-[var(--accent)]/10 text-[var(--accent)] mb-2">A</span>
+            <h3 class="font-semibold text-[var(--text-primary)]">Standard Badge</h3>
+            <p class="text-xs text-[var(--text-secondary)] mt-1">Logo + nom + yulduzlar + sharh soni</p>
+          </div>
+        </div>
+        <div class="preview-shell m-4 mb-0">
+          {% if demo_pk %}
+          <iframe src="/widget/{{ demo_pk }}/?theme=light&size=md&style=full"
+                  width="280" height="72" frameborder="0" scrolling="no"
+                  style="border:none;overflow:hidden;display:block;border-radius:12px;"
+                  loading="lazy"
+                  title="Standard badge ko'rinishi — Fikrly"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+          </iframe>
+          {% else %}
+          <div style="width:280px;" class="bg-white rounded-xl border border-gray-200 p-3 flex items-center gap-3">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-emerald-500 font-bold">F</div>
+            <div class="flex-1"><div class="text-xs font-semibold text-gray-900 mb-1">Demo Kompaniya</div><div class="flex items-center gap-1">{% for i in "12345" %}<svg class="w-3 h-3" fill="#18C58F" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>{% endfor %}<span class="text-xs font-bold text-gray-900 ml-1">4.8</span><span class="text-xs text-gray-400">(42)</span></div></div>
+            <span class="text-[10px] font-semibold text-[#18C58F]">fikrly.uz</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="p-4 mt-auto">
+          <button type="button" onclick="openCodeModal('standard')" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--accent)] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Kod olish
+          </button>
+        </div>
+      </div>
+
+      {# B — Compact Badge #}
+      <div id="wcard-compact" data-wtype="compact" class="wcard relative bg-[var(--bg)] rounded-2xl border border-[var(--border)] overflow-hidden flex flex-col">
+        <div class="wcard-selection-badge" aria-hidden="true"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+        <div class="p-5 border-b border-[var(--border)] flex items-center justify-between">
+          <div>
+            <span class="tag-pill bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 mb-2">B</span>
+            <h3 class="font-semibold text-[var(--text-primary)]">Compact Badge</h3>
+            <p class="text-xs text-[var(--text-secondary)] mt-1">Footer / sidebar uchun kichik variant</p>
+          </div>
+        </div>
+        <div class="preview-shell m-4 mb-0">
+          {% if demo_pk %}
+          <iframe src="/widget/{{ demo_pk }}/?theme=light&size=sm&style=compact"
+                  width="180" height="52" frameborder="0" scrolling="no"
+                  style="border:none;overflow:hidden;display:block;border-radius:10px;"
+                  loading="lazy"
+                  title="Compact badge ko'rinishi — Fikrly"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+          </iframe>
+          {% else %}
+          <div style="width:180px;" class="bg-white rounded-xl border border-gray-200 px-3 py-2 flex items-center gap-2">
+            <div class="w-7 h-7 bg-gray-100 rounded-md flex items-center justify-center text-emerald-500 font-bold text-xs">F</div>
+            <div class="flex items-center gap-1">{% for i in "12345" %}<svg class="w-2.5 h-2.5" fill="#18C58F" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>{% endfor %}<span class="text-xs font-bold text-gray-900 ml-0.5">4.8</span></div>
+            <span class="text-[9px] font-semibold text-[#18C58F] ml-auto">fikrly.uz</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="p-4 mt-auto">
+          <button type="button" onclick="openCodeModal('compact')" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--surface)] text-[var(--text-primary)] text-sm font-semibold rounded-xl border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Kod olish
+          </button>
+        </div>
+      </div>
+
+      {# C — Large Badge #}
+      <div id="wcard-large" data-wtype="large" class="wcard relative bg-[var(--bg)] rounded-2xl border border-[var(--border)] overflow-hidden flex flex-col">
+        <div class="wcard-selection-badge" aria-hidden="true"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>
+        <div class="p-5 border-b border-[var(--border)] flex items-center justify-between">
+          <div>
+            <span class="tag-pill bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 mb-2">C</span>
+            <h3 class="font-semibold text-[var(--text-primary)]">Large Badge</h3>
+            <p class="text-xs text-[var(--text-secondary)] mt-1">Hero section / about page uchun katta variant</p>
+          </div>
+        </div>
+        <div class="preview-shell m-4 mb-0">
+          {% if demo_pk %}
+          <iframe src="/widget/{{ demo_pk }}/?theme=light&size=lg&style=full"
+                  width="320" height="90" frameborder="0" scrolling="no"
+                  style="border:none;overflow:hidden;display:block;border-radius:14px;max-width:100%;"
+                  loading="lazy"
+                  title="Large badge ko'rinishi — Fikrly"
+                  sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+          </iframe>
+          {% else %}
+          <div class="w-full max-w-xs bg-white rounded-2xl border border-gray-200 p-4 flex items-center gap-4">
+            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-emerald-500 font-bold text-xl">F</div>
+            <div class="flex-1"><div class="text-sm font-semibold text-gray-900 mb-1">Demo Kompaniya</div><div class="flex items-center gap-1">{% for i in "12345" %}<svg class="w-4 h-4" fill="#18C58F" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>{% endfor %}<span class="text-sm font-bold text-gray-900 ml-1">4.8</span><span class="text-xs text-gray-400 ml-1">(42 sharh)</span></div></div>
+            <span class="text-xs font-semibold text-[#18C58F]">fikrly.uz</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="p-4 mt-auto">
+          <button type="button" onclick="openCodeModal('large')" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--surface)] text-[var(--text-primary)] text-sm font-semibold rounded-xl border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            Kod olish
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 4. INSTALLATION — SIMPLE MODE                                   #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--bg)] border-t border-[var(--border)] py-16 md:py-20" id="install">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3">Qanday o'rnatiladi?</h2>
+      <p class="text-[var(--text-secondary)] max-w-xl mx-auto">3 ta qadam, 2 daqiqa.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+      {# Steps #}
+      <div class="space-y-8">
+
+        <div class="flex gap-5 relative">
+          <div class="flex-shrink-0 relative">
+            <div class="w-10 h-10 rounded-full bg-[var(--accent)] text-white flex items-center justify-center font-bold text-sm z-10 relative">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="pt-1.5">
+            <h3 class="font-semibold text-[var(--text-primary)] mb-1.5">Dashboarddan kodni oling</h3>
+            <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
+              <a href="{% url 'business_dashboard' %}" class="text-[var(--accent)] hover:underline">Biznes dashboardingizga</a> kiring. "Saytingizga badge qo'shing" bo'limida kodingizni toping va nusxalang.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-5 relative">
+          <div class="flex-shrink-0 relative">
+            <div class="w-10 h-10 rounded-full bg-[var(--accent)] text-white flex items-center justify-center font-bold text-sm z-10 relative">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="pt-1.5">
+            <h3 class="font-semibold text-[var(--text-primary)] mb-1.5">Kodni saytingizga joylashtiring</h3>
+            <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Quyidagi kodni HTML faylingizga nusxalang. <strong class="text-[var(--text-primary)]">123</strong> ni o'zingizning kompaniya ID ingizga almashtiring.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-5">
+          <div class="flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-[var(--accent)] text-white flex items-center justify-center font-bold text-sm">3</div>
+          </div>
+          <div class="pt-1.5">
+            <h3 class="font-semibold text-[var(--text-primary)] mb-1.5">Saytingizni saqlang</h3>
+            <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
+              Sayt sahifasini yangilang — widget darhol ko'rinadi. 📌 Footer yoki sidebarga qo'yish tavsiya qilinadi.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      {# Code block #}
+      <div>
+        <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">iframe embed kodi</p>
+        <div class="relative">
+          <div class="code-block" id="code-simple"><span class="token-cmt">&lt;!-- Fikrly badge --&gt;</span>
+<span class="token-tag">&lt;iframe</span> <span class="token-attr">src</span>=<span class="token-val">"https://fikrly.uz/widget/123/"</span>
+        <span class="token-attr">width</span>=<span class="token-val">"280"</span>
+        <span class="token-attr">height</span>=<span class="token-val">"72"</span>
+        <span class="token-attr">frameborder</span>=<span class="token-val">"0"</span>
+        <span class="token-attr">scrolling</span>=<span class="token-val">"no"</span>
+        <span class="token-attr">style</span>=<span class="token-val">"border:none;overflow:hidden;"</span>
+        <span class="token-attr">loading</span>=<span class="token-val">"lazy"</span><span class="token-tag">&gt;&lt;/iframe&gt;</span></div>
+          <button class="copy-btn" onclick="copyCode('code-simple', this)">Nusxalash</button>
+        </div>
+        <p class="mt-3 text-xs text-[var(--text-secondary)]">
+          📌 <strong>123</strong> raqamini o'zingizning kompaniya ID ingizga almashtiring.
+          ID ni dashboardingizdan yoki sahifa URL'idan ko'rishingiz mumkin.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 5. ADVANCED — JS EMBED                                          #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--surface)] border-t border-[var(--border)] py-16 md:py-20">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <details class="group">
+      <summary class="flex items-center justify-between cursor-pointer">
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-[var(--text-primary)]">
+            Advanced — JavaScript versiyasi
+          </h2>
+          <p class="text-sm text-[var(--text-secondary)] mt-1">Har bir sahifada to'g'ri joyga auto-o'lchanadigan widget</p>
+        </div>
+        <div class="flex-shrink-0 ml-4 w-8 h-8 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center">
+          <svg class="faq-chevron w-4 h-4 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </summary>
+
+      <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+        <div>
+          <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Script embed kodi</p>
+          <div class="relative">
+            <div class="code-block" id="code-js"><span class="token-cmt">&lt;!-- Fikrly widget (JS versiyasi) --&gt;</span>
+<span class="token-tag">&lt;script</span>
+  <span class="token-attr">src</span>=<span class="token-val">"https://fikrly.uz/widget.js"</span>
+  <span class="token-attr">data-company</span>=<span class="token-val">"123"</span>
+  <span class="token-attr">data-style</span>=<span class="token-val">"full"</span>
+  <span class="token-attr">data-size</span>=<span class="token-val">"md"</span>
+  <span class="token-attr">data-theme</span>=<span class="token-val">"auto"</span><span class="token-tag">&gt;&lt;/script&gt;</span></div>
+            <button class="copy-btn" onclick="copyCode('code-js', this)">Nusxalash</button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="font-semibold text-[var(--text-primary)]">Afzalliklari</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3">
+              <div class="w-5 h-5 rounded-full bg-[var(--accent)]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-[var(--accent)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-[var(--text-primary)]">Auto-resize</p>
+                <p class="text-xs text-[var(--text-secondary)]">Konteyner kengligiga qarab avtomatik o'lchamlanadi</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <div class="w-5 h-5 rounded-full bg-[var(--accent)]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-[var(--accent)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-[var(--text-primary)]">Auto theme</p>
+                <p class="text-xs text-[var(--text-secondary)]"><code class="text-xs bg-[var(--bg)] border border-[var(--border)] rounded px-1 font-mono">data-theme="auto"</code> — foydalanuvchining OS sozlamalariga moslashadi</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <div class="w-5 h-5 rounded-full bg-[var(--accent)]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-[var(--accent)]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-[var(--text-primary)]">To'liq customization</p>
+                <p class="text-xs text-[var(--text-secondary)]">data-atributlari orqali barcha sozlamalar</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </details>
+
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 6. CUSTOMIZATION OPTIONS                                        #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--bg)] border-t border-[var(--border)] py-16 md:py-20">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3">Sozlash parametrlari</h2>
+      <p class="text-[var(--text-secondary)]">URL ga qo'shib yuborasiz — barchasi ishlaydi.</p>
+    </div>
+
+    <div class="bg-[var(--surface)] rounded-2xl border border-[var(--border)] overflow-hidden mb-8">
+      <table class="param-table w-full">
+        <thead>
+          <tr class="text-left bg-[var(--bg)]">
+            <th>Parametr</th>
+            <th>Qiymatlar</th>
+            <th>Standart</th>
+            <th>Ta'rif</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>theme</code></td>
+            <td><code>light</code> · <code>dark</code> · <code>auto</code></td>
+            <td><code>light</code></td>
+            <td>Rang sxemasi. <code>auto</code> — OS sozlamalariga moslashadi.</td>
+          </tr>
+          <tr>
+            <td><code>size</code></td>
+            <td><code>sm</code> · <code>md</code> · <code>lg</code></td>
+            <td><code>md</code></td>
+            <td>Badge o'lchami: sm≈220×60, md≈280×72, lg≈360×90 px.</td>
+          </tr>
+          <tr>
+            <td><code>style</code></td>
+            <td><code>full</code> · <code>compact</code></td>
+            <td><code>full</code></td>
+            <td><code>full</code> — nom + sharh soni. <code>compact</code> — faqat yulduzlar va ball.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    {# Example code block #}
+    <div>
+      <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Misol — to'q rang, katta o'lcham</p>
+      <div class="relative">
+        <div class="code-block" id="code-custom"><span class="token-cmt">&lt;!-- Dark, large badge --&gt;</span>
+<span class="token-tag">&lt;iframe</span>
+  <span class="token-attr">src</span>=<span class="token-val">"https://fikrly.uz/widget/123/?theme=dark&amp;size=lg&amp;style=full"</span>
+  <span class="token-attr">width</span>=<span class="token-val">"360"</span>
+  <span class="token-attr">height</span>=<span class="token-val">"90"</span>
+  <span class="token-attr">frameborder</span>=<span class="token-val">"0"</span>
+  <span class="token-attr">scrolling</span>=<span class="token-val">"no"</span>
+  <span class="token-attr">style</span>=<span class="token-val">"border:none;overflow:hidden;"</span>
+  <span class="token-attr">loading</span>=<span class="token-val">"lazy"</span><span class="token-tag">&gt;&lt;/iframe&gt;</span></div>
+        <button class="copy-btn" onclick="copyCode('code-custom', this)">Nusxalash</button>
+      </div>
+    </div>
+
+    {# Live dark demo #}
+    {% if demo_pk %}
+    <div class="mt-6">
+      <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">Ko'rinish</p>
+      <div style="background:#1F2937;border-radius:14px;padding:20px;display:inline-block;">
+        <iframe src="/widget/{{ demo_pk }}/?theme=dark&size=lg&style=full"
+                width="360" height="90" frameborder="0" scrolling="no"
+                style="border:none;overflow:hidden;display:block;border-radius:14px;"
+                loading="lazy"
+                title="Dark theme badge ko'rinishi — Fikrly"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+        </iframe>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 7. FAQ                                                          #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--surface)] border-t border-[var(--border)] py-16 md:py-20">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3">Ko'p so'raladigan savollar</h2>
+    </div>
+
+    <div class="space-y-3" id="faq">
+
+      {% for item in faq %}
+      <details class="bg-[var(--bg)] rounded-xl border border-[var(--border)] overflow-hidden group">
+        <summary class="flex items-center justify-between gap-4 p-5 hover:bg-[var(--surface)] transition-colors">
+          <span class="font-medium text-[var(--text-primary)] text-sm sm:text-base">{{ item.q }}</span>
+          <svg class="faq-chevron flex-shrink-0 w-4 h-4 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </summary>
+        <div class="faq-answer px-5 pb-5 pt-2 text-sm text-[var(--text-secondary)] leading-relaxed border-t border-[var(--border)]">
+          {{ item.a }}
+        </div>
+      </details>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+
+{# ═══════════════════════════════════════════════════════════════ #}
+{# 8. FINAL CTA                                                    #}
+{# ═══════════════════════════════════════════════════════════════ #}
+<section class="bg-[var(--bg)] border-t border-[var(--border)] py-20 md:py-28">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--accent)]/10 mb-6 text-3xl">🚀</div>
+    <h2 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight">
+      Widgetni hoziroq qo'shing
+    </h2>
+    <p class="text-lg text-[var(--text-secondary)] mb-8 max-w-lg mx-auto">
+      2 daqiqa vaqt sarflab saytingizga ishonch elementi qo'shing. Bepul.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{% url 'business_dashboard' %}"
+         class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--accent)] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity text-base">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        Dashboardga o'tish
+      </a>
+      <a href="{% url 'review_submission' %}"
+         class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[var(--surface)] text-[var(--text-primary)] font-semibold rounded-xl border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors text-base">
+        Sharh qoldirish
+      </a>
+    </div>
+    <p class="mt-6 text-sm text-[var(--text-secondary)]">
+      Allaqachon o'rnatdingizmi?
+      <a href="{% url 'business_dashboard' %}" class="text-[var(--accent)] hover:underline ml-1">Dashboardda tekshiring →</a>
+    </p>
+  </div>
+</section>
+
+
+{# ── Widget Code Modal ──────────────────────────────────────── #}
+<div id="wcm"
+     class="fixed inset-0 z-50 hidden items-center justify-center p-4"
+     role="dialog" aria-modal="true" aria-labelledby="wcm-title"
+     style="opacity:0;transition:opacity .2s ease;">
+  {# Backdrop #}
+  <div id="wcm-backdrop"
+       class="absolute inset-0 bg-black/50"
+       style="backdrop-filter:blur(4px);"
+       onclick="closeCodeModal()">
+  </div>
+
+  {# Panel #}
+  <div id="wcm-panel"
+       class="relative bg-[var(--surface)] rounded-2xl shadow-2xl border border-[var(--border)] w-full max-w-lg max-h-[90vh] overflow-y-auto z-10">
+
+    {# Header #}
+    <div class="flex items-center justify-between p-5 border-b border-[var(--border)]">
+      <div>
+        <div id="wcm-type-pill" class="tag-pill bg-[var(--accent)]/10 text-[var(--accent)] mb-1.5 text-xs"></div>
+        <h3 id="wcm-title" class="font-semibold text-[var(--text-primary)]">Embed kodi</h3>
+      </div>
+      <button onclick="closeCodeModal()"
+              class="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--bg)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
+              aria-label="Yopish (Esc)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    {# Live preview #}
+    <div class="p-5 border-b border-[var(--border)]">
+      <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Ko'rinish</p>
+      <div id="wcm-preview" class="preview-shell min-h-[80px] flex items-center justify-center">
+        <div class="wcm-skeleton"></div>
+      </div>
+    </div>
+
+    {# Code block #}
+    <div class="p-5 border-b border-[var(--border)]">
+      <p class="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">HTML kodi</p>
+      <div class="relative">
+        <pre id="wcm-code"
+             class="code-block text-xs whitespace-pre overflow-x-auto"
+             style="max-height:200px;"></pre>
+        <button id="wcm-copy-btn"
+                class="copy-btn"
+                onclick="copyModalCode()">Nusxalash</button>
+      </div>
+    </div>
+
+    {# Auth / demo notice (shown when user has no company) #}
+    <div id="wcm-notice" class="px-5 pt-4 hidden">
+      <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-4 flex items-start gap-3">
+        <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <p class="text-sm font-medium text-amber-800 dark:text-amber-300">
+            Kodda hali demo kompaniya IDsi ko'rsatilmoqda.
+          </p>
+          <p class="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+            O'z kodingizni olish uchun
+            <a href="{% url 'account_login' %}" class="underline font-medium">kiring</a>
+            yoki
+            <a href="{% url 'account_signup' %}" class="underline font-medium">ro'yxatdan o'ting</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {# Footer actions #}
+    <div class="p-5 flex items-center gap-3">
+      <button onclick="copyModalCode()"
+              class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--accent)] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+        Kodni nusxalash
+      </button>
+      <button onclick="closeCodeModal()"
+              class="px-4 py-2.5 bg-[var(--bg)] text-[var(--text-secondary)] font-medium rounded-xl border border-[var(--border)] hover:border-[var(--accent)] transition-colors text-sm">
+        Yopish
+      </button>
+    </div>
+
+  </div>{# /panel #}
+</div>{# /modal #}
+
+
+{# ── Toast notification ──────────────────────────────────────── #}
+<div id="copy-toast"
+     class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none
+            flex items-center gap-2 px-5 py-3 rounded-xl bg-gray-900 text-white text-sm font-medium shadow-xl
+            transition-all duration-300 opacity-0 translate-y-4"
+     aria-live="polite">
+  <svg class="w-4 h-4 text-[#18C58F]" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+  </svg>
+  Kod nusxalandi ✓
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   WIDGET PAGE — full JS engine
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Config per widget type ─────────────────────────────────── */
+var WIDGET_CFG = {
+  standard: { label: 'Standard Badge', size: 'md', style: 'full',    width: 280, height: 72  },
+  compact:  { label: 'Compact Badge',  size: 'sm', style: 'compact', width: 200, height: 60  },
+  large:    { label: 'Large Badge',    size: 'lg', style: 'full',    width: 420, height: 120 }
+};
+
+/* ── Company context injected from Django ───────────────────── */
+var USER_CID  = '{{ user_company.pk|default:"" }}';     // logged-in user's company pk
+var DEMO_PK   = '{{ demo_pk|default:"" }}';             // fallback demo company pk
+var SITE_HOST = 'https://fikrly.uz';
+
+/* Currently selected widget type for the section cards */
+var _selectedType = 'standard';
+
+/* ── Open "Kod olish" modal ─────────────────────────────────── */
+function openCodeModal(wtype) {
+  var cfg = WIDGET_CFG[wtype];
+  if (!cfg) return;
+  _selectedType = wtype;
+
+  /* Highlight the selected card */
+  document.querySelectorAll('.wcard').forEach(function(c) {
+    c.classList.remove('wcard-selected');
+  });
+  var activeCard = document.getElementById('wcard-' + wtype);
+  if (activeCard) activeCard.classList.add('wcard-selected');
+
+  /* Decide which company ID to use */
+  var companyId = USER_CID || DEMO_PK;
+  var isDemo    = !USER_CID;
+
+  /* -- Header pill + title -- */
+  var pillEl = document.getElementById('wcm-type-pill');
+  if (pillEl) pillEl.textContent = cfg.label;
+
+  /* -- Skeleton while iframe loads -- */
+  var previewEl = document.getElementById('wcm-preview');
+  if (previewEl) {
+    previewEl.innerHTML = '<div class="wcm-skeleton" style="width:' + cfg.width + 'px;height:' + cfg.height + 'px;"></div>';
+    if (companyId) {
+      var iframe = document.createElement('iframe');
+      iframe.src = '/widget/' + companyId + '/?size=' + cfg.size + '&style=' + cfg.style + '&theme=light';
+      iframe.setAttribute('width',       cfg.width);
+      iframe.setAttribute('height',      cfg.height);
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('scrolling',   'no');
+      iframe.setAttribute('loading',     'eager');
+      iframe.setAttribute('title',       cfg.label + " ko'rinishi");
+      iframe.setAttribute('sandbox',     'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+      iframe.style.cssText = 'border:none;overflow:hidden;display:none;border-radius:10px;';
+      iframe.onload = function() {
+        previewEl.innerHTML = '';
+        iframe.style.display = 'block';
+        previewEl.appendChild(iframe);
+      };
+      /* Fallback: show iframe even if onload never fires (cross-origin) */
+      var t = setTimeout(function() {
+        if (previewEl.contains(iframe)) return;
+        previewEl.innerHTML = '';
+        iframe.style.display = 'block';
+        previewEl.appendChild(iframe);
+      }, 1200);
+      iframe.addEventListener('load', function() { clearTimeout(t); });
+      previewEl.appendChild(iframe);
+    }
+  }
+
+  /* -- Embed code -- */
+  var codeEl = document.getElementById('wcm-code');
+  if (codeEl) codeEl.textContent = buildEmbedCode(companyId || '123', cfg);
+
+  /* -- Auth notice -- */
+  var notice = document.getElementById('wcm-notice');
+  if (notice) {
+    if (isDemo) notice.classList.remove('hidden');
+    else        notice.classList.add('hidden');
+  }
+
+  /* -- Reset copy button -- */
+  var copyBtn = document.getElementById('wcm-copy-btn');
+  if (copyBtn) { copyBtn.classList.remove('copied'); copyBtn.textContent = 'Nusxalash'; }
+
+  /* -- Show modal -- */
+  var modal = document.getElementById('wcm');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  requestAnimationFrame(function() {
+    modal.style.opacity = '1';
+  });
+  document.body.style.overflow = 'hidden';
+
+  /* Trap focus in panel */
+  var panel = document.getElementById('wcm-panel');
+  if (panel) panel.focus();
+}
+
+/* ── Close modal ────────────────────────────────────────────── */
+function closeCodeModal() {
+  var modal = document.getElementById('wcm');
+  if (!modal) return;
+  modal.style.opacity = '0';
+  setTimeout(function() {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }, 200);
+  document.body.style.overflow = '';
+}
+
+/* ── Build clean embed code string ─────────────────────────── */
+function buildEmbedCode(companyId, cfg) {
+  return (
+    '<iframe\n' +
+    '  src="' + SITE_HOST + '/widget/' + companyId + '/?size=' + cfg.size + '&style=' + cfg.style + '&theme=light"\n' +
+    '  width="'       + cfg.width  + '"\n' +
+    '  height="'      + cfg.height + '"\n' +
+    '  frameborder="0"\n' +
+    '  scrolling="no"\n' +
+    '  style="border:none;overflow:hidden;"\n' +
+    '  loading="lazy">\n' +
+    '</iframe>'
+  );
+}
+
+/* ── Copy modal embed code ──────────────────────────────────── */
+function copyModalCode() {
+  var codeEl = document.getElementById('wcm-code');
+  var copyBtn = document.getElementById('wcm-copy-btn');
+  if (!codeEl) return;
+  var text = codeEl.textContent.trim();
+
+  function onSuccess() {
+    if (copyBtn) {
+      copyBtn.classList.add('copied');
+      copyBtn.textContent = '✓ Nusxalandi';
+      setTimeout(function() {
+        copyBtn.classList.remove('copied');
+        copyBtn.textContent = 'Nusxalash';
+      }, 2500);
+    }
+    showToast();
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(function() { fallbackCopy(text, onSuccess); });
+  } else {
+    fallbackCopy(text, onSuccess);
+  }
+}
+
+/* ── Textarea fallback copy (iOS Safari, HTTP) ──────────────── */
+function fallbackCopy(text, cb) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { if (document.execCommand('copy') && cb) cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+/* ── Static code-block copy (installation section) ─────────── */
+function copyCode(id, btn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var text = (el.innerText || el.textContent).trim();
+
+  function onSuccess() {
+    if (btn) {
+      btn.classList.add('copied');
+      btn.textContent = '✓ Nusxalandi';
+      setTimeout(function() {
+        btn.classList.remove('copied');
+        btn.textContent = 'Nusxalash';
+      }, 2500);
+    }
+    showToast();
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(function() { fallbackCopy(text, onSuccess); });
+  } else {
+    fallbackCopy(text, onSuccess);
+  }
+}
+
+/* ── Toast ──────────────────────────────────────────────────── */
+function showToast() {
+  var toast = document.getElementById('copy-toast');
+  if (!toast) return;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(function() {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(16px)';
+  }, 2500);
+}
+
+/* ── Keyboard: Escape closes modal ─────────────────────────── */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeCodeModal();
+});
+
+/* ── Smooth scroll for anchor links ─────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+/* ── Widget card click → select + open code modal ───────────── */
+document.querySelectorAll('.wcard').forEach(function(card) {
+  card.addEventListener('click', function(e) {
+    /* Don't double-fire if the inner button was directly clicked */
+    if (e.target.closest('button')) return;
+    var wtype = card.dataset.wtype;
+    if (wtype) openCodeModal(wtype);
+  });
+  /* Make card keyboard-navigable */
+  card.setAttribute('tabindex', '0');
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      var wtype = card.dataset.wtype;
+      if (wtype) openCodeModal(wtype);
+    }
+  });
+});
+</script>
+{% endblock %}

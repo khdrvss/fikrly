@@ -1,15 +1,51 @@
 // PWA Installation and Management
 (function() {
   'use strict';
+
+  const ENABLE_SERVICE_WORKER = false;
+  const SERVICE_WORKER_URL = '/service-worker.js?v=20260222-2';
   
   let deferredPrompt;
   
   // Register service worker
   if ('serviceWorker' in navigator) {
+    if (!ENABLE_SERVICE_WORKER) {
+      window.addEventListener('load', async () => {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((registration) => registration.unregister()));
+
+          if (window.caches && typeof window.caches.keys === 'function') {
+            const cacheNames = await window.caches.keys();
+            const fikrlyCaches = cacheNames.filter((name) => name.startsWith('fikrly'));
+            await Promise.all(fikrlyCaches.map((name) => window.caches.delete(name)));
+          }
+          console.log('Service worker disabled and stale caches cleared');
+        } catch (error) {
+          console.error('Service worker cleanup failed:', error);
+        }
+      });
+      return;
+    }
+
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
+      navigator.serviceWorker.register(SERVICE_WORKER_URL)
         .then(registration => {
           console.log('ServiceWorker registered:', registration.scope);
+
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
+
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
           
           // Check for updates every 24 hours
           setInterval(() => {
@@ -19,6 +55,13 @@
         .catch(error => {
           console.error('ServiceWorker registration failed:', error);
         });
+
+      let hasRefreshedForSw = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hasRefreshedForSw) return;
+        hasRefreshedForSw = true;
+        window.location.reload();
+      });
     });
   }
   

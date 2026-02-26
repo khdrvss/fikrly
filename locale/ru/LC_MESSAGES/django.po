@@ -996,22 +996,16 @@ msgid "ishonchli tanlov"
 msgstr "надежный выбор"
 
 #: frontend/templates/pages/home.html:37
-#, fuzzy
-#| msgid ""
-#| "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, "
-#| "ishonchli tanlov."
 msgid ""
 "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy mijozlar fikrlari "
 "orqali eng yaxshi bizneslarni toping."
 msgstr ""
-"Самая надежная платформа отзывов в Узбекистане. Реальные мнения, надежный "
-"выбор."
+"Самая надежная платформа отзывов в Узбекистане. Находите лучшие компании "
+"по реальным отзывам клиентов."
 
 #: frontend/templates/pages/home.html:51
-#, fuzzy
-#| msgid "Biznesni rivojlantirish"
 msgid "Bizneslarni qidirish"
-msgstr "Развитие бизнеса"
+msgstr "Поиск компаний"
 
 #: frontend/templates/pages/home.html:52
 msgid "Biznes nomi, kategoriya yoki joylashuvni qidiring..."

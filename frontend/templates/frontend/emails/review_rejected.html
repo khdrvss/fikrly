@@ -1,0 +1,34 @@
+{% extends 'frontend/emails/base.html' %}
+
+{% block content %}
+<div class="greeting">Salom, {{ user_name }}!</div>
+
+<div class="message">
+    <p>Afsuski, <strong>{{ company_name }}</strong> kompaniyasiga yozgan sharhingiz moderatsiyadan o'tmadi va platforma qoidalariga muvofiq olib tashlandi.</p>
+</div>
+
+<div class="review-box" style="border-left-color: #e53e3e;">
+    <div class="company" style="color: #e53e3e;">{{ company_name }}</div>
+    {% if reason %}
+    <p style="margin: 8px 0 0 0; color: #888;">
+        <strong>Sabab:</strong> {{ reason }}
+    </p>
+    {% else %}
+    <p style="margin: 8px 0 0 0; color: #888;">
+        Sharh platforma qoidalariga mos kelmadi.
+    </p>
+    {% endif %}
+</div>
+
+<div class="message">
+    <p>Agar xohlaydigan bo'lsangiz, qoidalarga rioya qilgan holda yangi sharh yozishingiz mumkin.</p>
+</div>
+
+<a href="{{ companies_url }}" class="button" style="background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);">Kompaniyalarga o'tish</a>
+
+<div class="message">
+    <p style="color: #888; font-size: 14px;">
+        Savollaringiz bo'lsa, <a href="mailto:support@fikrly.uz" style="color: #667eea;">support@fikrly.uz</a> ga murojaat qiling.
+    </p>
+</div>
+{% endblock %}

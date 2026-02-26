@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import get_language
+from django.utils.functional import cached_property
 import uuid
 
 
@@ -41,9 +42,15 @@ class BusinessCategory(models.Model):
     is_featured = models.BooleanField(
         default=False, help_text=_("Bosh sahifada ko'rsatish")
     )
+    is_active = models.BooleanField(
+        default=True,
+        help_text=_("Agar o'chirilsa, bu kategoriya va uning barcha kompaniyalari saytda ko'rinmaydi"),
+        verbose_name="Faol",
+    )
 
     class Meta:
-        verbose_name_plural = "Business Categories"
+        verbose_name_plural = "Biznes Kategoriyalar (Filtrlarda ishlatiladi)"
+        verbose_name = "Biznes Kategoriya"
         ordering = ["name"]
 
     def __str__(self):
@@ -64,7 +71,6 @@ class BusinessCategory(models.Model):
 
 class Company(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    category = models.CharField(max_length=100)
     category_fk = models.ForeignKey(
         BusinessCategory,
         on_delete=models.SET_NULL,
@@ -73,7 +79,6 @@ class Company(models.Model):
         related_name="companies",
     )
     city = models.CharField(max_length=100, blank=True)
-    description = models.TextField(blank=True)
     description = models.TextField(blank=True)
     image_url = models.URLField(blank=True)
     image = models.ImageField(upload_to="company_images/", blank=True, null=True)
@@ -158,6 +163,19 @@ class Company(models.Model):
     )
     is_active = models.BooleanField(
         default=True, help_text=_("Agar o'chirilsa, saytda ko'rinmaydi")
+    )
+    # Ownership claim state
+    is_claimed = models.BooleanField(
+        default=False,
+        help_text=_("Biznes egasi tomonidan egallangan va tasdiqlangan"),
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        related_name="owned_companies",
+        on_delete=models.SET_NULL,
+        help_text=_("Tasdiqlangan biznes egasi"),
     )
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     review_count = models.PositiveIntegerField(default=0)
@@ -258,12 +276,12 @@ class Company(models.Model):
             return self.description_ru
         return self.description
 
-    @property
+    @cached_property
     def display_logo(self) -> str:
-        """Return uploaded logo if file exists, then external URL, then backup URL."""
+        """Return uploaded logo URL, then external URL, then backup URL."""
         if self.logo:
             try:
-                if self.logo.name and self.logo.storage.exists(self.logo.name):
+                if self.logo.name:
                     return self.logo.url
             except Exception:
                 pass
@@ -328,6 +346,14 @@ class Review(models.Model):
             models.Index(fields=["company", "is_approved", "-created_at"]),
             models.Index(fields=["user", "is_approved", "-created_at"]),
             models.Index(fields=["company", "is_approved", "-helpful_count"]),
+        ]
+        constraints = [
+            # One review per authenticated user per company (NULLs are excluded by the DB)
+            models.UniqueConstraint(
+                fields=["user", "company"],
+                condition=models.Q(user__isnull=False),
+                name="unique_review_per_user_per_company",
+            ),
         ]
 
     def __str__(self) -> str:
@@ -445,6 +471,7 @@ class UserProfile(models.Model):
         auto_now_add=True, null=True, blank=True
     )
     approved_at = models.DateTimeField(null=True, blank=True)
+    username_change_log = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return f"Profile({self.user.username})"
@@ -531,58 +558,107 @@ class CompanyClaim(models.Model):
         return f"Claim({self.company.name}) by {self.email} [{self.status}]"
 
 
-class Category(models.Model):
-    COLOR_CHOICES = [
-        ("red", "Qizil"),
-        ("orange", "To'q sariq"),
-        ("yellow", "Sariq"),
-        ("green", "Yashil"),
-        ("blue", "Ko'k"),
-        ("purple", "Binafsha"),
-        ("pink", "Pushti"),
-        ("gray", "Kulrang"),
+def claim_proof_upload_path(instance, filename):
+    ext = filename.split(".")[-1]
+    return f"claim_proofs/{uuid.uuid4()}.{ext}"
+
+
+class BusinessOwnershipClaim(models.Model):
+    """Full ownership claim with document proof for moderation approval."""
+
+    POSITION_CHOICES = [
+        ("owner", "Egasi (Owner)"),
+        ("manager", "Menejer (Manager)"),
+        ("other", "Boshqa (Other)"),
     ]
 
-    name = models.CharField(max_length=100, unique=True, verbose_name="Kategoriya nomi")
-    slug = models.SlugField(max_length=100, unique=True, verbose_name="URL slug")
-    description = models.TextField(blank=True, verbose_name="Tavsif")
-    icon_svg = models.TextField(
+    STATUS_CHOICES = [
+        ("pending", "Kutilmoqda"),
+        ("approved", "Tasdiqlandi"),
+        ("rejected", "Rad etildi"),
+    ]
+
+    company = models.ForeignKey(
+        Company,
+        related_name="ownership_claims",
+        on_delete=models.CASCADE,
+        verbose_name=_("Kompaniya"),
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="ownership_claims",
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        verbose_name="SVG icon kodi",
-        help_text="SVG path elementi, masalan: <path d='M12 2L2 7L12 12L22 7L12 2Z'/>",
+        verbose_name=_("Foydalanuvchi"),
     )
-    color = models.CharField(
-        max_length=20, choices=COLOR_CHOICES, default="gray", verbose_name="Rang"
+
+    # Applicant info
+    full_name = models.CharField(max_length=200, verbose_name=_("To'liq ism"))
+    phone = models.CharField(max_length=30, verbose_name=_("Telefon raqam"))
+    email = models.EmailField(verbose_name=_("Email"))
+    position = models.CharField(
+        max_length=20,
+        choices=POSITION_CHOICES,
+        default="owner",
+        verbose_name=_("Lavozim"),
     )
-    is_active = models.BooleanField(default=True, verbose_name="Faol")
-    sort_order = models.PositiveIntegerField(
-        default=0, verbose_name="Tartib", help_text="Kichik raqam birinchi ko'rsatiladi"
+    proof_file = models.FileField(
+        upload_to=claim_proof_upload_path,
+        blank=True,
+        null=True,
+        verbose_name=_("Tasdiq hujjati"),
     )
+    comment = models.TextField(blank=True, verbose_name=_("Izoh"))
+
+    # Moderation
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+        db_index=True,
+        verbose_name=_("Holat"),
+    )
+    rejection_reason = models.TextField(blank=True, verbose_name=_("Rad etish sababi"))
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="reviewed_ownership_claims",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("Ko'rib chiqdi"),
+    )
+
+    # Telegram message tracking
+    telegram_message_id = models.CharField(max_length=50, blank=True)
+    telegram_chat_id = models.CharField(max_length=50, blank=True)
+
+    # Meta
+    request_ip = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["sort_order", "name"]
-        verbose_name = "Kategoriya"
-        verbose_name_plural = "Kategoriyalar"
+        ordering = ["-created_at"]
+        verbose_name = "Biznes egallash so'rovi"
+        verbose_name_plural = "Biznes egallash so'rovlari"
+        indexes = [
+            models.Index(fields=["company", "status"]),
+            models.Index(fields=["status", "-created_at"]),
+        ]
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return f"OwnershipClaim({self.company.name}) by {self.full_name} [{self.status}]"
 
     @property
-    def company_count(self):
-        """Return count of companies in this category"""
-        return Company.objects.filter(category=self.name).count()
-
-    @property
-    def review_count(self):
-        """Return total reviews for companies in this category"""
-        from django.db.models import Sum
-
-        result = Company.objects.filter(category=self.name).aggregate(
-            total_reviews=Sum("review_count")
-        )
-        return result["total_reviews"] or 0
+    def proof_file_url(self):
+        if self.proof_file:
+            try:
+                return self.proof_file.url
+            except Exception:
+                return ""
+        return ""
 
 
 class UserGamification(models.Model):
@@ -710,45 +786,6 @@ class Badge(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.name}"
-
-
-class TwoFactorAuth(models.Model):
-    """Two-factor authentication settings for users"""
-
-    user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="two_factor"
-    )
-    is_enabled = models.BooleanField(default=False)
-    secret_key = models.CharField(max_length=32, blank=True)
-    backup_codes = models.JSONField(default=list, help_text="List of backup codes")
-    last_used = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Two-Factor Authentication"
-        verbose_name_plural = "Two-Factor Authentications"
-
-    def __str__(self):
-        return (
-            f"{self.user.username} - 2FA {'Enabled' if self.is_enabled else 'Disabled'}"
-        )
-
-    def generate_backup_codes(self, count=10):
-        """Generate backup codes"""
-        import secrets
-
-        codes = [secrets.token_hex(4).upper() for _ in range(count)]
-        self.backup_codes = codes
-        self.save()
-        return codes
-
-    def use_backup_code(self, code):
-        """Use a backup code (one-time use)"""
-        if code in self.backup_codes:
-            self.backup_codes.remove(code)
-            self.save()
-            return True
-        return False
 
 
 class ReviewImage(models.Model):

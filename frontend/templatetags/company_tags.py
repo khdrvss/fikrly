@@ -2,6 +2,7 @@ from django import template
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 import datetime
+import hashlib
 
 register = template.Library()
 
@@ -81,3 +82,49 @@ def is_open_now(working_hours):
             return {"status": False, "text": _("Yopiq")}
     except ValueError:
         return {"status": False, "text": _("Noma'lum")}
+
+
+AVATAR_GRADIENTS = [
+    "from-emerald-400 to-emerald-500",
+    "from-sky-400 to-blue-500",
+    "from-violet-400 to-purple-500",
+    "from-pink-400 to-rose-500",
+    "from-amber-400 to-orange-500",
+    "from-cyan-400 to-teal-500",
+    "from-lime-400 to-green-500",
+    "from-fuchsia-400 to-indigo-500",
+]
+
+
+@register.filter
+def avatar_gradient(value):
+    seed = str(value or "anonymous")
+    digest = hashlib.md5(seed.encode("utf-8")).hexdigest()
+    index = int(digest[:8], 16) % len(AVATAR_GRADIENTS)
+    return AVATAR_GRADIENTS[index]
+
+
+@register.filter
+def avatar_style(value):
+    seed = str(value or "anonymous")
+    digest = hashlib.md5(seed.encode("utf-8")).hexdigest()
+    gradients = [
+        ("#ef4444", "#dc2626"),  # red
+        ("#f59e0b", "#d97706"),  # amber
+        ("#84cc16", "#65a30d"),  # lime
+        ("#10b981", "#059669"),  # emerald
+        ("#06b6d4", "#0891b2"),  # cyan
+        ("#3b82f6", "#2563eb"),  # blue
+        ("#6366f1", "#4f46e5"),  # indigo
+        ("#8b5cf6", "#7c3aed"),  # violet
+        ("#d946ef", "#c026d3"),  # fuchsia
+        ("#ec4899", "#db2777"),  # pink
+        ("#14b8a6", "#0d9488"),  # teal
+        ("#f97316", "#ea580c"),  # orange
+    ]
+    index = int(digest[:8], 16) % len(gradients)
+    c1, c2 = gradients[index]
+    return (
+        f"background-color: {c1}; "
+        f"background-image: linear-gradient(135deg, {c1}, {c2});"
+    )

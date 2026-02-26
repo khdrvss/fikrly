@@ -8,7 +8,7 @@ from .settings import *
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+        "NAME": BASE_DIR / "db_e2e.sqlite3",
     }
 }
 
@@ -36,9 +36,16 @@ PASSWORD_HASHERS = [
 #         return None
 # MIGRATION_MODULES = DisableMigrations()
 
-# Keep debug off in tests
-DEBUG = False
-TEMPLATE_DEBUG = False
+# Keep debug on in test settings so runserver can serve static assets for e2e.
+DEBUG = True
+TEMPLATE_DEBUG = True
+
+# E2E/local test runner uses plain HTTP; disable HTTPS-only redirects/cookies here.
+USE_HTTPS = False
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_SECONDS = 0
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 # Required for test security
 SECRET_KEY = "test-secret-key-for-testing-only-do-not-use-in-production"

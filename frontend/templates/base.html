@@ -30,7 +30,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Fikrly">
 
-    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="stylesheet" href="{% static_bust 'css/theme.css' %}">
     <link rel="stylesheet" href="{% static_bust 'dist/bundle.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -163,7 +163,7 @@
 <body class="bg-[var(--bg)] text-[var(--text-primary)] transition-colors duration-300 font-sans flex flex-col min-h-screen">
     <!-- Header Navigation (Trustpilot-style) -->
     <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
             <div class="flex justify-between items-center h-[72px]">
                 <!-- Logo & Nav Links -->
                 <div class="flex items-center gap-8">
@@ -195,43 +195,40 @@
 
                 <!-- Right: Language + Auth -->
                 <div class="flex items-center gap-3">
-                <!-- Right: Language + Auth -->
-                <div class="flex items-center gap-3">
                     <!-- Language Switcher -->
-                    <form action="{% url 'set_language' %}" method="post" class="hidden lg:block">
-                        {% csrf_token %}
-                        <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                        <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')" 
+                    {% get_translated_url 'uz' as lang_url_uz %}
+                    {% get_translated_url 'ru' as lang_url_ru %}
+                    <div class="hidden lg:block relative lang-wrapper">
+                        <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden'); event.stopPropagation();"
                                 class="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            {% get_current_language as LANGUAGE_CODE %}
                             {{ LANGUAGE_CODE|upper }}
                         </button>
-                        <div class="hidden absolute mt-2 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50">
-                            {% get_available_languages as LANGUAGES %}
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            {% for language in languages %}
-                            <button type="submit" name="language" value="{{ language.code }}"
-                                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 {% if language.code == LANGUAGE_CODE %}bg-emerald-50 text-emerald-600 font-medium{% else %}text-gray-700{% endif %}">
-                                {{ language.name_local }}
-                            </button>
-                            {% endfor %}
+                        <div class="lang-dropdown hidden absolute right-0 mt-2 w-36 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-50">
+                            <a href="{{ lang_url_uz }}"
+                               class="block px-4 py-2 text-sm hover:bg-gray-50 {% if LANGUAGE_CODE == 'uz' %}bg-emerald-50 text-emerald-600 font-medium{% else %}text-gray-700{% endif %}">
+                                O'zbek tili
+                            </a>
+                            <a href="{{ lang_url_ru }}"
+                               class="block px-4 py-2 text-sm hover:bg-gray-50 {% if LANGUAGE_CODE == 'ru' %}bg-emerald-50 text-emerald-600 font-medium{% else %}text-gray-700{% endif %}">
+                                Русский
+                            </a>
                         </div>
-                    </form>
+                    </div>
 
                     {% if user.is_authenticated %}
-                        <a href="{% url 'user_profile' %}" class="text-sm text-gray-700 hover:text-gray-900 font-medium">
+                        <a href="{% url 'user_profile' %}" class="hidden lg:inline text-sm text-gray-700 hover:text-gray-900 font-medium">
                             {{ user.first_name|default:user.username }}
                         </a>
-                        <form method="post" action="{% url 'account_logout' %}" class="inline">
+                        <form method="post" action="{% url 'account_logout' %}" class="hidden lg:inline">
                             {% csrf_token %}
                             <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">{% trans "Chiqish" %}</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'account_login' %}" class="text-sm text-gray-700 hover:text-gray-900 font-medium">{% trans "Kirish" %}</a>
-                        <a href="{% url 'account_signup' %}" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition whitespace-nowrap">
+                        <a href="{% url 'account_login' %}" class="hidden lg:inline text-sm text-gray-700 hover:text-gray-900 font-medium">{% trans "Kirish" %}</a>
+                        <a href="{% url 'account_signup' %}" class="hidden lg:inline-flex bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition whitespace-nowrap">
                             {% trans "Ro'yxatdan o'tish" %}
                         </a>
                     {% endif %}
@@ -247,32 +244,97 @@
         </div>
 
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white">
-            <div class="px-4 py-4 space-y-3">
+        <div id="mobile-menu" class="hidden lg:hidden border-t border-slate-200 bg-white shadow-lg">
+            <div class="px-4 py-4 space-y-1">
                 <!-- Mobile Search -->
-                <form method="get" action="{% url 'business_list' %}" class="relative">
-                    <input type="search" name="q" value="{{ request.GET.q }}" 
+                <form method="get" action="{% url 'business_list' %}" class="relative mb-3">
+                    <input type="search" name="q" value="{{ request.GET.q }}"
                            placeholder="{% trans 'Kompaniya qidiring...' %}"
-                           class="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
+                           class="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 text-sm">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </form>
-                
-                <a href="{% url 'category_browse' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">{% trans "Kategoriyalar" %}</a>
-                <a href="{% url 'business_list' %}" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg">{% trans "Kompaniyalar" %}</a>
+
+                <!-- Nav Links as list -->
+                <a href="{% url 'category_browse' %}" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 hover:bg-slate-50 transition-colors">
+                    <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                    </span>
+                    <span class="font-medium text-sm">{% trans "Kategoriyalar" %}</span>
+                    <svg class="w-4 h-4 text-slate-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+
+                <a href="{% url 'business_list' %}" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 hover:bg-slate-50 transition-colors">
+                    <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </span>
+                    <span class="font-medium text-sm">{% trans "Kompaniyalar" %}</span>
+                    <svg class="w-4 h-4 text-slate-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+
+                <a href="{% url 'review_submission' %}" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 hover:bg-slate-50 transition-colors">
+                    <span class="w-9 h-9 flex items-center justify-center rounded-lg bg-purple-50 text-purple-600 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </span>
+                    <span class="font-medium text-sm">{% trans "Sharh yozish" %}</span>
+                    <svg class="w-4 h-4 text-slate-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+
+                <!-- Language & Auth -->
+                <div class="pt-3 mt-2 border-t border-slate-100 space-y-3">
+                    <!-- Language Switcher -->
+                    <div class="flex gap-2">
+                        <a href="{{ lang_url_uz }}"
+                           class="flex-1 text-center px-3 py-2.5 text-sm rounded-xl font-medium {% if LANGUAGE_CODE == 'uz' %}bg-emerald-50 text-emerald-600{% else %}bg-slate-100 text-gray-600 hover:bg-slate-200{% endif %}">
+                            O'zbek
+                        </a>
+                        <a href="{{ lang_url_ru }}"
+                           class="flex-1 text-center px-3 py-2.5 text-sm rounded-xl font-medium {% if LANGUAGE_CODE == 'ru' %}bg-emerald-50 text-emerald-600{% else %}bg-slate-100 text-gray-600 hover:bg-slate-200{% endif %}">
+                            Русский
+                        </a>
+                    </div>
+
+                    <!-- Auth Buttons -->
+                    {% if user.is_authenticated %}
+                    <div class="flex gap-2">
+                        <a href="{% url 'user_profile' %}" class="flex-1 text-center px-3 py-2.5 text-sm bg-slate-100 hover:bg-slate-200 text-gray-700 rounded-xl font-medium truncate">
+                            {{ user.first_name|default:user.username }}
+                        </a>
+                        <form method="post" action="{% url 'account_logout' %}" class="flex-1">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full px-3 py-2.5 text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-xl font-medium">{% trans "Chiqish" %}</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="flex gap-2">
+                        <a href="{% url 'account_login' %}" class="flex-1 text-center px-3 py-2.5 text-sm bg-slate-100 hover:bg-slate-200 text-gray-700 rounded-xl font-medium">
+                            {% trans "Kirish" %}
+                        </a>
+                        <a href="{% url 'account_signup' %}" class="flex-1 text-center px-3 py-2.5 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl font-medium">
+                            {% trans "Ro'yxatdan o'tish" %}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </header>
 
     <main class="flex-grow">
         {% if messages %}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="hidden" aria-hidden="true">
             {% for message in messages %}
-            <div class="p-4 mb-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200{% elif message.tags == 'error' %}bg-red-100 text-red-700 border border-red-200{% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %} relative shadow-sm"
-                role="alert">
-                <span class="block sm:inline">{{ message }}</span>
-            </div>
+            <div
+                data-flash-message="{{ message|escape }}"
+                data-flash-level="{{ message.tags|default:'info' }}"
+            ></div>
             {% endfor %}
         </div>
         {% endif %}
@@ -280,117 +342,271 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <!-- Company Info -->
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <img src="{% static 'favicons/favicon.png' %}" alt="Fikrly" class="w-8 h-8 rounded-lg">
-                        <span class="text-2xl font-bold">Fikrly</span>
+    {# JSON-LD Organization structured data #}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Fikrly",
+      "url": "https://fikrly.uz",
+      "logo": "https://fikrly.uz/static/favicons/favicon.png",
+      "sameAs": [
+        "https://t.me/fikrly_support",
+        "https://www.instagram.com/fikrlyuz/"
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+998936895105",
+          "contactType": "customer service",
+          "email": "fikrlyuzb@gmail.com",
+          "availableLanguage": ["Uzbek", "Russian"]
+        }
+      ]
+    }
+    </script>
+
+    <footer class="bg-gray-900 text-white mt-auto" role="contentinfo" aria-label="{% trans 'Sayt pastki qismi' %}">
+
+        {# ── Widget CTA strip — only shown to business owners or anonymous users, hidden for regular consumers to reduce noise #}
+        {% if not request.user.is_authenticated or request.user.owned_companies.exists %}
+        <div class="border-b border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-center sm:text-left">
+                        <p class="text-sm font-semibold text-white">{% trans "Saytingizga ishonch qo'shing" %}</p>
+                        <p class="text-sm text-gray-400 mt-0.5 leading-relaxed">{% trans "Fikrly badge'ini o'rnating — mijozlar sizga ko'proq ishonadi." %}</p>
                     </div>
-                    <p class="text-gray-400 mb-6">
+                    <a href="{% url 'widgets_page' %}"
+                       class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 focus:bg-gray-700 text-white text-sm font-medium rounded-lg border border-gray-700 hover:border-gray-600 focus:border-[#18C58F] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#18C58F] focus:ring-offset-2 focus:ring-offset-gray-900"
+                       data-track="footer-widget-cta"
+                       aria-label="{% trans 'Widget o\'rnatish haqida batafsil' %}">
+                        <svg class="w-3.5 h-3.5 text-[#18C58F]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                        {% trans "Widget o'rnatish" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {# ── Main 4-column nav ── #}
+        <nav aria-label="{% trans 'Sayt xaritasi' %}">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+
+                {# ── Col 1: Brand + contact + socials ── #}
+                <div>
+                    <a href="{% url 'index' %}" class="inline-flex items-center gap-2 mb-4 group" aria-label="Fikrly {% trans 'bosh sahifasi' %}">
+                        <img src="{% static 'favicons/favicon.png' %}" alt="" aria-hidden="true" class="w-7 h-7 rounded-lg">
+                        <span class="text-base font-bold tracking-tight group-hover:text-[#18C58F] transition-colors duration-200">Fikrly</span>
+                    </a>
+                    <p class="text-sm text-gray-400 leading-relaxed mb-6">
                         {% trans "O'zbekistonning eng ishonchli sharh platformasi. Haqiqiy fikrlar, ishonchli tanlov." %}
                     </p>
 
-                    <!-- Contact Info -->
-                    <div class="space-y-3 mb-6">
-                        <a href="tel:+998936895105"
-                            class="flex items-center text-gray-400 hover:text-white transition-colors group">
-                            <div
-                                class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mr-3 group-hover:bg-primary-600 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                    </path>
+                    {# Contact #}
+                    <address class="not-italic space-y-2.5 mb-6">
+                        <div>
+                            <a href="tel:+998936895105"
+                               class="inline-flex items-center gap-2.5 text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               aria-label="{% trans 'Telefon raqam' %}: +998 93 689 51 05">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                 </svg>
-                            </div>
-                            <span>+998 93 689 51 05</span>
-                        </a>
-                        <a href="mailto:fikrlyuzb@gmail.com"
-                            class="flex items-center text-gray-400 hover:text-white transition-colors group">
-                            <div
-                                class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mr-3 group-hover:bg-primary-600 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                    </path>
+                                +998 93 689 51 05
+                            </a>
+                        </div>
+                        <div>
+                            {# Email obfuscated via HTML entity encoding to reduce bot harvesting #}
+                            <a href="mailto:fikrlyuzb&#64;gmail&#46;com"
+                               class="inline-flex items-center gap-2.5 text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               aria-label="{% trans 'Email manzil' %}: fikrlyuzb@gmail.com">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                 </svg>
-                            </div>
-                            <span>fikrlyuzb@gmail.com</span>
-                        </a>
-                    </div>
+                                fikrlyuzb&#64;gmail&#46;com
+                            </a>
+                        </div>
+                    </address>
 
-                    <!-- Social Links -->
-                    <div class="flex space-x-3">
-                        <a href="https://t.me/fikrly_support" target="_blank" rel="noopener"
-                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#229ED9] hover:text-white transition-all"
-                            aria-label="Telegram">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.638z" />
+                    {# Social links #}
+                    <div class="flex gap-2" role="list" aria-label="{% trans 'Ijtimoiy tarmoqlar' %}">
+                        <a href="https://t.me/fikrly_support"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#229ED9] hover:text-white focus:bg-[#229ED9] focus:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#229ED9] focus:ring-offset-2 focus:ring-offset-gray-900"
+                           aria-label="{% trans 'Telegram kanalimiz' %} ({% trans 'yangi qimda ochiladi' %})"
+                           role="listitem"
+                           data-track="footer-social-telegram">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.638z"/>
                             </svg>
                         </a>
-                        <a href="https://www.instagram.com/fikrlyuz/" target="_blank" rel="noopener"
-                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gradient-to-br hover:from-[#833ab4] hover:via-[#fd1d1d] hover:to-[#fcb045] hover:text-white transition-all"
-                            aria-label="Instagram">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                        <a href="https://www.instagram.com/fikrlyuz/"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-[#E1306C] hover:text-white focus:bg-[#E1306C] focus:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#E1306C] focus:ring-offset-2 focus:ring-offset-gray-900"
+                           aria-label="{% trans 'Instagram sahifamiz' %} ({% trans 'yangi oymada ochiladi' %})"
+                           role="listitem"
+                           data-track="footer-social-instagram">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                             </svg>
                         </a>
                     </div>
                 </div>
 
-                <!-- Quick Links -->
+                {# ── Col 2: Quick links ── #}
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">{% trans "Tezkor havolalar" %}</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'index' %}" class="text-gray-400 hover:text-white transition-colors">{% trans "Bosh sahifa" %}</a></li>
-                        <li><a href="{% url 'category_browse' %}"
-                                class="text-gray-400 hover:text-white transition-colors">{% trans "Kategoriyalar" %}</a>
+                    <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-4">{% trans "Tezkor havolalar" %}</h3>
+                    <ul class="space-y-2.5" role="list">
+                        <li>
+                            <a href="{% url 'index' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-nav-home">{% trans "Bosh sahifa" %}</a>
                         </li>
-                        <li><a href="{% url 'business_profile' %}"
-                                class="text-gray-400 hover:text-white transition-colors">{% trans "Bizneslar" %}</a>
+                        <li>
+                            <a href="{% url 'category_browse' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-nav-categories">{% trans "Kategoriyalar" %}</a>
                         </li>
-                        <li><a href="{% url 'review_submission' %}"
-                                class="text-gray-400 hover:text-white transition-colors">{% trans "Sharh yozish" %}</a>
+                        <li>
+                            <a href="{% url 'business_list' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-nav-businesses">{% trans "Bizneslar" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'review_submission' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-nav-write-review">{% trans "Sharh yozish" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'advanced_search' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-nav-search">{% trans "Qidirish" %}</a>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Business -->
+                {# ── Col 3: Business ── #}
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">{% trans "Biznes uchun" %}</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'business_dashboard' %}"
-                                class="text-gray-400 hover:text-white transition-colors">{% trans "Biznes paneli" %}</a>
+                    <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-4">{% trans "Biznes uchun" %}</h3>
+                    <ul class="space-y-2.5" role="list">
+                        {% if request.user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'business_dashboard' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-biz-dashboard">{% trans "Biznes paneli" %}</a>
                         </li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{% trans "Biznesni ro'yxatga olish" %}</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">{% trans "Reklama berish" %}</a></li>
+                        {% else %}
+                        <li>
+                            <a href="{% url 'account_login' %}?next={% url 'business_dashboard' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-biz-login">{% trans "Biznes paneli" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'account_signup' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-biz-register">{% trans "Biznesni ro'yxatga olish" %}</a>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <a href="{% url 'contact_us' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-biz-advertise">{% trans "Reklama berish" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'widgets_page' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 inline-flex items-center gap-1.5 group focus:outline-none focus:underline"
+                               data-track="footer-biz-widget">
+                                {% trans "Widget o'rnatish" %}
+                                <svg class="w-3 h-3 text-gray-600 group-hover:text-gray-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
-                <!-- Support -->
+                {# ── Col 4: Support / Legal ── #}
                 <div>
-                    <h3 class="text-lg font-semibold mb-4">{% trans "Yordam" %}</h3>
-                    <ul class="space-y-2">
-                        <li><a href="{% url 'contact_us' %}" class="text-gray-400 hover:text-white transition-colors">{% trans "Bog'lanish" %}</a></li>
-                        <li><a href="{% url 'privacy_policy' %}" class="text-gray-400 hover:text-white transition-colors">{% trans "Maxfiylik siyosati" %}</a></li>
-                        <li><a href="{% url 'terms_of_service' %}" class="text-gray-400 hover:text-white transition-colors">{% trans "Foydalanish shartlari" %}</a></li>
-                        <li><a href="{% url 'community_guidelines' %}" class="text-gray-400 hover:text-white transition-colors">{% trans "Hamjamiyat qoidalari" %}</a></li>
+                    <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-4">{% trans "Yordam" %}</h3>
+                    <ul class="space-y-2.5" role="list">
+                        <li>
+                            <a href="{% url 'contact_us' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-support-contact">{% trans "Bog'lanish" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'privacy_policy' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-legal-privacy">{% trans "Maxfiylik siyosati" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'terms_of_service' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-legal-terms">{% trans "Foydalanish shartlari" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'community_guidelines' %}"
+                               class="text-sm text-gray-400 hover:text-white focus:text-white transition-colors duration-200 focus:outline-none focus:underline"
+                               data-track="footer-legal-guidelines">{% trans "Hamjamiyat qoidalari" %}</a>
+                        </li>
                     </ul>
                 </div>
-            </div>
 
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
-                <p class="text-gray-500">{% trans "© 2025 Fikrly. Barcha huquqlar himoyalangan." %}</p>
             </div>
         </div>
+        </nav>
+
+        {# ── Bottom bar ── #}
+        <div class="border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p class="text-xs text-gray-500">
+                        © {% now "Y" %} Fikrly. {% trans "Barcha huquqlar himoyalangan." %}
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <a href="{% url 'privacy_policy' %}" class="text-xs text-gray-600 hover:text-gray-400 transition-colors duration-200 focus:outline-none focus:underline">{% trans "Maxfiylik" %}</a>
+                        <span class="text-gray-700" aria-hidden="true">·</span>
+                        <a href="{% url 'terms_of_service' %}" class="text-xs text-gray-600 hover:text-gray-400 transition-colors duration-200 focus:outline-none focus:underline">{% trans "Shartlar" %}</a>
+                        <span class="text-gray-700" aria-hidden="true">·</span>
+                        <span class="text-xs text-gray-600">🇺🇿 O'zbekiston</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </footer>
+
+    {# ── Minimal footer tracking ── #}
+    <script>
+    (function() {
+      document.addEventListener('click', function(e) {
+        var el = e.target.closest('[data-track]');
+        if (!el) return;
+        var label = el.getAttribute('data-track');
+        // Fire into any analytics layer that exists
+        if (window.gtag) { gtag('event', 'footer_click', { event_label: label }); }
+        if (window.ym)   { ym(window._ym_id, 'reachGoal', label); }
+        if (window.dataLayer) { dataLayer.push({ event: 'footer_click', label: label }); }
+      }, { passive: true });
+    }());
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Close language dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                document.querySelectorAll('.lang-dropdown').forEach(function(dd) {
+                    if (!dd.closest('.lang-wrapper').contains(e.target)) {
+                        dd.classList.add('hidden');
+                    }
+                });
+            });
+
             // Mobile Menu Toggle
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -409,32 +625,33 @@
                 });
             }
 
-            // Back to Top Button
-            const backToTopBtn = document.createElement('button');
-            backToTopBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>';
-            backToTopBtn.className = 'fixed bottom-8 right-8 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-all duration-300 opacity-0 translate-y-10 z-50';
-            backToTopBtn.setAttribute('aria-label', 'Back to top');
-            document.body.appendChild(backToTopBtn);
+            // Convert Django flash messages to popup toasts for clearer feedback
+            const flashNodes = document.querySelectorAll('[data-flash-message]');
+            flashNodes.forEach((node) => {
+                const text = (node.dataset.flashMessage || '').trim();
+                const level = (node.dataset.flashLevel || 'info').toLowerCase();
+                if (!text) return;
 
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 300) {
-                    backToTopBtn.classList.remove('opacity-0', 'translate-y-10');
-                } else {
-                    backToTopBtn.classList.add('opacity-0', 'translate-y-10');
+                if (window.Toast && typeof window.Toast.show === 'function') {
+                    const normalized = level === 'error' ? 'error' : (level === 'success' ? 'success' : 'info');
+                    window.Toast.show(text, normalized, 3500);
+                    return;
                 }
-            });
 
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                const fallback = document.createElement('div');
+                fallback.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[1200] px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white ${level === 'error' ? 'bg-red-600' : (level === 'success' ? 'bg-green-600' : 'bg-blue-600')}`;
+                fallback.textContent = text;
+                document.body.appendChild(fallback);
+                setTimeout(() => fallback.remove(), 3200);
             });
         });
     </script>
 
     <!-- UI Enhancements: Toast, Skeleton, Form Validation -->
-    <script src="{% static 'js/ui-enhancements.js' %}"></script>
+    <script defer src="{% static_bust 'js/ui-enhancements.v2.js' %}"></script>
 
     <!-- PWA Install Prompt -->
-    <script src="{% static 'js/pwa-install.js' %}"></script>
+    <script defer src="{% static_bust 'js/pwa-install.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

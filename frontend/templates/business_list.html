@@ -1,0 +1,87 @@
+<div class="search-section">
+  <div class="relative">
+    <input id="businessSearchInput" type="text" placeholder="Search businesses..." class="w-full h-11 px-4 pr-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500" autocomplete="off" />
+    <div id="searchSpinner" class="hidden absolute right-3 top-1/2 -translate-y-1/2">
+      <svg class="w-5 h-5 animate-spin text-slate-500" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+    </div>
+  </div>
+
+  <div id="businessSearchResults" class="mt-3 space-y-2"></div>
+</div>
+
+<script>
+  (function () {
+    const input = document.getElementById('businessSearchInput');
+    const resultsBox = document.getElementById('businessSearchResults');
+    const spinner = document.getElementById('searchSpinner');
+    let timer = null;
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlight(text, query) {
+      if (!text) return '';
+      const safe = escapeRegex(query.trim());
+      if (!safe) return text;
+      return text.replace(new RegExp(`(${safe})`, 'ig'), '<mark class="bg-yellow-200 px-0.5 rounded">$1</mark>');
+    }
+
+    function renderBusinesses(items, query) {
+      if (!Array.isArray(items) || items.length === 0) {
+        resultsBox.innerHTML = '<div class="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-600">No businesses found</div>';
+        return;
+      }
+
+      resultsBox.innerHTML = items.map((item) => {
+        const logo = item.logo
+          ? `<img src="${item.logo}" alt="${item.name}" class="w-11 h-11 rounded-lg object-cover border border-slate-200">`
+          : `<div class="w-11 h-11 rounded-lg border border-slate-200 bg-slate-100"></div>`;
+
+        return `
+          <a href="/business/${item.id}/" class="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 hover:bg-slate-50 transition-colors">
+            ${logo}
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-semibold text-slate-900 truncate">${highlight(item.name || '', query)}</div>
+              <div class="mt-1 flex items-center gap-2">
+                <span class="text-xs text-amber-600 font-medium">★ ${Number(item.rating || 0).toFixed(1)}</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">${item.category || ''}</span>
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    async function searchBusinesses(raw) {
+      const query = (raw || '').trim();
+      if (query.length < 2) {
+        resultsBox.innerHTML = '';
+        return;
+      }
+
+      spinner.classList.remove('hidden');
+      try {
+        const response = await fetch(`/api/search/?q=${encodeURIComponent(query)}`, {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        });
+        const data = await response.json();
+        const businessesOnly = (data.results || []).filter((item) => item && item.id && item.name);
+        renderBusinesses(businessesOnly, query);
+      } catch (_) {
+        resultsBox.innerHTML = '<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">No businesses found</div>';
+      } finally {
+        spinner.classList.add('hidden');
+      }
+    }
+
+    input.addEventListener('input', (e) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => searchBusinesses(e.target.value), 300);
+    });
+  })();
+</script>

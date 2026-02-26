@@ -2,51 +2,160 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Sharhni tahrirlash | Fikrly" %}{% endblock %}
+{% block title %}{% trans "Sharhni tahrirlash" %} | {{ review.company.name }} | Fikrly{% endblock %}
 
 {% block content %}
-<div class="bg-primary min-h-screen py-12">
-    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-elevated rounded-2xl shadow-sm border border-borderPrimary p-8">
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-textPrimary">{% trans "Sharhni tahrirlash" %}</h1>
-            </div>
+<div class="min-h-screen bg-[var(--bg)] py-8 px-4">
+  <div class="max-w-2xl mx-auto">
 
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
+    <!-- Back link -->
+    <a href="{% url 'user_profile' %}" class="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-6 transition">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      {% trans "Profilga qaytish" %}
+    </a>
 
-                {% if form.non_field_errors %}
-                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                    {{ form.non_field_errors }}
-                </div>
-                {% endif %}
-
-                <div>
-                    <label for="{{ form.rating.id_for_label }}" class="block text-sm font-medium text-textSecondary mb-1">{% trans "Baho" %}</label>
-                    {{ form.rating }}
-                    {% if form.rating.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.rating.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div>
-                    <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-textSecondary mb-1">{% trans "Matn" %}</label>
-                    {{ form.text }}
-                    {% if form.text.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.text.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-4 border-t border-borderPrimary">
-                    <a href="{% url 'user_profile' %}" class="px-4 py-2 border border-borderPrimary shadow-sm text-sm font-medium rounded-lg text-textSecondary bg-elevated hover:bg-secondary transition-colors">
-                        {% trans "Bekor qilish" %}
-                    </a>
-                    <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-[var(--accent)] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
-                        {% trans "Saqlash" %}
-                    </button>
-                </div>
-            </form>
-        </div>
+    <!-- Company card -->
+    <div class="flex items-center gap-4 bg-[var(--surface)] border border-[var(--border)] rounded-2xl px-5 py-4 mb-6">
+      {% if review.company.display_logo %}
+      <img src="{{ review.company.display_logo }}" alt="{{ review.company.name }}" class="w-12 h-12 rounded-xl object-contain bg-[var(--bg)] border border-[var(--border)] p-1">
+      {% else %}
+      <div class="w-12 h-12 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center text-[var(--accent)] font-bold text-lg">
+        {{ review.company.name|first }}
+      </div>
+      {% endif %}
+      <div>
+        <div class="font-semibold text-[var(--text-primary)]">{{ review.company.name }}</div>
+        <div class="text-xs text-[var(--text-secondary)] mt-0.5">{{ review.company.city }}{% if review.company.category_fk %} &middot; {{ review.company.category_fk.name }}{% endif %}</div>
+      </div>
     </div>
+
+    <!-- Moderation notice -->
+    <div class="flex gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl px-4 py-3 mb-6 text-sm text-amber-800 dark:text-amber-300">
+      <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      <span>{% trans "Tahrirlangandan so'ng sharh qayta moderatsiyaga yuboriladi va administrator tasdiqlagunga qadar ko'rinmaydi." %}</span>
+    </div>
+
+    <!-- Main form card -->
+    <div class="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+      <h1 class="text-xl font-bold text-[var(--text-primary)] mb-6">{% trans "Sharhni tahrirlash" %}</h1>
+
+      <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Star rating -->
+        <div>
+          <label class="block text-sm font-semibold text-[var(--text-primary)] mb-3">{% trans "Baholash" %}</label>
+          <div class="flex gap-2" id="starRating">
+            {% for i in "12345" %}
+            <button type="button" data-value="{{ i }}"
+              class="star-btn text-4xl leading-none transition-transform hover:scale-110 focus:outline-none"
+              aria-label="{{ i }} yulduz">
+              &#9733;
+            </button>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="rating" id="ratingInput" value="{{ review.rating }}">
+          {% if form.rating.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ form.rating.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Review text -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="id_text" class="text-sm font-semibold text-[var(--text-primary)]">{% trans "Sharh matni" %}</label>
+            <span id="charCount" class="text-xs text-[var(--text-secondary)]">0 / 2000</span>
+          </div>
+          {% blocktrans asvar placeholder %}Tajribangiz haqida to'liqroq yozing...{% endblocktrans %}
+          <textarea name="text" id="id_text" rows="6"
+            class="w-full px-4 py-3 text-sm bg-[var(--bg)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none transition"
+            placeholder="{{ placeholder }}"
+            maxlength="2000">{{ form.text.value }}</textarea>
+          {% if form.text.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ form.text.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Receipt upload -->
+        <div>
+          <label class="block text-sm font-semibold text-[var(--text-primary)] mb-2">{% trans "Xarid cheki" %} <span class="font-normal text-[var(--text-secondary)]">({% trans 'ixtiyoriy' %})</span></label>
+          {% if review.receipt %}
+          <div class="text-xs text-[var(--text-secondary)] mb-2">{% trans "Hozirgi:" %} <a href="{{ review.receipt.url }}" target="_blank" class="text-[var(--accent)] underline">{% trans "Ko'rish" %}</a></div>
+          {% endif %}
+          <label class="flex items-center gap-3 px-4 py-3 bg-[var(--bg)] border border-dashed border-[var(--border)] rounded-xl cursor-pointer hover:border-[var(--accent)] transition">
+            <svg class="w-5 h-5 text-[var(--text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.414 6.586a6 6 0 108.485 8.485L20.5 13"/></svg>
+            <span class="text-sm text-[var(--text-secondary)]">{% trans "Fayl tanlash" %}</span>
+            <input type="file" name="receipt" accept="image/*" class="hidden" id="receiptInput">
+          </label>
+          <span id="receiptName" class="text-xs text-[var(--text-secondary)] mt-1 block"></span>
+          {% if form.receipt.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ form.receipt.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-between pt-4 border-t border-[var(--border)]">
+          <a href="{% url 'user_profile' %}"
+            class="px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] border border-[var(--border)] rounded-xl hover:bg-[var(--bg)] transition">
+            {% trans "Bekor qilish" %}
+          </a>
+          <button type="submit"
+            class="px-6 py-2.5 text-sm font-semibold text-white bg-[var(--accent)] hover:opacity-90 rounded-xl transition">
+            {% trans "Saqlash va yuborish" %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
+
+<script>
+(function() {
+  const stars = document.querySelectorAll('.star-btn');
+  const input = document.getElementById('ratingInput');
+  const textarea = document.getElementById('id_text');
+  const charCount = document.getElementById('charCount');
+  const receiptInput = document.getElementById('receiptInput');
+  const receiptName = document.getElementById('receiptName');
+
+  let current = parseInt(input.value) || 0;
+
+  function paintStars(val) {
+    stars.forEach(s => {
+      const v = parseInt(s.dataset.value);
+      s.style.color = v <= val ? '#f59e0b' : 'var(--border)';
+    });
+  }
+
+  stars.forEach(s => {
+    s.addEventListener('mouseenter', () => paintStars(parseInt(s.dataset.value)));
+    s.addEventListener('mouseleave', () => paintStars(current));
+    s.addEventListener('click', () => {
+      current = parseInt(s.dataset.value);
+      input.value = current;
+      paintStars(current);
+    });
+  });
+
+  paintStars(current);
+
+  function updateCount() {
+    const len = textarea.value.length;
+    charCount.textContent = len + ' / 2000';
+    charCount.style.color = len > 1800 ? '#ef4444' : '';
+  }
+  textarea.addEventListener('input', updateCount);
+  updateCount();
+
+  receiptInput && receiptInput.addEventListener('change', function() {
+    receiptName.textContent = this.files[0] ? this.files[0].name : '';
+  });
+})();
+</script>
 {% endblock %}

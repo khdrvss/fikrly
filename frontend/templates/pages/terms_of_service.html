@@ -1,57 +1,95 @@
-{% load static %}
-{% load static_bust %}
+{% extends 'legal/base_legal.html' %}
 {% load i18n %}
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% trans "Foydalanish shartlari | Fikrly" %}</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}">
-  <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon.png' %}">
-  <link rel="manifest" href="{% static 'manifest.json' %}">
-  <link rel="stylesheet" href="{% static_bust 'dist/bundle.css' %}">
-</head>
-<body class="bg-background">
-  <header class="bg-surface shadow-subtle">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <a href="{% url 'index' %}" class="text-2xl font-bold text-primary">Fikrly</a>
-    </div>
-  </header>
 
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <h1 class="text-3xl font-bold text-primary mb-6">{% trans "Foydalanish shartlari" %}</h1>
-    <div class="prose max-w-none text-text-secondary">
-      <p>{% trans "Oxirgi yangilanish: 2025-09-22" %}</p>
-      <p>{% trans "Ushbu Foydalanish shartlari Fikrly platformasidan foydalanish qoidalarini belgilaydi. Platformadan foydalanish orqali ushbu shartlarga rozilik bildirasiz." %}</p>
-      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "1. Hisob qaydnoması" %}</h2>
-      <ul class="list-disc ml-6">
-        <li>{% trans "Roʻyxatdan oʻtish uchun haqiqiy email talab qilinadi. Email tasdiqlanmaguncha ayrim imkoniyatlar yopiq boʻlishi mumkin." %}</li>
-        <li>{% trans "Profil maʼlumotlarini yangilab turing; firibgarlik va soxtalashtirish taqiqlanadi." %}</li>
-      </ul>
-      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "2. Kontent va sharhlar" %}</h2>
-      <ul class="list-disc ml-6">
-        <li>{% trans "Haqorat, nafrat, yolgʻon axborot, spamlarga yoʻl qoʻyilmaydi." %}</li>
-        <li>{% trans "Sharhlar real tajribaga asoslanishi va foydali boʻlishi kerak." %}</li>
-        <li>{% trans "Qoida buzilishida kontentni oʻchirish yoki cheklash huquqiga egamiz." %}</li>
-      </ul>
-      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "3. Biznes egalari" %}</h2>
-      <ul class="list-disc ml-6">
-        <li>{% trans "Javob yozishda hurmat saqlang; manipulyativ yoki sotib olingan sharhlarga ruxsat berilmaydi." %}</li>
-      </ul>
-      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "4. Maʼlumotlar va maxfiylik" %}</h2>
-      <p>{% trans "Maxfiylik siyosati bilan tanishing:" %} <a class="text-primary underline" href="{% url 'privacy_policy' %}">{% trans "Maxfiylik siyosati" %}</a>.</p>
-      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "5. Masʼuliyat cheklovi" %}</h2>
-      <p>{% trans "Platformadan \"boricha\" foydalaniladi; uchinchi tomon kontenti uchun javobgar emasmiz." %}</p>
-      <h2 class="text-xl font-semibold text-primary mt-6">{% trans "6. Bogʻlanish" %}</h2>
-      <p>{% trans "Taklif va murojaatlar uchun:" %} <a class="underline" href="mailto:fikrlyuzb@gmail.com">fikrlyuzb@gmail.com</a></p>
-    </div>
-  </main>
+{% block title %}{% trans "Foydalanish shartlari" %} | Fikrly{% endblock %}
+{% block meta_description %}{% trans "Fikrly platformasidan foydalanish shartlari va qoidalari." %}{% endblock %}
+{% block schema_name %}{% trans "Foydalanish shartlari" %} | Fikrly{% endblock %}
 
-  <footer class="bg-primary text-white py-8 mt-12">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <a href="{% url 'index' %}" class="underline">Bosh sahifa</a>
-    </div>
-  </footer>
-</body>
-</html>
+{% block breadcrumb_label %}{% trans "Foydalanish shartlari" %}{% endblock %}
+
+{% block page_icon %}
+<svg class="w-5 h-5 text-[#18C58F]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+</svg>
+{% endblock %}
+
+{% block page_title %}{% trans "Foydalanish shartlari" %}{% endblock %}
+{% block last_updated %}{% trans "Oxirgi yangilanish: 2025 yil 22 sentyabr" %}{% endblock %}
+
+{% block page_intro %}
+<p class="mt-3 text-sm text-gray-500 dark:text-gray-400 max-w-2xl leading-relaxed">
+  {% trans "Ushbu shartlar Fikrly platformasidan foydalanish qoidalarini belgilaydi. Platformadan foydalanish orqali ushbu shartlarga rozilik bildirasiz." %}
+</p>
+{% endblock %}
+
+{% block toc %}
+<aside class="hidden lg:block">
+  <div class="sticky top-24">
+    <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">{% trans "Mundarija" %}</p>
+    <nav aria-label="{% trans 'Sahifa mundarijasi' %}">
+      <a href="#account" class="toc-link">{% trans "1. Hisob qaydnomasi" %}</a>
+      <a href="#content" class="toc-link">{% trans "2. Kontent va sharhlar" %}</a>
+      <a href="#business" class="toc-link">{% trans "3. Biznes egalari" %}</a>
+      <a href="#data" class="toc-link">{% trans "4. Ma'lumotlar" %}</a>
+      <a href="#liability" class="toc-link">{% trans "5. Mas'uliyat cheklovi" %}</a>
+      <a href="#contact" class="toc-link">{% trans "6. Bog'lanish" %}</a>
+    </nav>
+  </div>
+</aside>
+{% endblock %}
+
+{% block article_label %}{% trans "Foydalanish shartlari mazmuni" %}{% endblock %}
+
+{% block legal_content %}
+<section id="account">
+  <h2>{% trans "1. Hisob qaydnomasi" %}</h2>
+  <ul>
+    <li>{% trans "Ro'yxatdan o'tish uchun haqiqiy email talab qilinadi. Email tasdiqlanmaguncha ayrim imkoniyatlar yopiq bo'lishi mumkin." %}</li>
+    <li>{% trans "Profil ma'lumotlarini yangilab turing; firibgarlik va soxtalashtirish taqiqlanadi." %}</li>
+    <li>{% trans "Hisobingiz xavfsizligi uchun kuchli parol ishlating va uni hech kimga bermang." %}</li>
+  </ul>
+</section>
+
+<section id="content">
+  <h2>{% trans "2. Kontent va sharhlar" %}</h2>
+  <ul>
+    <li>{% trans "Haqorat, nafrat, yolg'on axborot, spamlarga yo'l qo'yilmaydi." %}</li>
+    <li>{% trans "Sharhlar real tajribaga asoslanishi va foydali bo'lishi kerak." %}</li>
+    <li>{% trans "Qoida buzilishida kontentni o'chirish yoki cheklash huquqiga egamiz." %}</li>
+  </ul>
+  <div class="callout">
+    <p>{% trans "Barcha sharhlar moderatsiyadan o'tadi. Shubhali yoki qoidabuzar kontent darhol o'chiriladi." %}</p>
+  </div>
+</section>
+
+<section id="business">
+  <h2>{% trans "3. Biznes egalari" %}</h2>
+  <ul>
+    <li>{% trans "Javob yozishda hurmat saqlang; manipulyativ yoki sotib olingan sharhlarga ruxsat berilmaydi." %}</li>
+    <li>{% trans "Biznes ma'lumotlarini to'g'ri va dolzarb holatda saqlang." %}</li>
+    <li>{% trans "Soxta sharhlar yoki reyting manipulyatsiyasi hisobni bloklashga olib keladi." %}</li>
+  </ul>
+</section>
+
+<section id="data">
+  <h2>{% trans "4. Ma'lumotlar va maxfiylik" %}</h2>
+  <p>{% trans "Ma'lumotlaringiz qanday ishlatilishi haqida batafsil:" %}
+    <a href="{% url 'privacy_policy' %}">{% trans "Maxfiylik siyosati" %}</a>.
+  </p>
+</section>
+
+<section id="liability">
+  <h2>{% trans "5. Mas'uliyat cheklovi" %}</h2>
+  <p>{% trans "Platforma \"boricha\" taqdim etiladi; uchinchi tomon kontenti uchun javobgar emasmiz. Texnik uzilishlar, ma'lumot yo'qotish yoki foyda ko'rmaslik uchun to'lov da'vo qilinmaydi." %}</p>
+</section>
+
+<section id="contact">
+  <h2>{% trans "6. Bog'lanish" %}</h2>
+  <p>{% trans "Taklif va murojaatlar uchun:" %}
+    <a href="mailto:fikrlyuzb&#64;gmail&#46;com">fikrlyuzb&#64;gmail&#46;com</a>
+    {% trans "yoki" %}
+    <a href="{% url 'contact_us' %}">{% trans "aloqa formi" %}</a>
+    {% trans "orqali murojaat qiling." %}
+  </p>
+</section>
+{% endblock %}

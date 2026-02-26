@@ -18,16 +18,29 @@ Including another URLconf
 from django.urls import path, include
 from django.contrib import admin
 from django.conf import settings
+
+# Custom error handlers (only active when DEBUG=False)
+handler404 = "core.views.custom_404"
+handler500 = "core.views.custom_500"
 from django.conf.urls.static import static
 from django.contrib.sitemaps.views import sitemap
 from frontend.sitemaps import CompanySitemap, StaticSitemap, CategorySitemap
-from frontend.views import robots_txt, bing_site_auth, favicon_file, service_worker
+from frontend.views import (
+    robots_txt,
+    bing_site_auth,
+    favicon_file,
+    service_worker,
+    safe_set_language,
+)
+from frontend.moderation_views import telegram_webhook
 from django.conf.urls.i18n import i18n_patterns
 from django.views.generic import TemplateView
 
 urlpatterns = [
+    path("i18n/setlang/", safe_set_language, name="set_language"),
     path("i18n/", include("django.conf.urls.i18n")),
     path("robots.txt", robots_txt, name="robots_txt"),
+    path("api/tg/webhook/", telegram_webhook, name="telegram_webhook"),
     path("BingSiteAuth.xml", bing_site_auth, name="bing_site_auth"),
     path(
         "sitemap.xml",

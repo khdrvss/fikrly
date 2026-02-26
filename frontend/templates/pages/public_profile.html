@@ -49,6 +49,20 @@
                     <p class="text-[var(--text-secondary)]">{{ profile.bio }}</p>
                 </div>
                 {% endif %}
+
+                {% if gamification %}
+                <div class="mt-6 pt-6 border-t border-[var(--border)] flex items-center gap-4 flex-wrap">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-300">
+                        ⭐ {% trans "Daraja" %} {{ gamification.level }}
+                    </span>
+                    <span class="text-sm text-[var(--text-secondary)]">{{ gamification.xp }} XP</span>
+                    {% for badge in badges %}
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300" title="{{ badge.badge_name }}">
+                        🏅 {{ badge.badge_name }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
         </div>
 

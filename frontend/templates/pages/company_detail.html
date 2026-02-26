@@ -5,793 +5,1222 @@
 {% load company_tags %}
 
 {% block title %}{{ company.name }} sharhlar va reyting | Fikrly.uz{% endblock %}
-
-{% block meta_description %}{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari. Xizmat sifati,
-afzalliklari va kamchiliklari — bularning barchasi Fikrly.uz platformasida.{% endblock %}
+{% block meta_description %}{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari. Xizmat sifati, afzalliklari va kamchiliklari — bularning barchasi Fikrly.uz platformasida.{% endblock %}
 
 {% block extra_head %}
 <meta property="og:type" content="business.business" />
 <meta property="og:title" content="{{ company.name }} sharhlar va reyting | Fikrly.uz" />
-<meta property="og:description"
-    content="{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari. Xizmat sifati, afzalliklari va kamchiliklari — bularning barchasi Fikrly.uz platformasida." />
+<meta property="og:description" content="{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari." />
 <meta property="og:image" content="{{ company.display_image_url|default:company.image_url }}" />
-
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="{{ company.name }} sharhlar va reyting | Fikrly.uz" />
-<meta name="twitter:description"
-    content="{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari. Xizmat sifati, afzalliklari va kamchiliklari — bularning barchasi Fikrly.uz platformasida." />
+<meta name="twitter:description" content="{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari." />
 <meta name="twitter:image" content="{{ company.display_image_url|default:company.image_url }}" />
 <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [{
-        "@type": "ListItem",
-        "position": 1,
-        "name": "{% trans 'Bosh sahifa' %}",
-        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'index' %}"
-      },{
-        "@type": "ListItem",
-        "position": 2,
-        "name": "{% trans 'Bizneslar' %}",
-        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'business_list' %}"
-      },{
-        "@type": "ListItem",
-        "position": 3,
-        "name": "{{ company.name }}",
-        "item": "{{ request.build_absolute_uri }}"
-      }]
-    }
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type":"ListItem","position":1,"name":"{% trans 'Bosh sahifa' %}","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'index' %}"},
+    {"@type":"ListItem","position":2,"name":"{% trans 'Bizneslar' %}","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'business_list' %}"},
+    {"@type":"ListItem","position":3,"name":"{{ company.name }}","item":"{{ request.build_absolute_uri }}"}
+  ]
+}
+</script>
 <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "{{ company.name }}",
-      "image": "{{ company.display_image_url|default:company.image_url }}",
-      "@id": "{{ request.build_absolute_uri }}",
-      "url": "{{ request.build_absolute_uri }}",
-      "telephone": "{{ company.phone_public }}",
-      "email": "{{ company.email_public }}",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "{{ company.address }}",
-        "addressLocality": "{{ company.city|default:'Tashkent' }}",
-        "addressCountry": "UZ"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "{{ company.rating }}",
-        "reviewCount": "{{ company.review_count }}",
-        "bestRating": "5",
-        "worstRating": "1"
-      }
-    }
-    </script>
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "{{ company.name }}",
+  "image": "{{ company.display_image_url|default:company.image_url }}",
+  "@id": "{{ request.build_absolute_uri }}",
+  "url": "{{ request.build_absolute_uri }}",
+  "telephone": "{{ company.phone_public }}",
+  "address": {"@type":"PostalAddress","streetAddress":"{{ company.address }}","addressLocality":"{{ company.city|default:'Tashkent' }}","addressCountry":"UZ"},
+  "aggregateRating": {"@type":"AggregateRating","ratingValue":"{{ company.rating }}","reviewCount":"{{ company.review_count }}","bestRating":"5","worstRating":"1"}
+}
+</script>
+<style>
+  /* ── TABS ── */
+  .tab-link { position: relative; }
+  .tab-underline {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .tab-link.active .tab-underline { opacity: 1; }
+  .tab-link.active { color: #111827; font-weight: 600; }
+
+  /* ── RATING BARS ── */
+  .star-row { transition: opacity 0.15s ease; }
+  .star-row:hover { opacity: 0.75; }
+
+  /* ── SCROLLBARS ── */
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ── SIMILAR COMPANIES CAROUSEL ── */
+  .similar-card {
+    flex-shrink: 0;
+    width: 160px;
+    scroll-snap-align: start;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  @media (hover: hover) {
+    .similar-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,0.11); }
+  }
+  .similar-card:active { transform: scale(0.97); }
+
+  /* ── REVIEW CARDS LIFT ── */
+  article.review-card {
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+  }
+  @media (hover: hover) {
+    article.review-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); transform: translateY(-1px); }
+  }
+
+  /* ── STAR GLOW ON HOVER ── */
+  .star-glow:hover svg { filter: drop-shadow(0 0 4px rgba(24,197,143,0.5)); }
+
+  /* ── PRIMARY CTA HOVER SCALE ── */
+  .btn-primary {
+    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(24,197,143,0.35); }
+  .btn-primary:active { transform: scale(0.98); box-shadow: none; }
+
+  /* ── SECTION DIVIDERS ── */
+  .section-divider { border: 0; border-top: 1px solid #F3F4F6; margin: 0; }
+
+  /* ── TRUST BLOCK ACCENT ── */
+  .trust-block {
+    background: #F9FBFF;
+    border-left: 4px solid #18C58F;
+    border-radius: 0 16px 16px 0;
+  }
+
+  /* ── TAB NAV BUTTONS ── */
+  #tabNav .tab-nav-btn {
+    transition: background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  #tabNav .tab-nav-btn:hover { transform: translateY(-1px); }
+  #tabNav .tab-nav-btn:active { transform: scale(0.98); }
+</style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="relative bg-surface-light dark:bg-surface-dark pb-12">
-    <!-- Cover Image -->
-    <div class="relative w-full h-[280px] md:h-[340px] overflow-hidden">
-        <!-- Breadcrumbs Overlay -->
-        <div class="absolute top-0 left-0 w-full z-20 pt-4">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <nav class="flex" aria-label="Breadcrumb">
-                    <ol
-                        class="inline-flex items-center space-x-1 md:space-x-3 bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                        <li class="inline-flex items-center">
-                            <a href="{% url 'index' %}"
-                                class="inline-flex items-center text-sm font-medium text-white hover:text-white/80">
-                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
-                                    </path>
-                                </svg>
-                                {% trans "Bosh sahifa" %}
-                            </a>
-                        </li>
-                        <li>
-                            <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                <a href="{% url 'category_browse' %}"
-                                    class="ml-1 text-sm font-medium text-white hover:text-white/80 md:ml-2">{% trans "Kategoriyalar" %}</a>
-                            </div>
-                        </li>
-                        {% if company.category_fk %}
-                        <li>
-                            <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white/60" aria-hidden="true" fill="currentColor"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                <a href="{% url 'business_list_by_category' category_slug=company.category_fk.slug %}"
-                                    class="ml-1 text-sm font-medium text-white hover:text-white/80 md:ml-2">{{ company.category_fk.display_name }}</a>
-                            </div>
-                        </li>
-                        {% endif %}
-                        <li aria-current="page">
-                            <div class="flex items-center">
-                                <svg class="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="ml-1 text-sm font-medium text-white/90 md:ml-2">{{ company.name }}</span>
-                            </div>
-                        </li>
-                    </ol>
-                </nav>
-            </div>
+<div class="min-h-screen bg-[#F9FAFB]">
+
+  {# ── MINIMAL TOP NAV ── #}
+  <nav class="sticky top-0 z-40 bg-white border-b border-[#E5E7EB]">
+    <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="javascript:history.back()" class="flex items-center gap-1.5 text-[#6B7280] hover:text-[#111827] transition-colors text-sm font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        <span class="hidden sm:inline">{% trans "Orqaga" %}</span>
+      </a>
+      <div class="flex items-center gap-1">
+        <button id="shareBtn" data-share-url="{{ request.build_absolute_uri }}"
+          title="{% trans 'Ulashish' %}"
+          class="w-10 h-10 flex items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] hover:text-[#111827] hover:border-[#D1D5DB] hover:bg-[#F9FAFB] transition-colors">
+          <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+          </svg>
+        </button>
+        <button id="likeBtn"
+          data-auth="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
+          data-liked="{% if liked_state %}1{% else %}0{% endif %}"
+          data-like-url="{% url 'like_company' company.pk %}"
+          title="{% trans 'Saqlash' %}"
+          {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'"{% endif %}
+          class="w-10 h-10 flex items-center justify-center rounded-full border border-[#E5E7EB] hover:border-red-200 hover:bg-red-50 transition-colors {% if liked_state %}text-red-500 border-red-200 bg-red-50{% else %}text-[#6B7280]{% endif %}">
+          <svg id="likeIcon" class="w-[18px] h-[18px]" fill="{% if liked_state %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  {# ── BUSINESS HERO ── #}
+  <section id="heroSection" class="border-b border-[#E8F5F0]" style="background: linear-gradient(160deg, #F8FFFC 0%, #F0FDF8 100%);">
+    <div class="max-w-3xl mx-auto px-4 pt-6 pb-6">
+
+      {# Row 1: Logo (72px) + Name/Meta #}
+      <div class="flex items-start gap-4 mb-5">
+
+        {# Logo — 72px with soft shadow #}
+        <div class="w-[72px] h-[72px] rounded-xl bg-white overflow-hidden flex-shrink-0 flex items-center justify-center"
+          style="box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.05);">
+          {% if company.display_logo %}
+          <img src="{{ company.display_logo }}" alt="{{ company.name }} logo"
+            class="w-full h-full object-contain p-1.5"
+            style="transform: scale(calc({{ company.logo_scale|default:100 }} / 100));"
+            onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.classList.remove('hidden')">
+          <span class="hidden text-2xl font-bold text-[#18C58F]">{{ company.name|slice:":1"|upper }}</span>
+          {% else %}
+          <span class="text-2xl font-bold text-[#18C58F]">{{ company.name|slice:":1"|upper }}</span>
+          {% endif %}
         </div>
 
-        <!-- TODO: Change default company cover image here. Recommended size: 1600x800px -->
-        {% static 'images/placeholder.png' as default_cover %}
-        <img src="{{ company.image_800_url|default:company.display_image_url|default:company.image_url|default:default_cover }}"
-            alt="{{ company.name }} cover"
-            data-lightbox="{{ company.display_image_url|default:company.image_url|default:default_cover }}"
-            class="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
-            onerror="this.src='{{ default_cover }}'">
-    </div>
+        {# Name + meta #}
+        <div class="flex-1 min-w-0 pt-1">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <h1 class="text-2xl font-semibold text-[#111827] leading-tight tracking-tight">{{ company.name }}</h1>
+            {% if company.is_verified %}
+            <span title="{% trans 'Tasdiqlangan profil' %}" class="flex-shrink-0">
+              <svg class="w-5 h-5 text-[#18C58F]" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            </span>
+            {% endif %}
+          </div>
+          <p class="text-xs text-[#6B7280] flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            {% if company.category_fk %}
+            <a href="{% url 'business_list_by_category' category_slug=company.category_fk.slug %}"
+              class="hover:text-[#18C58F] transition-colors font-medium">{{ company.category_fk.display_name }}</a>
+            {% endif %}
+            {% if company.city %}<span class="text-[#D1D5DB]">•</span><span>{{ company.city }}</span>{% endif %}
+            {% if years_on_site %}<span class="text-[#D1D5DB]">•</span><span>{{ years_on_site }} yildan beri</span>{% endif %}
+          </p>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div class="flex flex-col md:flex-row items-start md:items-end -mt-16 md:-mt-20 mb-6 gap-6">
-            <!-- Logo -->
-            <div
-                class="relative z-10 -mt-16 md:-mt-20 ml-6 md:ml-10 w-28 h-28 md:w-32 md:h-32 rounded-2xl shadow-2xl bg-[var(--surface)] ring-4 ring-[var(--bg)] transition-transform duration-300 hover:scale-105 overflow-hidden">
-                <div class="w-full h-full rounded-2xl overflow-hidden relative bg-bg-light dark:bg-bg-dark">
-                    {% if company.display_logo %}
-                    <img src="{{ company.display_logo }}" alt="{{ company.name }} logo"
-                        class="w-full h-full object-cover absolute inset-0"
-                        style="transform: scale(calc({{ company.logo_scale|default:100 }} / 100));"
-                        onerror="this.onerror=null;this.src='https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear';">
-                    {% else %}
-                    <img src="https://api.dicebear.com/7.x/shapes/svg?seed={{ company.name|urlencode }}&backgroundColor=b6e3f4,c0aede,d1d4f9&backgroundType=gradientLinear"
-                        alt="{{ company.name }} logo" class="w-full h-full object-cover absolute inset-0">
-                    {% endif %}
-                </div>
+          {# Inline rating in hero — compact #}
+          {% if company.review_count > 0 %}
+          <div class="flex items-center gap-1.5 mt-2">
+            <div class="flex items-center gap-0.5 star-glow">
+              {% for i in "12345" %}
+              <svg class="w-3.5 h-3.5 {% if company.rating >= forloop.counter %}text-[#18C58F]{% else %}text-[#D1D5DB]{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              {% endfor %}
             </div>
-
-            <!-- Title & Meta -->
-            <div class="flex-1 text-white md:mb-2 z-10 md:z-auto">
-                <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
-                    {{ company.name }}
-                    {% if company.is_verified %}
-                    <svg class="w-8 h-8 text-green-500 bg-white rounded-full p-0.5" fill="currentColor"
-                        viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    {% endif %}
-                </h1>
-                <div
-                    class="flex flex-wrap items-center gap-3 mt-2 text-sm md:text-base font-medium text-white/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)]">
-                    {% with cat=company.category_fk %}
-                    <span class="px-3 py-1 rounded-full
-                            {% if cat.color == 'red' %}bg-red-50 text-red-600
-                            {% elif cat.color == 'orange' %}bg-orange-50 text-orange-600
-                            {% elif cat.color == 'yellow' %}bg-yellow-50 text-yellow-600
-                            {% elif cat.color == 'green' %}bg-green-50 text-green-600
-                            {% elif cat.color == 'blue' %}bg-primary-50 text-primary-600
-                            {% elif cat.color == 'purple' %}bg-purple-50 text-purple-600
-                            {% elif cat.color == 'pink' %}bg-pink-50 text-pink-600
-                            {% else %}bg-gray-100 text-gray-600{% endif %}">
-                        {{ cat.display_name|default:company.category }}
-                    </span>
-                    {% endwith %}
-                    {% if company.city %}
-                    <span class="flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                            </path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        {{ company.city }}
-                    </span>
-                    {% endif %}
-                    {% if years_on_site %}
-                    <span>• {% blocktrans with years=years_on_site %}{{ years }} yil saytda{% endblocktrans %}</span>
-                    {% endif %}
-                </div>
-
+            <span class="text-sm font-bold text-[#111827]">{{ company.rating }}</span>
+            <span class="text-xs text-[#9CA3AF]">({{ company.review_count }} sharh)</span>
+          </div>
+          {% else %}
+          <div class="mt-2 flex items-center gap-1.5">
+            <div class="flex items-center gap-0.5">
+              {% for i in "12345" %}<svg class="w-3.5 h-3.5 text-[#E5E7EB]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>{% endfor %}
             </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-3 md:w-auto mt-4 md:mt-0 md:mb-2">
-                <a href="{% url 'review_submission' %}?company={{ company.pk }}"
-                    class="btn-primary px-4 py-2 md:px-6 md:py-3 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2 font-semibold text-sm md:text-base">
-                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                        </path>
-                    </svg>
-                    {% trans "Sharh yozish" %}
-                </a>
-                <button id="likeBtn"
-                    class="btn-outline px-3 py-2 md:px-4 md:py-3 rounded-xl border-border-light dark:border-border-dark hover:border-border-light hover:text-slate-700 dark:hover:text-slate-200 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors flex items-center gap-2 bg-surface-light dark:bg-surface-dark text-slate-700 dark:text-slate-200"
-                    data-auth="{% if request.user.is_authenticated %}1{% else %}0{% endif %}"
-                    data-liked="{% if liked_state %}1{% else %}0{% endif %}"
-                    data-like-url="{% url 'like_company' company.pk %}" {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'" {% endif %}>
-                    <svg id="likeIcon" class="w-5 h-5 md:w-6 md:h-6"
-                        fill="{% if liked_state %}currentColor{% else %}none{% endif %}" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                        </path>
-                    </svg>
-                    <span id="likeCount" class="font-medium">{{ company.like_count }}</span>
-                </button>
-                <button data-copy="{{ request.build_absolute_uri }}" data-copy-message="Kompaniya havolasi nusxalandi!"
-                    data-tooltip="Havolani ulashish"
-                    class="btn-outline px-3 py-2 md:px-4 md:py-3 rounded-xl border-border-light dark:border-border-dark hover:border-border-light hover:text-slate-700 dark:hover:text-slate-200 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors flex items-center gap-2 bg-surface-light dark:bg-surface-dark text-slate-700 dark:text-slate-200">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                    </svg>
-                </button>
-            </div>
+            <span class="text-xs text-[#9CA3AF]">{% trans "Hali sharh yo'q" %}</span>
+          </div>
+          {% endif %}
         </div>
+      </div>
+
+      {# CTA Row — Primary (write review) + optional secondary (website) #}
+      <div class="flex gap-3">
+        <a href="{% url 'review_submission' %}?company={{ company.pk }}"
+          class="btn-primary {% if company.website %}flex-[65]{% else %}flex-1{% endif %} h-[52px] min-w-0 flex items-center justify-center gap-2 bg-[#18C58F] text-white font-semibold rounded-full text-[15px]"
+          style="box-shadow: 0 4px 14px rgba(24,197,143,0.30);">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          <span>{% trans "Sharh yozish" %}</span>
+        </a>
+        {% if company.website %}
+        <a href="{{ company.website }}" target="_blank" rel="noopener"
+          class="flex-[35] h-[52px] min-w-0 flex items-center justify-center gap-1.5 border border-[#D1E8DF] text-[#374151] font-medium rounded-full hover:bg-white hover:border-[#18C58F]/40 transition-colors text-[13px] overflow-hidden bg-white/60">
+          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+          <span class="truncate">{% trans "Veb-sayt" %}</span>
+        </a>
+        {% endif %}
+      </div>
+
     </div>
-</div>
+  </section>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-20">
-    <div class="grid lg:grid-cols-3 gap-8">
-        <!-- Left Column: Main Content -->
-        <div class="lg:col-span-2 space-y-8">
-
-            <!-- About Section -->
-            {% if company.display_description or company.website or company.facebook_url or company.instagram_url or company.telegram_url %}
-            <section
-                class="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-sm border border-border-light dark:border-border-dark mb-8">
-                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">{% trans "Kompaniya haqida" %}
-                </h2>
-                {% if company.display_description %}
-                <p class="text-muted-light dark:text-muted-dark leading-relaxed">{{ company.display_description }}</p>
-                {% endif %}
-
-                <div class="mt-6 flex flex-wrap gap-3">
-                    {% if company.website %}
-                    <a href="{{ company.website }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-primary-600 transition-colors text-sm font-medium">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
-                            </path>
-                        </svg>
-                        {% trans "Veb-saytga o'tish" %}
-                    </a>
-                    {% endif %}
-                    {% if company.facebook_url %}
-                    <a href="{{ company.facebook_url }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-lg transition-colors text-sm font-medium">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M22 12a10 10 0 1 0-11.6 9.87v-6.99H7.9V12h2.5V9.79c0-2.46 1.47-3.82 3.72-3.82 1.08 0 2.2.19 2.2.19v2.42h-1.24c-1.22 0-1.6.76-1.6 1.54V12h2.72l-.43 2.88h-2.29v6.99A10 10 0 0 0 22 12Z" />
-                        </svg>
-                        Facebook
-                    </a>
-                    {% endif %}
-                    {% if company.instagram_url %}
-                    <a href="{{ company.instagram_url }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-lg transition-colors text-sm font-medium">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.75a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5z" />
-                        </svg>
-                        Instagram
-                    </a>
-                    {% endif %}
-                    {% if company.telegram_url %}
-                    <a href="{{ company.telegram_url }}" target="_blank" rel="noopener"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded-lg transition-colors text-sm font-medium">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path
-                                d="M9.9 14.2l-.4 5.6c.6 0 .9-.3 1.2-.7l2.9-2.8 6.1 4.5c1.1.6 1.8.3 2.1-1l3.8-17.7c.4-1.7-.6-2.4-1.7-2l-22.4 8.6c-1.5.6-1.5 1.4-.3 1.8l5.7 1.8L19 6.1c.8-.5 1.6-.2 1 0l-10.1 8.1z" />
-                        </svg>
-                        Telegram
-                    </a>
-                    {% endif %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- Rating Overview -->
-            <section class="bg-surface-light dark:bg-surface-dark rounded-2xl p-6 shadow-sm border border-green-200">
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="text-center md:text-left">
-                        <div>
-                            <p class="text-sm text-muted-light dark:text-muted-dark">Top-rated in this category</p>
-                            <div
-                                class="text-6xl font-extrabold tracking-tight bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
-                                {{ company.rating }}</div>
-                        </div>
-                        <div class="flex items-center justify-center md:justify-start gap-1 my-2">
-                            {% for i in "12345" %}
-                            {% if company.rating >= i|add:0 %}
-                            <svg class="w-6 h-6 text-yellow-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            {% else %}
-                            <svg class="w-6 h-6 text-gray-200" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                        <div class="text-sm text-gray-500 font-medium">{% blocktrans with count=company.review_count %}{{ count }} ta sharh asosida{% endblocktrans %}</div>
-                    </div>
-
-                    <div class="flex-1 w-full space-y-2">
-                        {% for row in rating_distribution %}
-                        <a href="?{{ qs_no_stars }}stars={{ row.star }}" class="flex items-center gap-3 group">
-                            <span class="text-sm font-medium text-gray-600 w-3">{{ row.star }}</span>
-                            <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <div class="flex-1 h-2 relative overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                                <div class="h-full bg-yellow-400 transition-all duration-700 rounded-full"
-                                    style="width: {{ row.percent }}%"></div>
-                            </div>
-                            <span class="text-xs text-gray-400 w-8 text-right">{{ row.percent }}%</span>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </section>
-
-            <!-- Reviews List -->
-            <section id="reviews">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold text-gray-900">{% trans "Sharhlar" %}</h2>
-
-                    <!-- Filter Dropdown -->
-                    <div class="relative inline-block text-left">
-                        <form method="get" class="flex items-center gap-2">
-                            <select name="sort"
-                                class="form-select text-sm border-gray-200 rounded-lg focus:ring-primary-500 focus:border-primary-500"
-                                onchange="this.form.submit()">
-                                <option value="most_liked" {% if current_sort == 'most_liked' %}selected{% endif %}>{% trans "Eng ko'p layk" %}</option>
-                                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>{% trans "Eng yangi" %}</option>
-                                <option value="highest" {% if current_sort == 'highest' %}selected{% endif %}>{% trans "Yuqori baho" %}</option>
-                                <option value="lowest" {% if current_sort == 'lowest' %}selected{% endif %}>{% trans "Past baho" %}</option>
-                            </select>
-                            {% for key, val in request.GET.items %}
-                            {% if key != 'sort' and key != 'page' %}
-                            <input type="hidden" name="{{ key }}" value="{{ val }}" />
-                            {% endif %}
-                            {% endfor %}
-                        </form>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    {% for r in reviews %}
-                    <article
-                        class="rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-6 bg-white dark:bg-gray-800">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-500 text-white font-semibold flex items-center justify-center">
-                                    {{ r.user_name|slice:":1"|upper }}
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        {% if r.user %}
-                                        <a href="{% url 'public_profile' r.user.username %}"
-                                            class="font-semibold text-gray-900 hover:text-primary-600 hover:underline transition-colors">
-                                            {{ r.user_name }}
-                                        </a>
-                                        {% else %}
-                                        <div class="font-semibold text-gray-900">{{ r.user_name }}</div>
-                                        {% endif %}
-
-                                        {% if r.verified_purchase %}
-                                        <span class="relative inline-flex items-center">
-                                            <span
-                                                class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-20 animate-ping"></span>
-                                            <div class="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium border border-green-100 z-10"
-                                                title="{% trans 'Foydalanuvchi xarid chekini taqdim etgan' %}">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                                {% trans "Tasdiqlangan xarid" %}
-                                            </div>
-                                        </span>
-                                        {% endif %}
-                                    </div>
-                                    <div class="text-xs text-gray-500">{{ r.created_at|date:"d M, Y" }}</div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg">
-                                <span class="font-bold text-gray-900">{{ r.rating }}</span>
-                                <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ r.text }}</p>
-
-                        {% if r.owner_response_text %}
-                        <div class="mt-4 pl-4 border-l-4 border-primary-100 bg-primary-50/50 p-4 rounded-r-lg">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs font-bold text-primary-600 uppercase tracking-wider">{% trans "Biznes javobi" %}</span>
-                                <span class="text-xs text-gray-400">• {{ r.owner_response_at|date:"d M, Y" }}</span>
-                            </div>
-                            <p class="text-gray-600 text-sm">{{ r.owner_response_text }}</p>
-                        </div>
-                        {% endif %}
-
-                        <div class="mt-4 flex items-center justify-between text-sm">
-                            <button
-                                class="review-like-btn flex items-center gap-1 text-gray-500 hover:text-red-500 transition-colors {% if r.is_liked_by_user %}text-red-500{% endif %}"
-                                data-review-id="{{ r.pk }}" data-like-url="{% url 'like_review' r.pk %}" {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'; return false;"{% endif %}>
-                                <svg class="w-5 h-5"
-                                    fill="{% if r.is_liked_by_user %}currentColor{% else %}none{% endif %}"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
-                                <span class="like-count font-medium">{{ r.like_count }}</span>
-                            </button>
-
-                            <a href="{% url 'report_review' r.pk %}"
-                                class="text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                {% trans "Shikoyat" %}
-                            </a>
-                        </div>
-                    </article>
-                    {% empty %}
-                    <div class="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200">
-                        <div class="text-gray-400 mb-2">
-                            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-medium text-gray-900">{% trans "Hozircha sharhlar yo'q" %}</h3>
-                        <p class="text-gray-500">{% trans "Birinchi bo'lib o'z fikringizni qoldiring!" %}</p>
-                        <a href="{% url 'review_submission' %}?company={{ company.pk }}"
-                            class="inline-block mt-4 text-primary-600 font-medium hover:underline">{% trans "Sharh yozish" %} &rarr;</a>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Pagination -->
-                {% if reviews.has_other_pages %}
-                {% load url_params %}
-                <div class="mt-12 flex justify-center">
-                    <nav class="flex items-center space-x-2" aria-label="Pagination">
-                        {% if reviews.has_previous %}
-                        <a href="?{% url_replace request 'page' reviews.previous_page_number %}"
-                            class="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                            <span class="sr-only">{% trans "Oldingi" %}</span>
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7"></path>
-                            </svg>
-                        </a>
-                        {% else %}
-                        <span class="p-2 rounded-lg border border-gray-100 text-gray-300 cursor-not-allowed">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 19l-7-7 7-7"></path>
-                            </svg>
-                        </span>
-                        {% endif %}
-
-                        {% for i in reviews.paginator.page_range %}
-                        {% if reviews.number == i %}
-                        <span class="px-4 py-2 rounded-lg bg-primary-600 text-white font-medium shadow-sm">{{ i }}</span>
-                        {% elif i > reviews.number|add:'-3' and i < reviews.number|add:'3' %} <a
-                            href="?{% url_replace request 'page' i %}"
-                            class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                            {{ i }}</a>
-                            {% endif %}
-                            {% endfor %}
-
-                            {% if reviews.has_next %}
-                            <a href="?{% url_replace request 'page' reviews.next_page_number %}"
-                                class="p-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                                <span class="sr-only">{% trans "Keyingi" %}</span>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </a>
-                            {% else %}
-                            <span class="p-2 rounded-lg border border-gray-100 text-gray-300 cursor-not-allowed">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </span>
-                            {% endif %}
-                    </nav>
-                </div>
-                {% endif %}
-            </section>
-
-
+  {# ── RATING SUMMARY CARD ── #}
+  {% if company.review_count > 0 %}
+  <section class="max-w-3xl mx-auto px-4 mt-4">
+    <div class="bg-white rounded-2xl border border-[#E5E7EB] p-5 sm:p-6" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+      <div class="flex gap-6 items-start">
+        <div class="flex-shrink-0 text-center min-w-[72px]">
+          <div class="text-5xl font-extrabold text-[#111827] leading-none mb-1 relative inline-block">
+            {{ company.rating }}
+            <span class="rating-tooltip-anchor">
+              <svg class="w-3.5 h-3.5 text-[#C4C9D4] cursor-help absolute -top-1 -right-4" fill="currentColor" viewBox="0 0 20 20" aria-label="Reyting haqida" title="Reyting tasdiqlangan sharhlar asosida hisoblanadi"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+            </span>
+          </div>
+          <div class="text-xs font-semibold text-[#18C58F] uppercase tracking-wide mb-1">
+            {% if company.rating >= 4.5 %}A'lo{% elif company.rating >= 4.0 %}Yaxshi{% elif company.rating >= 3.0 %}O'rtacha{% else %}Past{% endif %}
+          </div>
+          <div class="text-xs text-[#6B7280]">{{ company.review_count }} sharh</div>
         </div>
-
-        <!-- Right Column: Sidebar -->
-        <aside class="space-y-6">
-            <!-- Contact Info Card -->
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-green-200">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans "Bog'lanish" %}</h3>
-                <div class="space-y-4">
-                    {% if company.address %}
-                    <div class="flex items-start gap-3">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0 text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">{% trans "Manzil" %}
-                            </div>
-                            <div class="text-gray-900">{{ company.address }}</div>
-                            {% if map_url %}
-                            <a href="{{ map_url }}" target="_blank"
-                                class="text-sm text-primary-600 hover:underline mt-1 inline-block">{% trans "Xaritada ko'rish" %}</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if company.phone_public %}
-                    <div class="flex items-start gap-3">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0 text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="w-full">
-                            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">{% trans "Telefon" %}
-                            </div>
-                            {% if request.user.is_authenticated %}
-                            <button id="revealPhone" data-url="{% url 'reveal_contact' company.pk 'phone' %}"
-                                class="text-primary-600 hover:underline font-medium">{% trans "Raqamni ko'rsatish" %}</button>
-                            {% else %}
-                            <a href="{% url 'account_login' %}?next={{ request.path }}"
-                                class="text-primary-600 hover:underline font-medium">{% trans "Raqamni ko'rsatish" %}</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    {% if company.email_public %}
-                    <div class="flex items-start gap-3">
-                        <div
-                            class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center flex-shrink-0 text-gray-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                        </div>
-                        <div class="w-full">
-                            <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">{% trans "Email" %}
-                            </div>
-                            {% if request.user.is_authenticated %}
-                            <button id="revealEmail" data-url="{% url 'reveal_contact' company.pk 'email' %}"
-                                class="text-primary-600 hover:underline font-medium">{% trans "Emailni ko'rsatish" %}</button>
-                            {% else %}
-                            <a href="{% url 'account_login' %}?next={{ request.path }}"
-                                class="text-primary-600 hover:underline font-medium">{% trans "Emailni ko'rsatish" %}</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
+        <div class="flex-1 space-y-2 pt-1">
+          {% for row in rating_distribution %}
+          <a href="?{{ qs_no_stars }}stars={{ row.star }}" class="star-row flex items-center gap-2.5">
+            <span class="text-xs font-medium text-[#6B7280] w-2 flex-shrink-0">{{ row.star }}</span>
+            <svg class="w-3.5 h-3.5 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <div class="flex-1 h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
+              <div class="star-bar-fill h-full bg-[#18C58F] rounded-full transition-all duration-700" style="width: {{ row.percent }}%"></div>
             </div>
-
-            <!-- Working Hours -->
-            {% if company.working_hours %}
-            {% is_open_now company.working_hours as status %}
-            <div class="bg-white rounded-2xl p-6 shadow-sm border border-green-200">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-gray-900">{% trans "Ish vaqti" %}</h3>
-                    <span
-                        class="px-2.5 py-0.5 rounded-full text-xs font-medium {% if status.status %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                        {{ status.text }}
-                    </span>
-                </div>
-                <div class="space-y-3">
-                    {% for item in company.working_hours|format_working_hours %}
-                    <div
-                        class="flex justify-between text-sm {% if item.is_today %}font-bold text-gray-900{% else %}text-gray-600{% endif %}">
-                        <span>{{ item.day }}</span>
-                        <span>{{ item.hours }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-
-
-
-            {% if not company.manager %}
-            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white shadow-lg">
-                <h3 class="font-bold text-lg mb-2">{% trans "Bu sizning biznesingizmi?" %}</h3>
-                <p class="text-gray-300 text-sm mb-4">{% trans "Kompaniyani tasdiqlang va ma'lumotlarni boshqaring." %}
-                </p>
-                <a href="{% if request.user.is_authenticated %}{% url 'claim_company' company.pk %}{% else %}{% url 'account_login' %}?next={% url 'claim_company' company.pk %}{% endif %}"
-                    class="block w-full py-2 bg-white text-gray-900 text-center rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                    {% trans "Kompaniyani tasdiqlash" %}
-                </a>
-            </div>
-            {% endif %}
-            <!-- Verification Info Card -->
-            <div class="bg-primary-50 rounded-2xl p-6 border border-primary-100">
-                <h3 class="text-sm font-bold text-primary-900 mb-2 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {% trans "Xaridingizni tasdiqlang" %}
-                </h3>
-                <p class="text-sm text-primary-800 mb-3">
-                    {% trans "Sharh yozishda xarid chekini yuklang va 'Tasdiqlangan xarid' belgisiga ega bo'ling." %}
-                </p>
-                <a href="{% url 'review_submission' %}?company={{ company.pk }}"
-                    class="inline-flex items-center gap-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-lg transition-colors w-full justify-center">
-                    {% trans "Sharh yozish" %}
-                </a>
-            </div>
-
-        </aside>
+            <span class="text-xs text-[#6B7280] w-8 text-right flex-shrink-0">{{ row.percent }}%</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
     </div>
+  </section>
+  {% endif %}
 
-    <!-- Similar Companies -->
-    {% if similar_companies %}
-    <section class="mt-12 border-t border-gray-100 pt-12">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">{% trans "O'xshash kompaniyalar" %}</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for c in similar_companies %}
-            <a href="{% url 'company_detail' c.pk %}"
-                class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
-                <div class="flex items-center gap-3 mb-3">
-                    {% if c.display_logo %}
-                    <img src="{{ c.display_logo }}" alt="{{ c.name }}"
-                        class="w-12 h-12 rounded-lg object-cover border border-gray-100">
-                    {% else %}
-                    <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                    </div>
-                    {% endif %}
-                    <div>
-                        <h3 class="font-semibold text-gray-900 group-hover:text-primary-600 line-clamp-1">{{ c.name }}
-                        </h3>
-                        <div class="flex items-center text-xs text-gray-500">
-                            <svg class="w-3 h-3 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            <span class="font-medium text-gray-900">{{ c.rating }}</span>
-                            <span class="mx-1">•</span>
-                            <span>{{ c.review_count }}</span>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-xs text-gray-500 line-clamp-2">{{ c.display_description|default:c.category }}</p>
+  {# ── STICKY TAB NAV ── #}
+  <div id="tabNav" class="sticky top-14 z-30 bg-white border-b border-[#E5E7EB]">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+
+      {# Left: scrollable tab links #}
+      <div class="flex items-stretch h-full overflow-x-auto scrollbar-none gap-6 sm:gap-8 flex-shrink min-w-0">
+        <a href="#reviews" data-tab="reviews"
+          class="tab-link active relative flex-shrink-0 flex items-center text-sm font-medium text-[#6B7280] whitespace-nowrap">
+          {% trans "Sharhlar" %}{% if company.review_count > 0 %}<span class="ml-1.5 bg-[#F3F4F6] text-[#374151] text-[11px] font-semibold px-1.5 py-0.5 rounded-full align-middle">{{ company.review_count }}</span>{% endif %}
+          <span class="tab-underline absolute bottom-0 left-0 right-0 h-[3px] bg-[#18C58F] rounded-t-sm"></span>
+        </a>
+        <a href="#about" data-tab="about"
+          class="tab-link relative flex-shrink-0 flex items-center text-sm font-medium text-[#6B7280] whitespace-nowrap">
+          {% trans "Haqida" %}
+          <span class="tab-underline absolute bottom-0 left-0 right-0 h-[3px] bg-[#18C58F] rounded-t-sm"></span>
+        </a>
+        <a href="#contact" data-tab="contact"
+          class="tab-link relative flex-shrink-0 flex items-center text-sm font-medium text-[#6B7280] whitespace-nowrap">
+          {% trans "Bog'lanish" %}
+          <span class="tab-underline absolute bottom-0 left-0 right-0 h-[3px] bg-[#18C58F] rounded-t-sm"></span>
+        </a>
+      </div>
+
+      {# Right: CTA buttons — desktop only #}
+      <div class="hidden sm:flex items-center gap-2.5 flex-shrink-0 ml-4">
+        {% if company.website %}
+        <a href="{{ company.website }}" target="_blank" rel="noopener"
+          class="tab-nav-btn border border-[#E5E7EB] text-[#374151] font-medium rounded-full hover:border-[#D1D5DB] hover:bg-[#F9FAFB] transition-colors whitespace-nowrap"
+          style="height:36px;min-height:36px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1;box-sizing:border-box;">
+          <svg style="width:14px;height:14px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+          <span>{% trans "Veb-sayt" %}</span>
+        </a>
+        {% endif %}
+        <a href="{% url 'review_submission' %}?company={{ company.pk }}"
+          class="tab-nav-btn bg-[#18C58F] text-white font-medium rounded-full whitespace-nowrap"
+          style="height:36px;min-height:36px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1;box-sizing:border-box;box-shadow:0 3px 10px rgba(24,197,143,0.25);">
+          <svg style="width:14px;height:14px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          <span>{% trans "Sharh yozish" %}</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  {# ── MAIN CONTENT ── #}
+  <main class="max-w-3xl mx-auto px-4 pt-3 pb-12 space-y-3 mt-0">
+
+    {# REVIEWS SECTION #}
+    <section id="reviews">
+      <div class="flex items-center justify-between mb-3 gap-3">
+        <h2 class="text-lg font-semibold text-[#111827]">{% trans "Sharhlar" %}</h2>
+        <form method="get">
+          {% for key, val in request.GET.items %}{% if key != 'sort' and key != 'page' %}<input type="hidden" name="{{ key }}" value="{{ val }}"/>{% endif %}{% endfor %}
+          <select name="sort"
+            class="text-sm border border-[#E5E7EB] rounded-lg py-1.5 px-3 text-[#374151] bg-white focus:ring-1 focus:ring-[#18C58F] focus:border-[#18C58F] cursor-pointer"
+            onchange="this.form.submit()">
+            <option value="most_liked" {% if current_sort == 'most_liked' %}selected{% endif %}>{% trans "Eng foydali" %}</option>
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>{% trans "Yangi" %}</option>
+            <option value="highest" {% if current_sort == 'highest' %}selected{% endif %}>{% trans "Eng yuqori baho" %}</option>
+            <option value="lowest" {% if current_sort == 'lowest' %}selected{% endif %}>{% trans "Eng past baho" %}</option>
+          </select>
+        </form>
+      </div>
+
+      {% if filters_active or current_stars %}
+      <div class="flex flex-wrap gap-2 mb-3">
+        {% for s in "54321" %}
+        <a href="?{{ qs_no_stars }}stars={{ s }}"
+          class="inline-flex items-center gap-1 px-3 py-1 rounded-full border text-xs font-medium transition-colors {% if current_stars and s|add:'0' == current_stars %}bg-[#18C58F] border-[#18C58F] text-white{% else %}bg-white border-[#E5E7EB] text-[#374151] hover:border-[#18C58F] hover:text-[#18C58F]{% endif %}">
+          {{ s }}<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </a>
+        {% endfor %}
+        {% if filters_active %}
+        <a href="?{{ clear_filters_qs }}" class="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-red-200 text-red-500 bg-red-50 hover:bg-red-100 text-xs font-medium transition-colors">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          Filterni olib tashlash
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="space-y-3">
+        {% for r in reviews %}
+        <article class="review-card bg-white rounded-2xl border border-[#E5E7EB] p-4">
+          {# Row 1: Stars + Date #}
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-0.5">
+              {% for i in "12345" %}
+              <svg class="w-[18px] h-[18px] {% if r.rating >= forloop.counter %}text-[#18C58F]{% else %}text-[#E5E7EB]{% endif %}" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              {% endfor %}
+            </div>
+            <span class="text-[11px] text-[#9CA3AF]">{{ r.created_at|date:"d M, Y" }}</span>
+          </div>
+
+          {# Row 2: Avatar + Name #}
+          <div class="flex items-center gap-2 mb-2.5">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="{{ r.user_name|avatar_style }}">
+              {{ r.user_name|slice:":1"|upper }}
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5 min-w-0">
+              {% if r.user %}
+              <a href="{% url 'public_profile' r.user.username %}" class="font-semibold text-[#111827] text-[13px] hover:text-[#18C58F] transition-colors truncate">{{ r.user_name }}</a>
+              {% else %}
+              <span class="font-semibold text-[#111827] text-[13px] truncate">{{ r.user_name }}</span>
+              {% endif %}
+              {% if r.verified_purchase %}
+              <span class="inline-flex items-center gap-0.5 text-[10px] font-medium text-[#18C58F] bg-[#18C58F]/10 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                {% trans "Tasdiqlangan" %}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <p class="text-[#374151] text-sm leading-relaxed">{{ r.text }}</p>
+
+          {% if r.receipt %}
+          <div class="mt-3">
+            <a href="{{ r.receipt.url }}" target="_blank" rel="noopener"
+              class="inline-flex items-center gap-1.5 text-xs font-medium text-[#18C58F] bg-[#18C58F]/10 px-3 py-1.5 rounded-full hover:bg-[#18C58F]/15 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.414 6.586a6 6 0 108.485 8.485L20.5 13"/></svg>
+              {% trans "Xarid chekini ko'rish" %}
             </a>
-            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if r.owner_response_text %}
+          <div class="mt-4 bg-[#F9FAFB] border-l-2 border-[#18C58F] rounded-r-xl px-3 py-3">
+            <div class="flex items-center gap-2 mb-1.5">
+              <svg class="w-3.5 h-3.5 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span class="text-[10px] font-bold text-[#18C58F] uppercase tracking-wider">{% trans "Rasmiy javob" %}</span>
+              <span class="text-[10px] text-[#6B7280]">{{ r.owner_response_at|date:"d M, Y" }}</span>
+            </div>
+            <p class="text-sm text-[#374151]">{{ r.owner_response_text }}</p>
+          </div>
+          {% endif %}
+
+          <div class="mt-3 flex items-center gap-3 pt-3 border-t border-[#F3F4F6]">
+            {# Foydali — button style (rounded-full, border) #}
+            <button class="review-like-btn inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors
+              {% if r.is_liked_by_user %}border-red-200 text-red-500 bg-red-50 hover:bg-red-100{% else %}border-[#E5E7EB] text-[#6B7280] hover:border-[#18C58F] hover:text-[#18C58F] bg-white{% endif %}"
+              data-review-id="{{ r.pk }}"
+              data-like-url="{% url 'like_review' r.pk %}"
+              {% if not request.user.is_authenticated %}onclick="window.location='{% url 'account_login' %}?next={{ request.path }}'; return false;"{% endif %}>
+              <svg class="w-3.5 h-3.5" fill="{% if r.is_liked_by_user %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+              <span class="like-count">{{ r.like_count }}</span>
+              <span>{% trans "Foydali" %}</span>
+            </button>
+
+            {% if company.manager == request.user %}
+            <a href="{% url 'manager_review_response' r.pk %}"
+              class="flex items-center gap-1.5 text-xs font-medium text-[#6B7280] hover:text-[#18C58F] transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+              {% trans "Javob berish" %}
+            </a>
+            {% endif %}
+
+            <a href="{% url 'report_review' r.pk %}"
+              class="ml-auto flex items-center gap-1 text-xs text-[#9CA3AF] hover:text-red-400 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
+              {% trans "Shikoyat" %}
+            </a>
+          </div>
+        </article>
+        {% empty %}
+        <div class="bg-white rounded-2xl border border-dashed border-[#E5E7EB] py-14 text-center px-6">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F0FDF8] to-[#D1FAE5] flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-[#18C58F]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-[#111827] mb-1">{% trans "Hali sharh yo'q" %}</h3>
+          <p class="text-sm text-[#9CA3AF] mb-5">{% trans "Birinchi bo'lib fikr bildiring" %}</p>
+          <a href="{% url 'review_submission' %}?company={{ company.pk }}"
+            class="btn-primary inline-flex items-center gap-2 bg-[#18C58F] text-white font-semibold py-2.5 px-7 rounded-full text-sm"
+            style="box-shadow: 0 4px 14px rgba(24,197,143,0.28);">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            {% trans "Sharh yozish" %}
+          </a>
         </div>
+        {% endfor %}
+      </div>
+
+      {# Pagination #}
+      {% if reviews.has_other_pages %}
+      {% load url_params %}
+      <div class="mt-8 flex justify-center">
+        <nav class="flex items-center gap-1.5" aria-label="Pagination">
+          {% if reviews.has_previous %}
+          <a href="?{% url_replace request 'page' reviews.previous_page_number %}"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#18C58F] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </a>
+          {% else %}
+          <span class="w-9 h-9 flex items-center justify-center rounded-full border border-[#F3F4F6] text-[#D1D5DB]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </span>
+          {% endif %}
+          {% for i in pages_to_show %}
+          {% if reviews.number == i %}
+          <span class="w-9 h-9 flex items-center justify-center rounded-full bg-[#18C58F] text-white font-semibold text-sm shadow-sm">{{ i }}</span>
+          {% else %}
+          <a href="?{% url_replace request 'page' i %}"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-[#E5E7EB] text-[#374151] hover:bg-[#F3F4F6] hover:text-[#18C58F] transition-colors text-sm">{{ i }}</a>
+          {% endif %}
+          {% endfor %}
+          {% if reviews.has_next %}
+          <a href="?{% url_replace request 'page' reviews.next_page_number %}"
+            class="w-9 h-9 flex items-center justify-center rounded-full border border-[#E5E7EB] text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#18C58F] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </a>
+          {% else %}
+          <span class="w-9 h-9 flex items-center justify-center rounded-full border border-[#F3F4F6] text-[#D1D5DB]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </span>
+          {% endif %}
+        </nav>
+      </div>
+      {% endif %}
+    </section>
+
+    <hr class="section-divider">
+
+    {# ABOUT SECTION #}
+    <section id="about" class="bg-white rounded-2xl border border-[#E5E7EB] p-5" style="box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+      <h2 class="text-lg font-semibold text-[#111827] mb-3">{% trans "Kompaniya haqida" %}</h2>
+      {% if company.display_description %}
+      <p class="text-sm text-[#374151] leading-relaxed whitespace-pre-line">{{ company.display_description }}</p>
+      {% else %}
+      <p class="text-sm text-[#9CA3AF] italic">{% trans "Tavsif mavjud emas." %}</p>
+      {% endif %}
+      {% if company.website or company.facebook_url or company.instagram_url or company.telegram_url %}
+      <div class="mt-4 flex flex-wrap gap-2">
+        {% if company.website %}
+        <a href="{{ company.website }}" target="_blank" rel="noopener"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-[#374151] bg-[#F9FAFB] border border-[#E5E7EB] px-3 py-1.5 rounded-full hover:border-[#18C58F] hover:text-[#18C58F] transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+          {% trans "Veb-sayt" %}
+        </a>
+        {% endif %}
+        {% if company.instagram_url %}
+        <a href="{{ company.instagram_url }}" target="_blank" rel="noopener"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-[#374151] bg-[#F9FAFB] border border-[#E5E7EB] px-3 py-1.5 rounded-full hover:border-[#D1D5DB] hover:bg-[#F3F4F6] transition-colors">
+          <svg class="w-3.5 h-3.5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="currentColor" stroke-width="2" fill="none"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Instagram
+        </a>
+        {% endif %}
+        {% if company.telegram_url %}
+        <a href="{{ company.telegram_url }}" target="_blank" rel="noopener"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-[#374151] bg-[#F9FAFB] border border-[#E5E7EB] px-3 py-1.5 rounded-full hover:border-[#D1D5DB] hover:bg-[#F3F4F6] transition-colors">
+          <svg class="w-3.5 h-3.5 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram
+        </a>
+        {% endif %}
+        {% if company.facebook_url %}
+        <a href="{{ company.facebook_url }}" target="_blank" rel="noopener"
+          class="inline-flex items-center gap-1.5 text-xs font-medium text-[#374151] bg-[#F9FAFB] border border-[#E5E7EB] px-3 py-1.5 rounded-full hover:border-[#D1D5DB] hover:bg-[#F3F4F6] transition-colors">
+          <svg class="w-3.5 h-3.5 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </section>
+
+    <hr class="section-divider">
+
+    {# CONTACT & HOURS #}
+    <section id="contact" class="bg-white rounded-2xl border border-[#E5E7EB] p-5" style="box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+      <h2 class="text-lg font-semibold text-[#111827] mb-4">{% trans "Bog'lanish" %}</h2>
+      <div class="space-y-4">
+        {% if company.address %}
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-0.5">{% trans "Manzil" %}</div>
+            <div class="text-sm text-[#111827]">{{ company.address }}</div>
+            {% if map_url %}<a href="{{ map_url }}" target="_blank" class="text-xs text-[#18C58F] hover:underline mt-0.5 inline-block">{% trans "Xaritada ko'rish" %} →</a>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% if company.phone_public %}
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-0.5">{% trans "Telefon" %}</div>
+            {% if request.user.is_authenticated %}
+            <button id="revealPhone" data-url="{% url 'reveal_contact' company.pk 'phone' %}"
+              class="inline-flex items-center gap-2 text-sm font-medium text-[#374151] border border-[#E5E7EB] bg-white px-3 py-1.5 rounded-lg hover:border-[#18C58F] hover:text-[#18C58F] transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              {% trans "Raqamni ko'rsatish" %}
+            </button>
+            <p class="text-[11px] text-[#9CA3AF] mt-1">🔒 Spamga qarshi himoya</p>
+            {% else %}
+            <a href="{% url 'account_login' %}?next={{ request.path }}"
+              class="inline-flex items-center gap-2 text-sm font-medium text-[#374151] border border-[#E5E7EB] bg-white px-3 py-1.5 rounded-lg hover:border-[#18C58F] hover:text-[#18C58F] transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              {% trans "Raqamni ko'rsatish" %}
+            </a>
+            <p class="text-[11px] text-[#9CA3AF] mt-1">🔒 Spamga qarshi himoya</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% if company.email_public %}
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wider mb-0.5">{% trans "Email" %}</div>
+            {% if request.user.is_authenticated %}
+            <button id="revealEmail" data-url="{% url 'reveal_contact' company.pk 'email' %}"
+              class="text-sm text-[#18C58F] font-medium hover:underline">{% trans "Emailni ko'rsatish" %}</button>
+            {% else %}
+            <a href="{% url 'account_login' %}?next={{ request.path }}" class="text-sm text-[#18C58F] font-medium hover:underline">{% trans "Emailni ko'rsatish" %}</a>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if company.working_hours %}
+      {% is_open_now company.working_hours as status %}
+      <div class="mt-5 pt-5 border-t border-[#F3F4F6]">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-semibold text-[#111827]">{% trans "Ish vaqti" %}</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full {% if status.status %}bg-[#18C58F]/10 text-[#18C58F]{% else %}bg-red-100 text-red-600{% endif %}">
+            {{ status.text }}
+          </span>
+        </div>
+        <div class="space-y-1.5">
+          {% for item in company.working_hours|format_working_hours %}
+          <div class="flex justify-between text-sm {% if item.is_today %}font-semibold text-[#111827]{% else %}text-[#6B7280]{% endif %}">
+            <span>{{ item.day }}</span>
+            <span>{{ item.hours }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </section>
+
+    <hr class="section-divider">
+
+    {# TRUST & TRANSPARENCY #}
+    <section class="trust-block border border-[#E8F0FE] p-5" style="box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+      <h2 class="text-lg font-semibold text-[#111827] mb-3">{% trans "Ishonch va shaffoflik" %}</h2>
+
+      {# Compact checklist #}
+      <ul class="space-y-2 mb-3">
+        {# Ownership / verification status #}
+        {% if company.is_claimed %}
+        <li class="flex items-center gap-2 text-sm text-[#374151]">
+          <svg class="w-4 h-4 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span class="font-medium">{% trans "Tasdiqlangan profil" %}</span>
+          <span class="text-xs text-[#9CA3AF]">({% trans "egasi mavjud" %})</span>
+        </li>
+        {% elif pending_ownership_claim %}
+        <li class="flex items-center gap-2 text-sm text-amber-600">
+          <svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>{% trans "Tasdiqlash jarayonida" %}</span>
+        </li>
+        {% elif company.is_verified %}
+        <li class="flex items-center gap-2 text-sm text-[#374151]">
+          <svg class="w-4 h-4 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span class="font-medium">{% trans "Tasdiqlangan profil" %}</span>
+        </li>
+        {% else %}
+        <li class="flex items-center gap-2 text-sm text-[#6B7280]">
+          <svg class="w-4 h-4 text-amber-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <span>{% trans "Profil tasdiqlanmagan" %}</span>
+        </li>
+        {% endif %}
+
+        {% if company.manager or company.owner %}
+        <li class="flex items-center gap-2 text-sm text-[#374151]">
+          <svg class="w-4 h-4 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span class="font-medium">{% trans "Egasi mavjud" %}</span>
+        </li>
+        {% endif %}
+
+        <li class="flex items-center gap-2 text-sm text-[#374151]">
+          <svg class="w-4 h-4 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          <span class="font-medium">{% trans "Sharhlar moderatsiyadan o'tadi" %}</span>
+        </li>
+      </ul>
+
+      <p class="text-xs text-[#9CA3AF] leading-relaxed">
+        {% trans "Fikrly sharhlarni moderatsiya qiladi. Har bir foydalanuvchi o'z fikriga javob beradi." %}
+      </p>
+
+      {# Claim button — hidden if claimed or pending #}
+      {% if not company.is_claimed and not pending_ownership_claim %}
+      <button id="openClaimModal" type="button"
+        class="mt-4 flex items-center justify-center gap-2 w-full border border-[#18C58F]/30 text-[#18C58F] font-medium py-2.5 px-4 rounded-full hover:bg-[#18C58F]/5 hover:border-[#18C58F]/50 transition-colors text-sm bg-white">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        {% trans "Bu sizning biznesingizmi? Profilni egallang" %}
+      </button>
+      {% elif pending_ownership_claim %}
+      <div class="mt-4 flex items-center justify-center gap-2 w-full bg-amber-50 border border-amber-200 text-amber-700 font-medium py-2.5 px-4 rounded-full text-sm">
+        ⏳ {% trans "So'rovingiz ko'rib chiqilmoqda" %}
+      </div>
+      {% elif company.is_claimed %}
+      <div class="mt-4 flex items-center justify-center gap-2 w-full bg-[#18C58F]/10 border border-[#18C58F]/20 text-[#18C58F] font-medium py-2.5 px-4 rounded-full text-sm">
+        ✅ {% trans "Tasdiqlangan profil — egasi mavjud" %}
+      </div>
+      {% endif %}
+    </section>
+
+    {# ── CLAIM MODAL ────────────────────────────────────────── #}
+    <div id="claimModal" class="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center hidden" role="dialog" aria-modal="true" aria-labelledby="claimModalTitle">
+      {# Backdrop #}
+      <div id="claimModalBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+      {# Sheet #}
+      <div class="relative w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-2xl p-6 pb-safe shadow-2xl max-h-[92vh] overflow-y-auto"
+           style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom))">
+
+        {# Header #}
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 id="claimModalTitle" class="text-[18px] font-bold text-[#111827]">{% trans "Biznesni egallash" %}</h2>
+            <p class="text-xs text-[#9CA3AF] mt-0.5">{{ company.name }}</p>
+          </div>
+          <button id="closeClaimModal" type="button" class="w-8 h-8 flex items-center justify-center rounded-full bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {# Disclaimer #}
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-5 flex gap-2">
+          <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <p class="text-xs text-amber-700 leading-relaxed">{% trans "Biznes egaligini tasdiqlovchi hujjat talab qilinadi. Ma'lumotlar moderator tomonidan tekshiriladi." %}</p>
+        </div>
+
+        {# Form #}
+        <form id="claimForm" novalidate>
+          {% csrf_token %}
+
+          <div class="space-y-4">
+            {# Full name #}
+            <div>
+              <label class="block text-sm font-medium text-[#374151] mb-1.5">{% trans "To'liq ism" %} <span class="text-red-500">*</span></label>
+              <input type="text" name="full_name" id="claim_full_name" required
+                class="w-full border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#18C58F]/30 focus:border-[#18C58F]"
+                placeholder="{% trans 'Ali Karimov' %}">
+              <p class="claim-field-error text-xs text-red-500 mt-1 hidden"></p>
+            </div>
+
+            {# Phone #}
+            <div>
+              <label class="block text-sm font-medium text-[#374151] mb-1.5">{% trans "Telefon raqam" %} <span class="text-red-500">*</span></label>
+              <input type="tel" name="phone" id="claim_phone" required
+                class="w-full border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#18C58F]/30 focus:border-[#18C58F]"
+                placeholder="+998901234567">
+              <p class="claim-field-error text-xs text-red-500 mt-1 hidden"></p>
+            </div>
+
+            {# Email #}
+            <div>
+              <label class="block text-sm font-medium text-[#374151] mb-1.5">{% trans "Email" %} <span class="text-red-500">*</span></label>
+              <input type="email" name="email" id="claim_email" required
+                class="w-full border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#18C58F]/30 focus:border-[#18C58F]"
+                placeholder="ali@example.com">
+              <p class="claim-field-error text-xs text-red-500 mt-1 hidden"></p>
+            </div>
+
+            {# Position #}
+            <div>
+              <label class="block text-sm font-medium text-[#374151] mb-1.5">{% trans "Kompaniyadagi lavozim" %} <span class="text-red-500">*</span></label>
+              <select name="position" id="claim_position"
+                class="w-full border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#18C58F]/30 focus:border-[#18C58F] bg-white">
+                <option value="owner">{% trans "Egasi (Owner)" %}</option>
+                <option value="manager">{% trans "Menejer (Manager)" %}</option>
+                <option value="other">{% trans "Boshqa (Other)" %}</option>
+              </select>
+            </div>
+
+            {# Proof file #}
+            <div>
+              <label class="block text-sm font-medium text-[#374151] mb-1.5">{% trans "Tasdiq hujjati" %} <span class="text-xs text-[#9CA3AF] font-normal">(PDF {% trans "yoki" %} rasm, {% trans "max" %} 5MB)</span></label>
+              <div id="claimFileArea" class="relative border-2 border-dashed border-[#E5E7EB] rounded-xl p-4 text-center hover:border-[#18C58F]/50 transition-colors cursor-pointer">
+                <input type="file" name="proof_file" id="claim_proof_file" accept="image/*,application/pdf"
+                  class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                <svg class="w-6 h-6 text-[#9CA3AF] mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                <p id="claimFileName" class="text-xs text-[#9CA3AF]">{% trans "Faylni tanlang yoki bu yerga tashlang" %}</p>
+              </div>
+              <p class="claim-field-error text-xs text-red-500 mt-1 hidden"></p>
+            </div>
+
+            {# Comment #}
+            <div>
+              <label class="block text-sm font-medium text-[#374151] mb-1.5">{% trans "Izoh" %} <span class="text-xs text-[#9CA3AF] font-normal">({% trans "ixtiyoriy" %})</span></label>
+              <textarea name="comment" id="claim_comment" rows="3"
+                class="w-full border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#18C58F]/30 focus:border-[#18C58F] resize-none"
+                placeholder="{% trans 'Qo\'shimcha ma\'lumot...' %}"></textarea>
+            </div>
+          </div>
+
+          {# Global error #}
+          <div id="claimGlobalError" class="hidden mt-3 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600"></div>
+
+          {# Submit #}
+          <button type="submit" id="claimSubmitBtn"
+            class="mt-5 w-full bg-[#18C58F] text-white font-semibold py-3 rounded-full text-sm hover:bg-[#15b07f] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <span id="claimBtnLabel">{% trans "Profilni tasdiqlashga yuborish" %}</span>
+            <svg id="claimSpinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    {# SIMILAR COMPANIES — Horizontal Discovery Carousel #}
+    {% if similar_companies %}
+    <section class="-mx-4">
+      {# Header row #}
+      <div class="flex items-baseline justify-between px-4 mb-3">
+        <div>
+          <h2 class="font-bold text-[#111827] text-[15px]" id="similarTitle">Sizga yoqishi mumkin</h2>
+          <p class="text-[11px] text-[#9CA3AF] mt-0.5">Shu toifadagi mashhur kompaniyalar</p>
+        </div>
+        <span class="text-[11px] text-[#18C58F] font-medium flex items-center gap-0.5">
+          Ko'rish
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </span>
+      </div>
+
+      {# Swipeable card track #}
+      <div class="flex gap-3 overflow-x-auto scrollbar-none snap-x snap-mandatory px-4 pb-2">
+        {% for c in similar_companies %}
+        {# Badge cycling: 0=fire, 1=star, 2=trending, rest=none #}
+        <a href="{% url 'company_detail' c.pk %}" class="similar-card">
+          <div class="bg-white rounded-[20px] p-4 flex flex-col items-center text-center"
+            style="box-shadow: 0 2px 12px rgba(0,0,0,0.07)">
+
+            {# Badge (cycles by loop index) #}
+            <div class="w-full flex justify-end mb-1 h-5">
+              {% if forloop.counter == 1 %}
+              <span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-orange-500 bg-orange-50 px-1.5 py-0.5 rounded-full">
+                🔥 Trend
+              </span>
+              {% elif forloop.counter == 2 %}
+              <span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-[#18C58F] bg-[#18C58F]/10 px-1.5 py-0.5 rounded-full">
+                ⭐ Top
+              </span>
+              {% elif forloop.counter == 3 %}
+              <span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded-full">
+                👁 Mashhur
+              </span>
+              {% else %}
+              <span></span>
+              {% endif %}
+            </div>
+
+            {# Logo in soft gradient circle #}
+            <div class="w-[56px] h-[56px] rounded-2xl border border-[#E5E7EB] overflow-hidden mb-3 flex-shrink-0 flex items-center justify-center bg-gradient-to-br from-[#f0fdf9] to-[#d1fae5]">
+              {% if c.display_logo %}
+              <img src="{{ c.display_logo }}" alt="{{ c.name }}"
+                class="w-full h-full object-contain p-1"
+                onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.classList.remove('hidden')">
+              <span class="hidden text-lg font-bold text-[#18C58F]">{{ c.name|slice:":1"|upper }}</span>
+              {% else %}
+              <span class="text-lg font-bold text-[#18C58F]">{{ c.name|slice:":1"|upper }}</span>
+              {% endif %}
+            </div>
+
+            {# Company name #}
+            <div class="font-bold text-[#111827] text-[13px] leading-snug line-clamp-2 w-full mb-1.5">{{ c.name }}</div>
+
+            {# Rating row #}
+            <div class="flex items-center justify-center gap-1 mb-2">
+              <svg class="w-3.5 h-3.5 text-[#18C58F] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span class="text-[13px] font-bold text-[#111827]">{{ c.rating }}</span>
+              <span class="text-[11px] text-[#9CA3AF]">({{ c.review_count }})</span>
+            </div>
+
+            {# Category pill #}
+            {% if c.category_fk %}
+            <span class="inline-block text-[10px] font-medium text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded-full truncate max-w-full mb-3">{{ c.category_fk.display_name }}</span>
+            {% else %}
+            <span class="mb-3 block h-4"></span>
+            {% endif %}
+
+            {# CTA #}
+            <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#18C58F] bg-[#18C58F]/10 px-3 py-1 rounded-full">
+              Ko'rish
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </span>
+
+          </div>
+        </a>
+        {% endfor %}
+        {# Spacer so last card doesn't flush right edge #}
+        <div class="w-1 flex-shrink-0"></div>
+      </div>
     </section>
     {% endif %}
+
+  </main>
+
+  {# ── BOTTOM STICKY BAR ── #}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Like & Reveal Logic
-    (function () {
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
+(function () {
+  var CSRF = '{{ csrf_token }}';
+
+  function getCsrf() {
+    var f = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    if (f) return f.value;
+    var c = document.cookie.split('; ').find(function(r){ return r.startsWith('csrftoken='); });
+    return c ? c.split('=')[1] : CSRF;
+  }
+
+  function post(url) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': getCsrf(), 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function(r){ return r.json(); });
+  }
+
+  function toast(msg, ok) {
+    var el = document.createElement('div');
+    el.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white opacity-0 transition-all duration-200 ' + (ok !== false ? 'bg-slate-900' : 'bg-red-600');
+    el.textContent = msg;
+    document.body.appendChild(el);
+    requestAnimationFrame(function(){ el.classList.replace('opacity-0','opacity-100'); });
+    setTimeout(function(){
+      el.classList.replace('opacity-100','opacity-0');
+      setTimeout(function(){ el.remove(); }, 220);
+    }, 1800);
+  }
+
+  /* Company like */
+  var likeBtn = document.getElementById('likeBtn');
+  if (likeBtn && likeBtn.dataset.auth === '1') {
+    likeBtn.addEventListener('click', function(){
+      post(likeBtn.dataset.likeUrl).then(function(d){
+        if (!d.ok) return;
+        var icon = document.getElementById('likeIcon');
+        if (d.liked) {
+          icon.setAttribute('fill','currentColor');
+          likeBtn.classList.add('text-red-500');
+          likeBtn.classList.remove('text-\\[\\#6B7280\\]');
+        } else {
+          icon.setAttribute('fill','none');
+          likeBtn.classList.remove('text-red-500');
         }
+      }).catch(function(){});
+    });
+  }
 
-        // Like Button
-        const likeBtn = document.getElementById('likeBtn');
-        if (likeBtn && likeBtn.dataset.auth === '1') {
-            likeBtn.addEventListener('click', function () {
-                const url = likeBtn.dataset.likeUrl;
-                fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
-                    .then(r => r.json())
-                    .then(d => {
-                        if (d.ok) {
-                            document.getElementById('likeCount').textContent = d.like_count;
-                            const icon = document.getElementById('likeIcon');
-                            if (d.liked) {
-                                icon.setAttribute('fill', 'currentColor');
-                                likeBtn.classList.add('text-red-500', 'border-red-500');
-                            } else {
-                                icon.setAttribute('fill', 'none');
-                                likeBtn.classList.remove('text-red-500', 'border-red-500');
-                            }
-                        }
-                    });
-            });
+  /* Reveal contact */
+  ['revealPhone','revealEmail'].forEach(function(id){
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function(){
+      post(btn.dataset.url).then(function(d){
+        if (d.ok) {
+          var type = id === 'revealEmail' ? 'mailto:' : 'tel:';
+          btn.outerHTML = '<a href="' + type + d.value + '" class="text-sm text-[#111827] font-medium hover:underline">' + d.value + '</a>';
         }
+      }).catch(function(){});
+    });
+  });
 
-        // Reveal Contact
-        ['revealEmail', 'revealPhone'].forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) {
-                btn.addEventListener('click', function () {
-                    const url = btn.dataset.url;
-                    fetch(url, { headers: { 'X-CSRFToken': getCookie('csrftoken') } })
-                        .then(r => r.json())
-                        .then(d => {
-                            if (d.ok) {
-                                const type = id === 'revealEmail' ? 'mailto:' : 'tel:';
-                                btn.outerHTML = `<a href="${type}${d.value}" class="text-gray-900 font-medium hover:underline">${d.value}</a>`;
-                            }
-                        });
-                });
-            }
-        });
+  /* Review likes */
+  document.querySelectorAll('.review-like-btn').forEach(function(btn){
+    if (btn.hasAttribute('onclick')) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      post(btn.dataset.likeUrl).then(function(d){
+        if (!d.ok) return;
+        var span = btn.querySelector('.like-count');
+        var svg = btn.querySelector('svg');
+        if (span) span.textContent = d.like_count;
+        if (d.liked) {
+          btn.classList.add('text-red-500');
+          btn.classList.remove('text-\\[\\#6B7280\\]');
+          if (svg) svg.setAttribute('fill','currentColor');
+        } else {
+          btn.classList.remove('text-red-500');
+          if (svg) svg.setAttribute('fill','none');
+        }
+      }).catch(function(){});
+    });
+  });
 
-        // Review Like Buttons
-        document.querySelectorAll('.review-like-btn').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                if (this.hasAttribute('onclick')) return;
-                e.preventDefault();
-                const url = this.dataset.likeUrl;
-                const countSpan = this.querySelector('.like-count');
-                const icon = this.querySelector('svg');
+  /* Share */
+  var shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      var url = shareBtn.dataset.shareUrl || location.href;
+      if (navigator.share) {
+        navigator.share({ title: document.title, url: url }).catch(function(){});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(function(){ toast('✅ Havola nusxalandi'); }).catch(fallbackCopy);
+      } else { fallbackCopy(); }
+      function fallbackCopy(){
+        try {
+          var t = document.createElement('textarea');
+          t.value = url; t.style.cssText = 'position:fixed;left:-9999px';
+          document.body.appendChild(t); t.select();
+          document.execCommand('copy');
+          document.body.removeChild(t);
+          toast('✅ Havola nusxalandi');
+        } catch(_){ toast('❌ Nusxalab bo\'lmadi', false); }
+      }
+    });
+  }
 
-                fetch(url, { method: 'POST', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.ok) {
-                            countSpan.textContent = data.like_count;
-                            if (data.liked) {
-                                this.classList.add('text-red-500');
-                                icon.setAttribute('fill', 'currentColor');
-                            } else {
-                                this.classList.remove('text-red-500');
-                                icon.setAttribute('fill', 'none');
-                            }
-                        }
-                    });
+  /* Tab active on scroll */
+  var tabs = document.querySelectorAll('.tab-link[data-tab]');
+  var tabMap = {};
+  tabs.forEach(function(t){ if (t.dataset.tab) tabMap[t.dataset.tab] = t; });
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(e){
+      e.preventDefault();
+      tabs.forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active');
+      var targetId = tab.dataset.tab;
+      var target = document.getElementById(targetId);
+      if (target) {
+        var offset = 56 + 56 + 8; // top-nav (56px) + tab bar (56px) + 8px breathing room
+        var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top: top, behavior: 'smooth' });
+      }
+    });
+  });
+  if ('IntersectionObserver' in window) {
+    var sectionIds = ['reviews','about','contact'];
+    var sectionObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          tabs.forEach(function(t){ t.classList.remove('active'); });
+          if (tabMap[id]) tabMap[id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    sectionIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) sectionObs.observe(el);
+    });
+  }
+
+  /* ── CLAIM MODAL ─────────────────────────────────── */
+  var claimModal      = document.getElementById('claimModal');
+  var claimBackdrop   = document.getElementById('claimModalBackdrop');
+  var openClaimBtn    = document.getElementById('openClaimModal');
+  var closeClaimBtn   = document.getElementById('closeClaimModal');
+  var claimForm       = document.getElementById('claimForm');
+  var claimSubmitBtn  = document.getElementById('claimSubmitBtn');
+  var claimSpinner    = document.getElementById('claimSpinner');
+  var claimBtnLabel   = document.getElementById('claimBtnLabel');
+  var claimGlobalErr  = document.getElementById('claimGlobalError');
+  var claimFileInput  = document.getElementById('claim_proof_file');
+  var claimFileName   = document.getElementById('claimFileName');
+
+  var CLAIM_URL = '{% url "submit_ownership_claim" company.pk %}';
+  var IS_AUTH = {% if request.user.is_authenticated %}true{% else %}false{% endif %};
+  var LOGIN_REDIRECT = '{% if not request.user.is_authenticated %}{% url "account_login" %}?next={{ request.path|urlencode }}%23claim-open{% endif %}';
+
+  function openClaim() {
+    if (!IS_AUTH) {
+      window.location.href = LOGIN_REDIRECT;
+      return;
+    }
+    if (!claimModal) return;
+    claimModal.style.display = 'flex';
+    claimModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    // Defer focus so browser has painted the element
+    requestAnimationFrame(function() {
+      var firstInput = claimModal.querySelector('input[name="full_name"]');
+      if (firstInput) { try { firstInput.focus(); } catch(e) {} }
+    });
+  }
+
+  function closeClaim() {
+    if (!claimModal) return;
+    claimModal.classList.add('hidden');
+    claimModal.style.display = '';
+    document.body.style.overflow = '';
+  }
+
+  if (openClaimBtn) { openClaimBtn.addEventListener('click', openClaim); }
+  if (closeClaimBtn) { closeClaimBtn.addEventListener('click', closeClaim); }
+  if (claimBackdrop) {
+    claimBackdrop.addEventListener('click', function(e) {
+      // Only close if clicked exactly on backdrop (not the sheet)
+      if (e.target === claimBackdrop) { closeClaim(); }
+    });
+  }
+
+  // Keyboard ESC
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && claimModal && !claimModal.classList.contains('hidden')) { closeClaim(); }
+  });
+
+  // Auto-open after login redirect (hash #claim-open)
+  if (IS_AUTH && window.location.hash === '#claim-open' && openClaimBtn && claimModal) {
+    // Clean hash from URL without reload
+    try {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    } catch(e) {}
+    setTimeout(function() { openClaim(); }, 300);
+  }
+
+  // File input label update
+  if (claimFileInput) {
+    claimFileInput.addEventListener('change', function(){
+      if (claimFileInput.files && claimFileInput.files[0]) {
+        claimFileName.textContent = claimFileInput.files[0].name;
+        claimFileName.style.color = '#374151';
+      }
+    });
+  }
+
+  // Client-side field validation helper — walks up ancestors until a direct
+  // child .claim-field-error is found (handles nested wrappers like the file area)
+  function claimFieldError(inputId, msg) {
+    var el = document.getElementById(inputId);
+    if (!el) return;
+    var parent = el.parentElement;
+    var errEl = null;
+    while (parent && parent !== claimForm) {
+      errEl = parent.querySelector(':scope > .claim-field-error');
+      if (errEl) break;
+      parent = parent.parentElement;
+    }
+    if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
+    el.classList.add('border-red-400');
+  }
+
+  function clearClaimErrors() {
+    claimForm.querySelectorAll('.claim-field-error').forEach(function(el){ el.classList.add('hidden'); el.textContent=''; });
+    claimForm.querySelectorAll('input,select,textarea').forEach(function(el){ el.classList.remove('border-red-400'); });
+    if (claimGlobalErr) { claimGlobalErr.classList.add('hidden'); claimGlobalErr.textContent=''; }
+  }
+
+  function showClaimGlobalError(msg) {
+    if (!claimGlobalErr) return;
+    claimGlobalErr.textContent = msg;
+    claimGlobalErr.classList.remove('hidden');
+  }
+
+  // Form submit
+  if (claimForm) {
+    claimForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearClaimErrors();
+
+      // Basic client-side validation
+      var fullName = (document.getElementById('claim_full_name') || {}).value || '';
+      var phone    = (document.getElementById('claim_phone') || {}).value || '';
+      var email    = (document.getElementById('claim_email') || {}).value || '';
+      var valid = true;
+
+      if (!fullName.trim()) {
+        claimFieldError('claim_full_name', "To'liq ismni kiriting");
+        valid = false;
+      }
+      if (!phone.trim()) {
+        claimFieldError('claim_phone', "Telefon raqamni kiriting");
+        valid = false;
+      }
+      if (!email.trim() || email.indexOf('@') === -1) {
+        claimFieldError('claim_email', "To'g'ri email kiriting");
+        valid = false;
+      }
+      if (!valid) return;
+
+      // Disable button & show spinner
+      claimSubmitBtn.disabled = true;
+      if (claimSpinner) claimSpinner.classList.remove('hidden');
+      if (claimBtnLabel) claimBtnLabel.textContent = 'Yuborilmoqda...';
+
+      var fd = new FormData(claimForm);
+      var csrfToken = getCsrf();
+
+      fetch(CLAIM_URL, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: fd,
+        credentials: 'same-origin',
+      })
+      .then(function(r) {
+        if (!r.ok && r.status !== 400) {
+          throw new Error('HTTP ' + r.status);
+        }
+        return r.json();
+      })
+      .then(function(d){
+        if (d.ok) {
+          closeClaim();
+          toast('✅ ' + (d.message || "So'rovingiz qabul qilindi!"));
+          // Replace button with pending badge
+          if (openClaimBtn) {
+            var pending = document.createElement('div');
+            pending.className = 'mt-4 flex items-center justify-center gap-2 w-full bg-amber-50 border border-amber-200 text-amber-700 font-medium py-2.5 px-4 rounded-full text-sm';
+            pending.textContent = "⏳ So'rovingiz ko'rib chiqilmoqda";
+            openClaimBtn.parentNode.replaceChild(pending, openClaimBtn);
+          }
+        } else {
+          // Server-side field errors
+          if (d.errors) {
+            var fieldMap = {
+              'full_name': 'claim_full_name',
+              'phone':     'claim_phone',
+              'email':     'claim_email',
+              'proof_file':'claim_proof_file',
+            };
+            var anyShown = false;
+            Object.keys(d.errors).forEach(function(field){
+              var inputId = fieldMap[field];
+              if (inputId) {
+                claimFieldError(inputId, d.errors[field].replace(/^\*\s*/, ''));
+                anyShown = true;
+              }
             });
-        });
-    })();
+            if (!anyShown) { showClaimGlobalError(d.error || 'Xatolik yuz berdi.'); }
+          } else {
+            showClaimGlobalError(d.error || 'Xatolik yuz berdi.');
+          }
+          // Re-enable button
+          claimSubmitBtn.disabled = false;
+          if (claimSpinner) claimSpinner.classList.add('hidden');
+          if (claimBtnLabel) claimBtnLabel.textContent = 'Profilni tasdiqlashga yuborish';
+        }
+      })
+      .catch(function(err){
+        showClaimGlobalError('Tarmoq xatosi. Qayta urinib ko\'ring.');
+        claimSubmitBtn.disabled = false;
+        if (claimSpinner) claimSpinner.classList.add('hidden');
+        if (claimBtnLabel) claimBtnLabel.textContent = 'Profilni tasdiqlashga yuborish';
+      });
+    });
+  }
+
+})();
 </script>
 {% endblock %}
