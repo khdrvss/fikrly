@@ -145,6 +145,8 @@ def update_company_stats_signal(sender, instance, **kwargs):
 
 @receiver([post_save, post_delete], sender=BusinessCategory)
 def clear_cache_on_category_change(sender, instance, **kwargs):
+    from .visibility import invalidate_categories_cache
+    invalidate_categories_cache()
     clear_public_cache()
 
 

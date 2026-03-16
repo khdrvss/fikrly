@@ -21,6 +21,29 @@
     <meta name="robots" content="index, follow" />
     <meta name="description"
         content="{% block meta_description %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha eng ishonchli sharh platformasi. Fikr qoldiring, kompaniyalarni baholang, boshqalarning tajribasini o‘qing.{% endblock %}" />
+    
+    <!-- OpenGraph -->
+    <meta property="og:site_name" content="Fikrly">
+    <meta property="og:locale" content="{% block og_locale %}uz_UZ{% endblock %}">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{% block title %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% block meta_description %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha eng ishonchli sharh platformasi{% endblock %}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ canonical_url|default:request.build_absolute_uri }}{% endblock %}">
+    {% block og_image %}
+    <meta property="og:image" content="https://fikrly.uz{% static 'favicons/android-chrome-192x192.png' %}">
+    <meta property="og:image:width" content="192">
+    <meta property="og:image:height" content="192">
+    {% endblock %}
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
+    <meta name="twitter:site" content="@fikrly_uz">
+    <meta name="twitter:title" content="{% block twitter_title %}{% block title %}Fikrly.uz{% endblock %}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{% block meta_description %}O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}{% endblock %}">
+    {% block twitter_image %}
+    <meta name="twitter:image" content="https://fikrly.uz{% static 'favicons/android-chrome-192x192.png' %}">
+    {% endblock %}
+    
     <title>{% block title %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}</title>
 
     {% if canonical_url %}

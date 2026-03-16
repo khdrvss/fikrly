@@ -30,6 +30,7 @@ from .views import (
 from frontend import views
 from frontend import advanced_views
 from frontend import moderation_views
+from frontend.api import api_root, v1_companies, v1_categories, v1_company_detail
 
 urlpatterns = [
     path("", views.home, name="index"),
@@ -210,4 +211,9 @@ urlpatterns = [
     ),
     # Utility
     path("health/", views.health_check, name="health_check"),
+    # API v1
+    path("api/", api_root, name="api_root"),
+    path("api/v1/companies/", v1_companies, name="v1_companies"),
+    path("api/v1/categories/", v1_categories, name="v1_categories"),
+    path("api/v1/companies/<str:slug>/", v1_company_detail, name="v1_company_detail"),
 ]

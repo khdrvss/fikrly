@@ -9,10 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Avg, Count, F, Q, Sum
+from django.db.models import Avg, Count, F, Prefetch, Q, Sum
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
+from frontend.cache_utils import get_safe_pagination_param, get_safe_limit_param
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.timezone import now
@@ -318,7 +319,7 @@ def business_list(request, category_slug=None):
 
     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
     is_get = request.method.upper() == "GET"
-    use_cache = is_get and (not request.user.is_authenticated) and (not is_ajax)
+    use_cache = is_get and (not request.user.is_authenticated) and (not is_ajax) and (not query)
     cache_key = None
     if use_cache:
         from django.utils.translation import get_language
@@ -457,7 +458,8 @@ def business_list(request, category_slug=None):
     )
 
     total_count = companies.count()
-    paginator = Paginator(companies, 20)
+    page_limit = get_safe_limit_param(request, "limit", 20, 50)
+    paginator = Paginator(companies, page_limit)
     page_number = request.GET.get("page", 1)
     logger.debug("business_list requested page: %s; total_companies=%s", page_number, total_count)
 
@@ -1041,9 +1043,23 @@ def company_detail(request, slug: str):
         for star in range(5, 0, -1)
     ]
 
-    reviews_qs = reviews_qs.select_related("user").prefetch_related("likes")
-    paginator = Paginator(reviews_qs, 10)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    reviews_qs = reviews_qs.select_related("user")
+    
+    if request.user.is_authenticated:
+        from ..models import ReviewLike
+        reviews_qs = reviews_qs.prefetch_related(
+            Prefetch(
+                "likes",
+                queryset=ReviewLike.objects.filter(user=request.user),
+                to_attr="user_likes"
+            )
+        )
+    else:
+        reviews_qs = reviews_qs.prefetch_related("likes")
+    
+    review_limit = get_safe_limit_param(request, "limit", 10, 50)
+    paginator = Paginator(reviews_qs, review_limit)
+    page_obj = paginator.get_page(get_safe_pagination_param(request))
 
     qd = request.GET.copy()
     qd.pop("page", None)
@@ -1061,13 +1077,8 @@ def company_detail(request, slug: str):
     reviews = page_obj
 
     if request.user.is_authenticated:
-        from ..models import ReviewLike
-        user_likes = set(
-            ReviewLike.objects.filter(user=request.user, review__in=reviews)
-            .values_list("review_id", flat=True)
-        )
         for r in reviews:
-            r.is_liked_by_user = r.id in user_likes
+            r.is_liked_by_user = bool(getattr(r, 'user_likes', []))
 
     current = page_obj.number
     total_pages = paginator.num_pages

@@ -7,6 +7,28 @@ import hashlib
 import json
 
 
+MAX_PAGINATION_LIMIT = 50
+DEFAULT_PAGINATION_LIMIT = 20
+
+
+def get_safe_pagination_param(request, param_name="page", default=1, max_limit=MAX_PAGINATION_LIMIT):
+    """Get safe pagination parameters from request, with limits to prevent abuse."""
+    try:
+        page = int(request.GET.get(param_name, default))
+        return max(1, page)
+    except (ValueError, TypeError):
+        return default
+
+
+def get_safe_limit_param(request, param_name="limit", default=DEFAULT_PAGINATION_LIMIT, max_limit=MAX_PAGINATION_LIMIT):
+    """Get safe limit parameter with max limit enforcement."""
+    try:
+        limit = int(request.GET.get(param_name, default))
+        return min(max(1, limit), max_limit)
+    except (ValueError, TypeError):
+        return default
+
+
 def cache_per_user(timeout=60 * 5, key_prefix="view"):
     """
     Cache decorator that creates separate cache entries per user.
@@ -166,7 +188,7 @@ def clear_public_cache() -> int:
         Number of deleted keys when pattern deletion is available,
         -1 when fallback `cache.clear()` is used.
     """
-    patterns = ["*business_list:*", "*api:*"]
+    patterns = ["*business_list:*", "*api:*", "*visible_business_categories*"]
     deleted = 0
 
     try:

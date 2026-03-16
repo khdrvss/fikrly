@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import logging
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
 
@@ -187,7 +188,14 @@ if REDIS_URL:
             "LOCATION": REDIS_URL,
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {
+                    "max_connections": int(os.environ.get("REDIS_MAX_CONNECTIONS", "50")),
+                    "retry_on_timeout": True,
+                },
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
             },
+            "KEY_PREFIX": "fikrly",
         }
     }
 else:
@@ -243,10 +251,16 @@ else:
                 if DB_PORT is not None and str(DB_PORT).isdigit()
                 else DB_PORT
             ),
-            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "60")),
+            "CONN_MAX_AGE": int(os.environ.get("DB_CONN_MAX_AGE", "600")),
             "CONN_HEALTH_CHECKS": True,
+            "OPTIONS": {
+                "connect_timeout": 10,
+            },
         }
     }
+    if DB_ENGINE == "django.db.backends.postgresql":
+        DATABASES["default"]["OPTIONS"]["sslmode"] = os.environ.get("DB_SSL_MODE", "prefer")
+        DATABASES["default"]["OPTIONS"]["sslrootcert"] = os.environ.get("DB_SSL_CERT", "")
 
 
 # Password validation

@@ -11,9 +11,30 @@ A BusinessCategory is publicly visible when:
    category.is_active is True
 """
 
+from django.core.cache import cache
 from django.db.models import QuerySet
 
 from .models import BusinessCategory, Company
+
+
+CATEGORIES_CACHE_KEY = "visible_business_categories"
+CATEGORIES_CACHE_TTL = 60 * 15  # 15 minutes
+
+
+def get_cached_categories() -> QuerySet[BusinessCategory]:
+    """Get visible business categories with caching."""
+    cached = cache.get(CATEGORIES_CACHE_KEY)
+    if cached is not None:
+        return cached
+    
+    categories = visible_business_categories(BusinessCategory.objects.all())
+    cache.set(CATEGORIES_CACHE_KEY, categories, CATEGORIES_CACHE_TTL)
+    return categories
+
+
+def invalidate_categories_cache() -> None:
+    """Call this when categories are modified."""
+    cache.delete(CATEGORIES_CACHE_KEY)
 
 
 # ---------------------------------------------------------------------------
