@@ -1,6 +1,7 @@
 """Simple API views with versioning support."""
 import json
 from django.db import models
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
@@ -126,7 +127,7 @@ def v1_categories(request):
     
     categories = (
         visible_business_categories(BusinessCategory.objects.all())
-        .annotate(company_count=Count("companies", filter=models.Q(companies__is_active=True)))
+        .annotate(company_count=Count("companies", filter=Q(companies__is_active=True)))
         .order_by("-company_count")[:50]
     )
     
