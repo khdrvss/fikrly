@@ -31,6 +31,7 @@ from frontend.views import (
     favicon_file,
     service_worker,
     safe_set_language,
+    health_check,
 )
 from frontend.moderation_views import telegram_webhook
 from django.conf.urls.i18n import i18n_patterns
@@ -57,6 +58,8 @@ urlpatterns = [
     path("favicon.ico", favicon_file, name="favicon"),
     # Service Worker for PWA
     path("service-worker.js", service_worker, name="service_worker"),
+    # Docker/uptime health check — must be outside i18n_patterns
+    path("health/", health_check, name="health_check"),
 ]
 
 urlpatterns += i18n_patterns(

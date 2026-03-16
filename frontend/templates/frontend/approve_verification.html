@@ -19,7 +19,7 @@
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
                         <h3 class="text-lg font-semibold mb-2">
-                            <a href="{% url 'company_detail' company.pk %}" class="text-[var(--accent)] hover:underline">
+                            <a href="{% url 'company_detail' slug=company.slug %}" class="text-[var(--accent)] hover:underline">
                                 {{ company.name }}
                             </a>
                         </h3>

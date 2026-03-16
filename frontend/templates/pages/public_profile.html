@@ -79,7 +79,7 @@
                              class="w-12 h-12 rounded-lg object-cover bg-[var(--bg)]"
                              onerror="this.src='https://via.placeholder.com/48'">
                         <div>
-                            <a href="{% url 'company_detail' review.company.pk %}" class="font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
+                            <a href="{% url 'company_detail' slug=review.company.slug %}" class="font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
                                 {{ review.company.name }}
                             </a>
                             <div class="text-xs text-[var(--text-secondary)]">{{ review.created_at|date:"d M, Y" }}</div>

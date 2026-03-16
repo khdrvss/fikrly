@@ -9,6 +9,7 @@ from .views import (
     business_profile,
     business_list,
     company_detail,
+    company_detail_by_pk,
     review_edit,
     review_delete,
     privacy_policy,
@@ -86,24 +87,15 @@ urlpatterns = [
         views.search_suggestions_api,
         name="search_suggestions_api",
     ),
-    path("bizneslar/<int:pk>/", company_detail, name="company_detail"),
+    # Legacy numeric-ID URLs — 301 redirect to the slug URL (must be before slug pattern)
+    path("bizneslar/<int:pk>/", company_detail_by_pk),
+    path("business/<int:pk>/", company_detail_by_pk),
+    path("biziness/<int:pk>/", company_detail_by_pk),
+    path("bizines/<int:pk>/", company_detail_by_pk),
+    path("bizness/<int:pk>/", company_detail_by_pk),
+    # Canonical slug-based URL (SEO-friendly)
+    path("bizneslar/<slug:slug>/", company_detail, name="company_detail"),
     path("widget/<int:pk>/", views.company_widget, name="company_widget"),
-    path(
-        "business/<int:pk>/",
-        RedirectView.as_view(pattern_name="company_detail", permanent=True),
-    ),
-    path(
-        "biziness/<int:pk>/",
-        RedirectView.as_view(pattern_name="company_detail", permanent=True),
-    ),
-    path(
-        "bizines/<int:pk>/",
-        RedirectView.as_view(pattern_name="company_detail", permanent=True),
-    ),
-    path(
-        "bizness/<int:pk>/",
-        RedirectView.as_view(pattern_name="company_detail", permanent=True),
-    ),
     path(
         "business/<int:pk>/reveal/<str:kind>/",
         views.reveal_contact,

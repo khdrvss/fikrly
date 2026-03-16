@@ -57,7 +57,9 @@ def review_submission(request):
                 "Siz qisqa vaqt ichida juda ko'p sharh yozdingiz. Iltimos, 5 daqiqadan keyin urinib ko'ring.",
             )
             if preselected_company_id:
-                return redirect("company_detail", pk=preselected_company_id)
+                preselected_company = initial.get("company")
+                if preselected_company:
+                    return redirect("company_detail", slug=preselected_company.slug)
             return redirect("index")
 
         form = ReviewForm(request.POST, request.FILES)
@@ -75,7 +77,7 @@ def review_submission(request):
                     user=request.user, company=selected_company
                 ).exists():
                     messages.error(request, "Siz bu kompaniyaga allaqachon sharh yozdingiz.")
-                    return redirect("company_detail", pk=selected_company.pk)
+                    return redirect("company_detail", slug=selected_company.slug)
 
             entry["count"] += 1
             cache.set(key, entry, timeout=window_seconds)
@@ -104,7 +106,7 @@ def review_submission(request):
                 request,
                 "Sharhingiz qabul qilindi va moderator tasdiqlagandan keyin ko'rinadi.",
             )
-            return redirect("company_detail", pk=company.pk)
+            return redirect("company_detail", slug=company.slug)
     else:
         if request.user.is_authenticated:
             full_name = f"{request.user.first_name} {request.user.last_name}".strip()
@@ -148,7 +150,7 @@ def manager_review_response(request, pk: int):
             except Exception:
                 pass
             messages.success(request, "Javob saqlandi.")
-            return redirect("company_detail", pk=review.company.pk)
+            return redirect("company_detail", slug=review.company.slug)
     else:
         form = OwnerResponseForm(instance=review)
 
@@ -188,7 +190,7 @@ def report_review(request, pk: int):
     if request.method == "POST":
         if entry["count"] >= max_reports:
             messages.error(request, "Juda ko'p urinish. Bir daqiqadan so'ng qayta urinib ko'ring.")
-            return redirect("company_detail", pk=review.company.pk)
+            return redirect("company_detail", slug=review.company.slug)
 
         form = ReportReviewForm(request.POST)
         if form.is_valid():
@@ -210,7 +212,7 @@ def report_review(request, pk: int):
                 f"Matn: {review.text[:200]}"
             )
             messages.success(request, "Shikoyatingiz yuborildi. Rahmat.")
-            return redirect("company_detail", pk=review.company.pk)
+            return redirect("company_detail", slug=review.company.slug)
     else:
         form = ReportReviewForm()
 

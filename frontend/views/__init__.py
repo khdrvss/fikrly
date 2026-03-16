@@ -24,6 +24,7 @@ from .company import (
     verify_claim,
     verification_badge,
     company_detail,
+    company_detail_by_pk,
     reveal_contact,
     like_company,
     submit_ownership_claim,
@@ -78,6 +79,7 @@ __all__ = [
     "verify_claim",
     "verification_badge",
     "company_detail",
+    "company_detail_by_pk",
     "reveal_contact",
     "like_company",
     # review

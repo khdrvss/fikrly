@@ -181,6 +181,12 @@ class Company(models.Model):
     review_count = models.PositiveIntegerField(default=0)
     like_count = models.PositiveIntegerField(default=0)
     view_count = models.PositiveIntegerField(default=0)
+    slug = models.SlugField(
+        max_length=280,
+        unique=True,
+        blank=True,
+        help_text=_("SEO-friendly URL segment, avto-yaratiladi"),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -200,6 +206,11 @@ class Company(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse("company_detail", kwargs={"slug": self.slug})
 
     def image_url_for_size(self, size: int):
         if size == 400 and self.image_400:
@@ -224,6 +235,9 @@ class Company(models.Model):
         return self.image_url_for_size(1200)
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_unique_slug()
+
         if self.logo_url:
             self.logo_url_backup = self.logo_url
 
@@ -268,6 +282,28 @@ class Company(models.Model):
             except Exception:
                 # Fail silently — preserve original upload if generation fails
                 pass
+
+    def _generate_unique_slug(self):
+        from django.utils.text import slugify
+
+        base = slugify(self.name, allow_unicode=False)
+        if not base:
+            base = slugify(self.name, allow_unicode=True)
+        if not base:
+            # fallback for names that reduce to nothing (pure symbols etc.)
+            base = f"company-{self.pk}" if self.pk else "company"
+        slug = base
+        n = 2
+        qs = Company.objects.filter(slug=slug)
+        if self.pk:
+            qs = qs.exclude(pk=self.pk)
+        while qs.exists():
+            slug = f"{base}-{n}"
+            n += 1
+            qs = Company.objects.filter(slug=slug)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+        return slug
 
     @property
     def display_description(self):

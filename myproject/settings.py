@@ -68,6 +68,9 @@ if not DEBUG:
     USE_HTTPS = _env_bool("USE_HTTPS", default=True)
     SECURE_SSL_REDIRECT = _env_bool("SECURE_SSL_REDIRECT", default=USE_HTTPS)
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # Exempt the health-check path from SSL redirect so Docker's internal
+    # HTTP healthcheck (curl http://localhost:8000/health/) returns 200
+    SECURE_REDIRECT_EXEMPT = [r"^health/$"]
 
     # HSTS (HTTP Strict Transport Security)
     if USE_HTTPS:
@@ -449,6 +452,11 @@ TELEGRAM_ERRORS_ENABLED = os.environ.get("TELEGRAM_ERRORS_ENABLED", "false").low
 
 # Google Analytics
 GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "")
+# Google Tag Manager container ID (e.g. 'GTM-XXXXXXX')
+GTM_ID = os.environ.get("GTM_ID", "GTM-WMVCCB9X")
+
+# Allauth email subject prefix — distinguishes Fikrly emails in inbox
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Fikrly] "
 
 
 # ============================================

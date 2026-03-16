@@ -188,7 +188,7 @@ a.badge:focus-visible { box-shadow: 0 0 0 3px var(--accent); }
 <body>
 
 <a class="badge"
-   href="{{ base_url }}/bizneslar/{{ company.pk }}/"
+   href="{{ base_url }}{% url 'company_detail' slug=company.slug %}"
    target="_blank"
    rel="noopener noreferrer"
    aria-label="{{ company.name }}{% if company.rating %} — {{ company.rating }} out of 5 stars, {{ company.review_count }} reviews{% endif %} — Fikrly.uz">

@@ -55,7 +55,7 @@ class Command(BaseCommand):
         # Add company pages
         active_companies = public_companies_queryset()
         for company in active_companies:
-            url = reverse("company_detail", args=[company.pk])
+            url = reverse("company_detail", kwargs={"slug": company.slug})
             lastmod = company.updated_at if hasattr(company, "updated_at") else None
             sitemap.append(
                 self._create_url_entry(

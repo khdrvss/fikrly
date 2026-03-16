@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-4">
-                    <a href="{% url 'company_detail' company.pk %}" class="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                    <a href="{% url 'company_detail' slug=company.slug %}" class="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
                         {% trans "Ortga qaytish" %}
                     </a>
                     <button type="submit" class="px-6 py-2.5 bg-[var(--accent)] hover:opacity-90 text-white font-medium rounded-lg shadow-sm shadow-primary-200 transition-colors">

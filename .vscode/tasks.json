@@ -4,102 +4,63 @@
 		{
 			"label": "django-check",
 			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"command": "${workspaceFolder}/.venv/bin/python",
 			"args": [
 				"manage.py",
 				"check"
 			],
 			"isBackground": false,
-			"problemMatcher": [
-				"$eslint - stylish"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"label": "makemigrations",
 			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"command": "${workspaceFolder}/.venv/bin/python",
 			"args": [
 				"manage.py",
 				"makemigrations"
 			],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"label": "migrate",
 			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"command": "${workspaceFolder}/.venv/bin/python",
 			"args": [
 				"manage.py",
 				"migrate",
 				"--noinput"
 			],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build"
-		},
-		{
-			"label": "makemigrations",
-			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
-			"args": [
-				"manage.py",
-				"makemigrations"
-			],
-			"isBackground": false,
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build"
-		},
-		{
-			"label": "migrate",
-			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
-			"args": [
-				"manage.py",
-				"migrate",
-				"--noinput"
-			],
-			"isBackground": false,
-			"problemMatcher": [
-				"$tsc"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"label": "makemigrations (likes)",
 			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"command": "${workspaceFolder}/.venv/bin/python",
 			"args": [
 				"manage.py",
 				"makemigrations"
 			],
 			"isBackground": false,
-			"problemMatcher": [
-				"$gcc"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"label": "migrate (likes)",
 			"type": "shell",
-			"command": "/home/manjaro/Desktop/fikrly_reviews_platform/.venv/bin/python",
+			"command": "${workspaceFolder}/.venv/bin/python",
 			"args": [
 				"manage.py",
 				"migrate",
 				"--noinput"
 			],
 			"isBackground": false,
-			"problemMatcher": [
-				"$gcc"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		}
 	]

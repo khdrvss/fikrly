@@ -293,7 +293,7 @@ def search_suggestions_api(request):
             "logo": c.display_logo,
             "image": c.display_image_url,
             "logo_scale": c.logo_scale,
-            "url": reverse("company_detail", args=[c.id]),
+            "url": reverse("company_detail", kwargs={"slug": c.slug}),
         }
         for c in companies
     ]
@@ -569,7 +569,7 @@ def claim_company(request, pk: int):
 
     if company.manager_id and company.manager_id != request.user.id:
         messages.error(request, "Bu kompaniya allaqon boshqarilmoqda.")
-        return redirect("company_detail", pk=company.pk)
+        return redirect("company_detail", slug=company.slug)
 
     if request.method == "POST":
         form = ClaimCompanyForm(request.POST, company=company)
@@ -618,7 +618,7 @@ def claim_company(request, pk: int):
                 pass
 
             messages.success(request, "Tasdiqlash havolasi email manzilingizga yuborildi.")
-            return redirect("company_detail", pk=company.pk)
+            return redirect("company_detail", slug=company.slug)
     else:
         form = ClaimCompanyForm(company=company)
 
@@ -633,13 +633,13 @@ def verify_claim(request, token: str):
 
     if claim.status != "pending":
         messages.info(request, "Bu so'rov allaqon ko'rib chiqilgan.")
-        return redirect("company_detail", pk=claim.company.pk)
+        return redirect("company_detail", slug=claim.company.slug)
 
     if now() > claim.expires_at:
         claim.status = "expired"
         claim.save(update_fields=["status"])
         messages.error(request, "Tasdiqlash havolasi muddati tugagan.")
-        return redirect("company_detail", pk=claim.company.pk)
+        return redirect("company_detail", slug=claim.company.slug)
 
     company = claim.company
     company.manager = claim.claimant
@@ -655,7 +655,7 @@ def verify_claim(request, token: str):
         details=f"Claim verified for {company.name} by {claim.claimant.username}",
     )
     messages.success(request, _("Company verified and linked to your profile."))
-    return redirect("company_detail", pk=company.pk)
+    return redirect("company_detail", slug=company.slug)
 
 
 def verification_badge(request):
@@ -979,10 +979,10 @@ def telegram_claim_webhook(request):
     return JsonResponse({"ok": True})
 
 
-def company_detail(request, pk: int):
+def company_detail(request, slug: str):
     company = get_object_or_404(
         Company.objects.select_related("category_fk"),
-        pk=pk,
+        slug=slug,
     )
     if not is_company_publicly_visible(company) and not (
         request.user.is_superuser
@@ -990,9 +990,9 @@ def company_detail(request, pk: int):
     ):
         raise Http404
 
-    session_key = f"viewed_company_{pk}"
+    session_key = f"viewed_company_{company.pk}"
     if not request.session.get(session_key):
-        Company.objects.filter(pk=pk).update(view_count=F("view_count") + 1)
+        Company.objects.filter(pk=company.pk).update(view_count=F("view_count") + 1)
         request.session[session_key] = True
 
     company.assessment = compute_assessment(float(company.rating), int(company.review_count))
@@ -1134,7 +1134,7 @@ def company_detail(request, pk: int):
             "map_url": map_url,
             "liked_state": liked_state,
             "similar_companies": similar_companies,
-            "canonical_url": request.build_absolute_uri(),
+            "canonical_url": request.build_absolute_uri(company.get_absolute_url()),
             "pending_ownership_claim": pending_ownership_claim,
             "user_has_pending_claim": user_has_pending_claim,
         },
@@ -1165,6 +1165,12 @@ def reveal_contact(request, pk: int, kind: str):
         details=f"{kind} revealed",
     )
     return JsonResponse({"ok": True, "value": value})
+
+
+def company_detail_by_pk(request, pk: int):
+    """301 redirect from legacy numeric-ID URLs to canonical slug URL."""
+    company = get_object_or_404(Company, pk=pk)
+    return redirect("company_detail", slug=company.slug, permanent=True)
 
 
 @login_required

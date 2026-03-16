@@ -266,7 +266,7 @@
                                              alt="{{ r.company.name }}"
                                              class="w-10 h-10 rounded-lg object-cover bg-[var(--surface)]">
                                         <div>
-                                            <a href="{% url 'company_detail' r.company.pk %}" class="font-semibold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
+                                            <a href="{% url 'company_detail' slug=r.company.slug %}" class="font-semibold text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors">
                                                 {{ r.company.name }}
                                             </a>
                                             <div class="text-xs text-[var(--text-secondary)]">{{ r.created_at|date:"d M, Y" }}</div>

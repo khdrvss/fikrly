@@ -323,7 +323,7 @@ fikrlari.{% endblocktrans %}
                 <!-- Cards Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for company in companies %}
-                    <a href="{% url 'company_detail' company.pk %}"
+                    <a href="{% url 'company_detail' slug=company.slug %}"
                         class="group bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col">
 
                         <!-- Card Body -->

@@ -5,13 +5,16 @@
 {% load company_tags %}
 
 {% block title %}{{ company.name }} sharhlar va reyting | Fikrly.uz{% endblock %}
-{% block meta_description %}{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari. Xizmat sifati, afzalliklari va kamchiliklari — bularning barchasi Fikrly.uz platformasida.{% endblock %}
+{% block meta_description %}{{ company.name }}{% if company.review_count > 0 %} — {{ company.review_count }} ta sharh, reyting {{ company.rating }}/5{% endif %}. Haqiqiy foydalanuvchi sharhlari, xizmat sifati va afzalliklari Fikrly.uz platformasida.{% endblock %}
 
 {% block extra_head %}
 <meta property="og:type" content="business.business" />
+<meta property="og:url" content="{{ canonical_url }}" />
 <meta property="og:title" content="{{ company.name }} sharhlar va reyting | Fikrly.uz" />
 <meta property="og:description" content="{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari." />
 <meta property="og:image" content="{{ company.display_image_url|default:company.image_url }}" />
+<meta property="og:locale" content="uz_UZ" />
+<meta property="og:site_name" content="Fikrly.uz" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="{{ company.name }} sharhlar va reyting | Fikrly.uz" />
 <meta name="twitter:description" content="{{ company.name }} haqida haqiqiy foydalanuvchi sharhlari va reytinglari." />
@@ -23,7 +26,7 @@
   "itemListElement": [
     {"@type":"ListItem","position":1,"name":"{% trans 'Bosh sahifa' %}","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'index' %}"},
     {"@type":"ListItem","position":2,"name":"{% trans 'Bizneslar' %}","item":"{{ request.scheme }}://{{ request.get_host }}{% url 'business_list' %}"},
-    {"@type":"ListItem","position":3,"name":"{{ company.name }}","item":"{{ request.build_absolute_uri }}"}
+    {"@type":"ListItem","position":3,"name":"{{ company.name|escapejs }}","item":"{{ canonical_url }}"}
   ]
 }
 </script>
@@ -31,13 +34,16 @@
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "{{ company.name }}",
+  "name": "{{ company.name|escapejs }}",
   "image": "{{ company.display_image_url|default:company.image_url }}",
-  "@id": "{{ request.build_absolute_uri }}",
-  "url": "{{ request.build_absolute_uri }}",
-  "telephone": "{{ company.phone_public }}",
-  "address": {"@type":"PostalAddress","streetAddress":"{{ company.address }}","addressLocality":"{{ company.city|default:'Tashkent' }}","addressCountry":"UZ"},
-  "aggregateRating": {"@type":"AggregateRating","ratingValue":"{{ company.rating }}","reviewCount":"{{ company.review_count }}","bestRating":"5","worstRating":"1"}
+  "@id": "{{ canonical_url }}",
+  "url": "{{ canonical_url }}",
+  "telephone": "{{ company.phone_public|default:'' }}",
+  "address": {"@type":"PostalAddress","streetAddress":"{{ company.address|default:''|escapejs }}","addressLocality":"{{ company.city|default:'Toshkent'|escapejs }}","addressCountry":"UZ"}{% if company.review_count > 0 %},
+  "aggregateRating": {"@type":"AggregateRating","ratingValue":{{ company.rating|stringformat:".2f" }},"reviewCount":{{ company.review_count }},"bestRating":5,"worstRating":1}{% if reviews.object_list %},
+  "review": [{% for r in reviews|slice:":5" %}
+    {"@type":"Review","reviewRating":{"@type":"Rating","ratingValue":"{{ r.rating }}","bestRating":"5","worstRating":"1"},"author":{"@type":"Person","name":"{{ r.user_name|escapejs }}"},"datePublished":"{{ r.created_at|date:'Y-m-d' }}","reviewBody":"{{ r.text|truncatechars:500|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}
+  ]{% endif %}{% endif %}
 }
 </script>
 <style>
@@ -806,7 +812,7 @@
       <div class="flex gap-3 overflow-x-auto scrollbar-none snap-x snap-mandatory px-4 pb-2">
         {% for c in similar_companies %}
         {# Badge cycling: 0=fire, 1=star, 2=trending, rest=none #}
-        <a href="{% url 'company_detail' c.pk %}" class="similar-card">
+        <a href="{% url 'company_detail' slug=c.slug %}" class="similar-card">
           <div class="bg-white rounded-[20px] p-4 flex flex-col items-center text-center"
             style="box-shadow: 0 2px 12px rgba(0,0,0,0.07)">
 

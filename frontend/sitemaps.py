@@ -25,10 +25,10 @@ class CompanySitemap(Sitemap):
         return public_companies_queryset().order_by("id")
 
     def lastmod(self, obj: Company):
-        return None
+        return obj.updated_at
 
     def location(self, obj: Company):
-        return reverse("company_detail", kwargs={"pk": obj.pk})
+        return reverse("company_detail", kwargs={"slug": obj.slug})
 
 
 class StaticSitemap(Sitemap):
