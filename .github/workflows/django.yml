@@ -15,6 +15,21 @@ jobs:
       matrix:
         python-version: [3.11]
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: fikrly_ci
+          POSTGRES_USER: fikrly_ci
+          POSTGRES_PASSWORD: fikrly_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fikrly_ci -d fikrly_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       DEBUG: "False"
       DB_ENGINE: django.db.backends.postgresql
@@ -46,21 +61,21 @@ jobs:
         npx playwright install --with-deps chromium
     - name: Migration Drift Check
       run: |
-        python manage.py makemigrations --settings=myproject.settings_test --check --dry-run
-        python manage.py migrate --settings=myproject.settings_test --noinput
+        python manage.py makemigrations --check --dry-run
+        python manage.py migrate --noinput
     - name: Django System Check
       run: |
-        python manage.py check --settings=myproject.settings_test
+        python manage.py check
     - name: Run Tests
       run: |
-        python manage.py test --settings=myproject.settings_test
+        python manage.py test
     - name: Run Linters
       run: |
         flake8 .
         black . --check
     - name: E2E Smoke (next redirect)
       run: |
-        python manage.py runserver 127.0.0.1:8000 --settings=myproject.settings_test > /tmp/django.log 2>&1 &
+        python manage.py runserver 127.0.0.1:8000 > /tmp/django.log 2>&1 &
         for i in {1..30}; do
           if curl -fsS http://127.0.0.1:8000/ >/dev/null; then
             break
