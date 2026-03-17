@@ -59,6 +59,15 @@ jobs:
     - name: Install Playwright Chromium
       run: |
         npx playwright install --with-deps chromium
+    - name: Wait for PostgreSQL
+      run: |
+        for i in {1..30}; do
+          if pg_isready -h 127.0.0.1 -p 5432 -U fikrly_ci; then
+            exit 0
+          fi
+          sleep 1
+        done
+        exit 1
     - name: Migration Drift Check
       run: |
         python manage.py makemigrations --check --dry-run
