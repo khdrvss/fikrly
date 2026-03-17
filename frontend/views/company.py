@@ -319,6 +319,7 @@ def business_list(request, category_slug=None):
 
     is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
     is_get = request.method.upper() == "GET"
+    query = request.GET.get("q", "").strip()
     use_cache = is_get and (not request.user.is_authenticated) and (not is_ajax) and (not query)
     cache_key = None
     if use_cache:
@@ -328,7 +329,6 @@ def business_list(request, category_slug=None):
         if cached_html:
             return HttpResponse(cached_html)
 
-    query = request.GET.get("q", "").strip()
     city = request.GET.get("city", "").strip()
     categories_multi = request.GET.getlist("categories")
     if categories_multi:

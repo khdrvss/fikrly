@@ -174,10 +174,12 @@ class EmailNotificationService:
         )
 
 
-# Celery tasks for async email sending
-@shared_task
+# Placeholder functions for async email sending (Celery not currently used)
+# These can be converted to Celery tasks if async processing is needed
+
+
 def send_review_response_email(review_id, owner_response):
-    """Async task to send review response notification."""
+    """Task to send review response notification."""
     from frontend.models import Review
 
     try:
@@ -189,9 +191,8 @@ def send_review_response_email(review_id, owner_response):
         logger.error(f"Review {review_id} not found for email notification")
 
 
-@shared_task
 def send_review_approved_email(review_id):
-    """Async task to send review approved notification."""
+    """Task to send review approved notification."""
     from frontend.models import Review
 
     try:
@@ -201,9 +202,8 @@ def send_review_approved_email(review_id):
         logger.error(f"Review {review_id} not found for email notification")
 
 
-@shared_task
 def send_helpful_vote_email(review_id, voter_count):
-    """Async task to send helpful vote milestone notification."""
+    """Task to send helpful vote milestone notification."""
     from frontend.models import Review
 
     try:
@@ -213,9 +213,8 @@ def send_helpful_vote_email(review_id, voter_count):
         logger.error(f"Review {review_id} not found for email notification")
 
 
-@shared_task
 def send_new_review_email(company_id, review_id):
-    """Async task to send new review notification to company owner."""
+    """Task to send new review notification to company owner."""
     from frontend.models import Company, Review
 
     try:
@@ -226,9 +225,8 @@ def send_new_review_email(company_id, review_id):
         logger.error(f"Failed to send new review email: {e}")
 
 
-@shared_task
 def send_weekly_digests():
-    """Celery beat task to send weekly digests to all active users."""
+    """Task to send weekly digests to all active users."""
     from frontend.models import Review, Company
     from django.utils import timezone
     from datetime import timedelta

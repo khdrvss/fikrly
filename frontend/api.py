@@ -93,7 +93,7 @@ def v1_companies(request):
     paginator = Paginator(companies, limit)
     page_obj = paginator.get_page(page)
     
-    return JsonResponse({
+    response = JsonResponse({
         "companies": [
             {
                 "id": c.id,
@@ -131,7 +131,7 @@ def v1_categories(request):
         .order_by("-company_count")[:50]
     )
     
-    return JsonResponse({
+    response = JsonResponse({
         "categories": [
             {
                 "id": c.id,
@@ -151,7 +151,6 @@ def v1_company_detail(request, slug):
     """Get company detail with reviews."""
     if request.method == "OPTIONS":
         return options_handler(request)
-    """Get company detail with reviews."""
     company = public_companies_queryset().filter(slug=slug).select_related("category_fk").first()
     if not company:
         return JsonResponse({"error": "Company not found"}, status=404)
@@ -159,7 +158,7 @@ def v1_company_detail(request, slug):
     reviews_limit = get_safe_limit_param(request, "reviews_limit", 5, 20)
     reviews = company.reviews.filter(is_approved=True).order_by("-created_at")[:reviews_limit]
     
-    return JsonResponse({
+    response = JsonResponse({
         "company": {
             "id": company.id,
             "name": company.name,
