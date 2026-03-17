@@ -838,12 +838,13 @@ def admin_reject_claim(request, claim_id: int):
 
     # Email notification to applicant
     try:
+        fallback_reason = reason if reason else "Ko'rsatilmagan"
         send_mail(
             subject="❌ Fikrly: Biznes egallash so'rovingiz rad etildi",
             message=(
                 f"Salom {claim.full_name},\n\n"
                 f"Afsuski, '{claim.company.name}' biznesini egallash so'rovingiz rad etildi.\n"
-                f"Sabab: {reason or 'Ko\'rsatilmagan'}\n\n"
+                f"Sabab: {fallback_reason}\n\n"
                 "Savollaringiz bo'lsa, support@fikrly.uz ga murojaat qiling.\n\n"
                 "Hurmat bilan,\nFikrly jamoasi"
             ),
