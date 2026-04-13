@@ -26,8 +26,8 @@
     <meta property="og:site_name" content="Fikrly">
     <meta property="og:locale" content="{% block og_locale %}uz_UZ{% endblock %}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:title" content="{% block og_title %}{% block title %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}{% block meta_description %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha eng ishonchli sharh platformasi{% endblock %}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha eng ishonchli sharh platformasi{% endblock %}">
     <meta property="og:url" content="{% block og_url %}{{ canonical_url|default:request.build_absolute_uri }}{% endblock %}">
     {% block og_image %}
     <meta property="og:image" content="https://fikrly.uz{% static 'favicons/android-chrome-192x192.png' %}">
@@ -38,8 +38,8 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}">
     <meta name="twitter:site" content="@fikrly_uz">
-    <meta name="twitter:title" content="{% block twitter_title %}{% block title %}Fikrly.uz{% endblock %}{% endblock %}">
-    <meta name="twitter:description" content="{% block twitter_description %}{% block meta_description %}O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}Fikrly.uz{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar{% endblock %}">
     {% block twitter_image %}
     <meta name="twitter:image" content="https://fikrly.uz{% static 'favicons/android-chrome-192x192.png' %}">
     {% endblock %}
@@ -156,25 +156,7 @@
             }
         }
     </script>
-    {% block extra_head %}
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ canonical_url|default:request.build_absolute_uri }}">
-    <meta property="og:title"
-        content="{% block og_title %}{{ self.title|default:'Fikrly.uz — O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar' }}{% endblock %}">
-    <meta property="og:description"
-        content="{% block og_description %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha eng ishonchli sharh platformasi.{% endblock %}">
-    <meta property="og:image" content="{% static 'favicons/android-chrome-192x192.png' %}">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ canonical_url|default:request.build_absolute_uri }}">
-    <meta property="twitter:title"
-        content="{% block twitter_title %}{{ self.title|default:'Fikrly.uz — O‘zbekiston bizneslari bo‘yicha sharhlar va reytinglar' }}{% endblock %}">
-    <meta property="twitter:description"
-        content="{% block twitter_description %}Fikrly.uz — O‘zbekiston bizneslari bo‘yicha eng ishonchli sharh platformasi.{% endblock %}">
-    <meta property="twitter:image" content="{% static 'favicons/android-chrome-192x192.png' %}">
-    {% endblock %}
+    {% block extra_head %}{% endblock %}
     {% block meta_keywords %}
     <meta name="keywords"
         content="fikrly, sharhlar, bizneslar, o'zbekiston, fikrlar, reyting, kompaniyalar, xizmatlar, reviews, uzbekistan, tashkent, toshkent" />

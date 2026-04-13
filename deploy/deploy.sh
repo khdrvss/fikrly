@@ -10,6 +10,10 @@ echo "🚀 Starting Fikrly deployment..."
 PROJECT_DIR="/var/www/fikrly"
 VENV_DIR="$PROJECT_DIR/venv"
 USER="www-data"
+NGINX_CONF_SOURCE="$PROJECT_DIR/deploy/nginx.conf"
+NGINX_SITE_NAME="fikrly"
+NGINX_SITE_AVAILABLE="/etc/nginx/sites-available/$NGINX_SITE_NAME"
+NGINX_SITE_ENABLED="/etc/nginx/sites-enabled/$NGINX_SITE_NAME"
 
 # Colors
 GREEN='\033[0;32m'
@@ -52,6 +56,21 @@ python manage.py check --deploy
 
 echo -e "${YELLOW}🔄 Restarting Gunicorn...${NC}"
 sudo systemctl restart gunicorn
+
+echo -e "${YELLOW}🧩 Ensuring Nginx site config is correct...${NC}"
+if [ ! -f "$NGINX_CONF_SOURCE" ]; then
+    echo -e "${RED}❌ Missing Nginx source config: $NGINX_CONF_SOURCE${NC}"
+    exit 1
+fi
+
+sudo cp "$NGINX_CONF_SOURCE" "$NGINX_SITE_AVAILABLE"
+
+if [ ! -L "$NGINX_SITE_ENABLED" ]; then
+    sudo ln -s "$NGINX_SITE_AVAILABLE" "$NGINX_SITE_ENABLED"
+fi
+
+echo -e "${YELLOW}🔍 Testing Nginx config...${NC}"
+sudo nginx -t
 
 echo -e "${YELLOW}🔄 Reloading Nginx...${NC}"
 sudo systemctl reload nginx

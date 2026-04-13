@@ -13,7 +13,6 @@ DB_SERVICE="${DB_SERVICE:-db}"
 COMPOSE_CMD_RAW="${COMPOSE_CMD:-docker compose}"
 
 BACKUP_FILE="$BACKUP_DIR/db_backup_${DATE}.dump"
-SHA256_FILE="$BACKUP_FILE.sha256"
 CONTAINER_DUMP_PATH="/tmp/fikrly_restore_verify_${DATE}.dump"
 VERIFY_DB="restore_verify_${DATE}"
 
@@ -49,8 +48,6 @@ if [[ ! -s "$BACKUP_FILE" ]]; then
     exit 1
 fi
 
-sha256sum "$BACKUP_FILE" > "$SHA256_FILE"
-
 cleanup_verify() {
     set +e
     "${COMPOSE_CMD[@]}" exec -T -e VERIFY_DB="$VERIFY_DB" "$DB_SERVICE" sh -lc 'dropdb -U "$POSTGRES_USER" --if-exists "$VERIFY_DB" >/dev/null 2>&1 || true'
@@ -71,8 +68,6 @@ trap - EXIT
 
 echo "[$(date -Is)] 🗑️ Removing backups older than $KEEP_DAYS days..."
 find "$BACKUP_DIR" -type f -name 'db_backup_*.dump' -mtime +"$KEEP_DAYS" -delete
-find "$BACKUP_DIR" -type f -name 'db_backup_*.dump.sha256' -mtime +"$KEEP_DAYS" -delete
 
 echo "[$(date -Is)] ✅ Backup + restore verification complete"
 echo "    Backup: $BACKUP_FILE"
-echo "    Checksum: $SHA256_FILE"
