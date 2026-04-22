@@ -3,6 +3,10 @@
 .env.*
 !.env.example
 
+# Credentials and secrets
+*_credentials.txt
+*_secrets.txt
+
 # Python virtual environments
 .venv/
 .venv_win/

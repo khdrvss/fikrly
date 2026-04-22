@@ -621,7 +621,8 @@
             // Close language dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 document.querySelectorAll('.lang-dropdown').forEach(function(dd) {
-                    if (!dd.closest('.lang-wrapper').contains(e.target)) {
+                    const wrapper = dd.closest('.lang-wrapper');
+                    if (wrapper && !wrapper.contains(e.target)) {
                         dd.classList.add('hidden');
                     }
                 });
@@ -644,26 +645,6 @@
                     }
                 });
             }
-
-            // Convert Django flash messages to popup toasts for clearer feedback
-            const flashNodes = document.querySelectorAll('[data-flash-message]');
-            flashNodes.forEach((node) => {
-                const text = (node.dataset.flashMessage || '').trim();
-                const level = (node.dataset.flashLevel || 'info').toLowerCase();
-                if (!text) return;
-
-                if (window.Toast && typeof window.Toast.show === 'function') {
-                    const normalized = level === 'error' ? 'error' : (level === 'success' ? 'success' : 'info');
-                    window.Toast.show(text, normalized, 3500);
-                    return;
-                }
-
-                const fallback = document.createElement('div');
-                fallback.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[1200] px-4 py-2 rounded-xl shadow-lg text-sm font-medium text-white ${level === 'error' ? 'bg-red-600' : (level === 'success' ? 'bg-green-600' : 'bg-blue-600')}`;
-                fallback.textContent = text;
-                document.body.appendChild(fallback);
-                setTimeout(() => fallback.remove(), 3200);
-            });
         });
     </script>
 

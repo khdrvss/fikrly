@@ -1,51 +1,15 @@
 // PWA Installation and Management
 (function() {
   'use strict';
-
-  const ENABLE_SERVICE_WORKER = false;
-  const SERVICE_WORKER_URL = '/service-worker.js?v=20260222-2';
   
   let deferredPrompt;
   
   // Register service worker
   if ('serviceWorker' in navigator) {
-    if (!ENABLE_SERVICE_WORKER) {
-      window.addEventListener('load', async () => {
-        try {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(registrations.map((registration) => registration.unregister()));
-
-          if (window.caches && typeof window.caches.keys === 'function') {
-            const cacheNames = await window.caches.keys();
-            const fikrlyCaches = cacheNames.filter((name) => name.startsWith('fikrly'));
-            await Promise.all(fikrlyCaches.map((name) => window.caches.delete(name)));
-          }
-          console.log('Service worker disabled and stale caches cleared');
-        } catch (error) {
-          console.error('Service worker cleanup failed:', error);
-        }
-      });
-      return;
-    }
-
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register(SERVICE_WORKER_URL)
+      navigator.serviceWorker.register('/service-worker.js')
         .then(registration => {
           console.log('ServiceWorker registered:', registration.scope);
-
-          if (registration.waiting) {
-            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-          }
-
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (!newWorker) return;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-              }
-            });
-          });
           
           // Check for updates every 24 hours
           setInterval(() => {
@@ -55,13 +19,6 @@
         .catch(error => {
           console.error('ServiceWorker registration failed:', error);
         });
-
-      let hasRefreshedForSw = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (hasRefreshedForSw) return;
-        hasRefreshedForSw = true;
-        window.location.reload();
-      });
     });
   }
   
@@ -180,10 +137,22 @@
   // Subscribe to push notifications
   async function subscribeUserToPush() {
     try {
+      const vapidKey = window.VAPID_PUBLIC_KEY;
+      if (!vapidKey) {
+        console.log('Push notification not configured: missing VAPID key');
+        return;
+      }
+      
+      const vapidArray = urlBase64ToUint8Array(vapidKey);
+      if (!vapidArray) {
+        console.log('Push notification not configured: invalid VAPID key');
+        return;
+      }
+      
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(window.VAPID_PUBLIC_KEY || '')
+        applicationServerKey: vapidArray
       });
       
       // Send subscription to server
@@ -204,14 +173,18 @@
   
   // Helper to convert VAPID key
   function urlBase64ToUint8Array(base64String) {
+    if (!base64String) return null;
+    
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
+    
+    // Handle Unicode characters properly
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; ++i) {
+      bytes[i] = binaryString.charCodeAt(i);
     }
-    return outputArray;
+    return bytes;
   }
   
   // Get CSRF token

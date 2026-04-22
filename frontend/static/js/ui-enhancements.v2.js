@@ -77,6 +77,59 @@ class SkeletonLoader {
 
 window.SkeletonLoader = SkeletonLoader;
 
+// Skeleton templates for infinite scroll
+const Skeleton = {
+  card() {
+    return `
+      <div class="bg-white rounded-2xl border border-gray-200 p-4 animate-pulse">
+        <div class="flex gap-4">
+          <div class="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0"></div>
+          <div class="flex-1 space-y-3">
+            <div class="h-5 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+  company() {
+    return `
+      <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden animate-pulse">
+        <div class="h-48 bg-gray-200"></div>
+        <div class="p-6 space-y-4">
+          <div class="h-6 bg-gray-200 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div class="flex justify-between pt-4 border-t border-gray-100">
+            <div class="h-4 bg-gray-200 rounded w-20"></div>
+            <div class="h-10 bg-gray-200 rounded w-24"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+  review() {
+    return `
+      <div class="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+          <div class="space-y-2">
+            <div class="h-4 bg-gray-200 rounded w-32"></div>
+            <div class="h-3 bg-gray-200 rounded w-24"></div>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded w-full"></div>
+          <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+          <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+        </div>
+      </div>
+    `;
+  }
+};
+
+window.Skeleton = Skeleton;
+
 
 // ============================================
 // 3. FORM VALIDATION
@@ -2674,6 +2727,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Convert Django messages to toasts
   const djangoMessages = document.querySelectorAll('.django-message, .messages .alert');
   djangoMessages.forEach(msg => {
+    // Skip if already processed (has data-processed attribute)
+    if (msg.dataset.processed) return;
+    msg.dataset.processed = 'true';
+    
     let type = 'info';
     if (msg.classList.contains('success') || msg.classList.contains('alert-success')) type = 'success';
     if (msg.classList.contains('error') || msg.classList.contains('alert-error') || msg.classList.contains('alert-danger')) type = 'error';
