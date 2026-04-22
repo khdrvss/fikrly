@@ -8,15 +8,14 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: VPS_HOST
 
     steps:
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: 22
         script_stop: true
         script: |
@@ -30,7 +29,7 @@ jobs:
           
           # Rebuild and restart containers
           echo "Rebuilding Docker containers..."
-          sudo docker compose up -d --build
+          docker compose up -d --build
           
           # Wait for containers to be healthy
           echo "Waiting for containers to start..."
@@ -38,7 +37,7 @@ jobs:
           
           # Run migrations
           echo "Running migrations..."
-          sudo docker compose exec -T web python manage.py migrate --noinput
+          docker compose exec -T web python manage.py migrate --noinput
           
           # Check health
           echo "Checking health..."
